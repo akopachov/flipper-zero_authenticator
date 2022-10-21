@@ -5,6 +5,7 @@
 #include <dialogs/dialogs.h>
 #include "../services/list/list.h"
 #include "../scenes/totp_scenes_enum.h"
+#include "../../../applications/services/cli/cli.h"
 
 #define TOTP_IV_SIZE 16
 
@@ -15,6 +16,7 @@ typedef struct {
     NotificationApp* notification;
     DialogsApp* dialogs;
     Gui* gui;
+    Cli* cli;
 
     float timezone_offset;
     ListNode* tokens_list;

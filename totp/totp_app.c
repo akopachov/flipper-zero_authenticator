@@ -18,6 +18,7 @@
 #include "scenes/scene_director.h"
 #include "services/ui/constants.h"
 #include "services/crypto/crypto.h"
+#include "services/cli/cli.h"
 
 #define IDLE_TIMEOUT 60000
 
@@ -45,7 +46,11 @@ static bool totp_state_init(PluginState* const plugin_state) {
 
     totp_scene_director_init_scenes(plugin_state);
 
-    if (plugin_state->crypto_verify_data == NULL) {
+    plugin_state->cli = furi_record_open(RECORD_CLI);
+    cli_add_command(
+        plugin_state->cli, "totp", CliCommandFlagParallelSafe, cli_command_totp, plugin_state);
+
+    if(plugin_state->crypto_verify_data == NULL) {
         DialogMessage* message = dialog_message_alloc();
         dialog_message_set_buttons(message, "No", NULL, "Yes");
         dialog_message_set_text(message, "Would you like to setup PIN?", SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, AlignCenter, AlignCenter);
@@ -82,9 +87,12 @@ static void plugin_state_free(PluginState* plugin_state) {
 
     totp_scene_director_dispose(plugin_state);
 
+    cli_delete_command(plugin_state->cli, "totp");
+
     furi_record_close(RECORD_GUI);
     furi_record_close(RECORD_NOTIFICATION);
     furi_record_close(RECORD_DIALOGS);
+    furi_record_close(RECORD_CLI);
 
     ListNode* node = plugin_state->tokens_list;
     ListNode* tmp;
