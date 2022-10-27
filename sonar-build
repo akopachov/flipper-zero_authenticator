@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 pushd flipperzero-firmware_unleashed
 ./fbt fap_totp
