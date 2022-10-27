@@ -39,6 +39,9 @@ jobs:
         run: |
           mkdir flipperzero-firmware_unleashed/applications_user/totp
           cp -r totp flipperzero-firmware_unleashed/applications_user/totp
+      - name: Init submodules
+        run: |
+          git submodule update --init --recursive
       - name: Run build-wrapper
         run: |
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} flipperzero-firmware_unleashed/fbt fap_totp
