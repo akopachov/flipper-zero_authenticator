@@ -49,6 +49,7 @@ jobs:
       - name: Run build-wrapper
         run: |
           pushd flipperzero-firmware_unleashed
+          mkdir $HOME/.sonar/build_wrapper_output
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} fbt
           popd
       - name: Run sonar-scanner
