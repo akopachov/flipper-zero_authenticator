@@ -45,7 +45,7 @@ jobs:
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
       - name: Symlink sources into firmware
         run: |
-          ln -s totp flipperzero-firmware_unleashed/applications_user/totp
+          cp -r totp flipperzero-firmware_unleashed/applications_user/totp
       - name: Run build-wrapper
         run: |
           mkdir $HOME/.sonar/build_wrapper_output
