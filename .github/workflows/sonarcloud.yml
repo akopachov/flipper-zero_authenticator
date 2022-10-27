@@ -38,8 +38,8 @@ jobs:
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
       - name: Copy sources
         run: |
-          ls
-          cp -r ./totp ./flipperzero-firmware_unleashed/application_user/totp
+          mkdir flipperzero-firmware_unleashed/application_user/totp
+          cp -r totp flipperzero-firmware_unleashed/application_user/totp
       - name: Run build-wrapper
         run: |
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} flipperzero-firmware_unleashed/fbt fap_totp
