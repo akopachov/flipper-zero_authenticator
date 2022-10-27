@@ -1,5 +1,6 @@
 #!/bin/bash
 
 pushd flipperzero-firmware_unleashed
+rm -rf applications/totp
 ./fbt fap_totp
 popd
