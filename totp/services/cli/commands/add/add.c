@@ -79,6 +79,14 @@ void totp_cli_command_add_docopt_options() {
         TOTP_CLI_COMMAND_ADD_ARG_UNSECURE_PREFIX) "             Show console user input as-is without masking\r\n");
 }
 
+static void furi_string_secure_free(FuriString* str) {
+    for (size_t i = furi_string_size(str) - 1; i >= 0; i--) {
+        furi_string_set_char(str, i, '\0');
+    }
+
+    furi_string_free(str);
+}
+
 void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
     FuriString* temp_str = furi_string_alloc();
     const char* temp_cstr;
@@ -146,13 +154,15 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     uint8_t c;
     while(cli_read(cli, &c, 1) == 1) {
         if(c == CliSymbolAsciiEsc) {
+            // Some keys generating escape-sequences
+            // We need to ignore them as we case about alpha-numerics only
             uint8_t c2;
             cli_read_timeout(cli, &c2, 1, 0);
             cli_read_timeout(cli, &c2, 1, 0);
         } else if(c == CliSymbolAsciiETX) {
             TOTP_CLI_DELETE_CURRENT_LINE();
-            TOTP_CLI_PRINTF("Cancelled by user");
-            furi_string_free(temp_str);
+            TOTP_CLI_PRINTF("Cancelled by user\r\n");
+            furi_string_secure_free(temp_str);
             token_info_free(token_info);
             return;
         } else if((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
@@ -166,8 +176,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         } else if(c == CliSymbolAsciiBackspace || c == CliSymbolAsciiDel) {
             size_t temp_str_size = furi_string_size(temp_str);
             if(temp_str_size > 0) {
-                TOTP_CLI_PRINTF("\b \b");
-                fflush(stdout);
+                TOTP_CLI_DELETE_LAST_CHAR();
                 furi_string_left(temp_str, temp_str_size - 1);
             }
         } else if(c == CliSymbolAsciiCR) {
@@ -181,20 +190,19 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     TOTP_CLI_DELETE_LAST_LINE();
 
     if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
-        furi_string_free(temp_str);
+        furi_string_secure_free(temp_str);
         token_info_free(token_info);
         return;
     }
 
     if(!token_info_set_secret(token_info, temp_cstr, strlen(temp_cstr), plugin_state->iv)) {
         TOTP_CLI_PRINTF("Token secret seems to be invalid and can not be parsed\r\n");
-        furi_string_free(temp_str);
+        furi_string_secure_free(temp_str);
         token_info_free(token_info);
         return;
     }
 
-    furi_string_reset(temp_str);
-    furi_string_free(temp_str);
+    furi_string_secure_free(temp_str);
 
     bool load_generate_token_scene = false;
     if(plugin_state->current_scene == TotpSceneGenerateToken) {
