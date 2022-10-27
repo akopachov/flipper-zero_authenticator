@@ -107,6 +107,7 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
         free(plugin_state->crypto_verify_data);
     }
     free(plugin_state);
+    free(plugin_state);
 }
 
 int32_t totp_app() {
