@@ -21,6 +21,7 @@
 #include "services/cli/cli.h"
 
 #define IDLE_TIMEOUT 60000
+#define SONAR_TEST "TESTING SONAR SCAN"
 
 static void render_callback(Canvas* const canvas, void* ctx) {
     PluginState* plugin_state = acquire_mutex((ValueMutex*)ctx, 25);
