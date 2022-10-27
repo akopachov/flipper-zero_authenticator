@@ -9,9 +9,16 @@ jobs:
     env:
       SONAR_SCANNER_VERSION: 4.7.0.2747
       SONAR_SERVER_URL: "https://sonarcloud.io"
-      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+      BUILD_WRAPPER_OUT_DIR: "$HOME/.sonar/build_wrapper_output" # Directory where build-wrapper output will be placed
       FBT_NO_SYNC: "true"
+      TARGETS: f7
+      DEFAULT_TARGET: f7
     steps:
+      - name: 'Decontaminate previous build leftovers'
+        run: |
+          if [ -d .git ]; then
+            git submodule status || git checkout "$(git rev-list --max-parents=0 HEAD | tail -n 1)"
+          fi
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
@@ -41,7 +48,9 @@ jobs:
           cp -r totp flipperzero-firmware_unleashed/applications_user/totp
       - name: Run build-wrapper
         run: |
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} flipperzero-firmware_unleashed/fbt
+          pushd flipperzero-firmware_unleashed
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} fbt
+          popd
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
