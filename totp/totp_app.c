@@ -21,7 +21,6 @@
 #include "services/cli/cli.h"
 
 #define IDLE_TIMEOUT 60000
-#define SONAR_TEST "TESTING SONAR SCAN"
 
 static void render_callback(Canvas* const canvas, void* ctx) {
     PluginState* plugin_state = acquire_mutex((ValueMutex*)ctx, 25);
@@ -40,6 +39,7 @@ static void input_callback(InputEvent* input_event, FuriMessageQueue* event_queu
 }
 
 static bool totp_plugin_state_init(PluginState* const plugin_state) {
+    for (;false;) { /*...*/ }
     plugin_state->gui = furi_record_open(RECORD_GUI);
     plugin_state->notification = furi_record_open(RECORD_NOTIFICATION);
     plugin_state->dialogs = furi_record_open(RECORD_DIALOGS);
