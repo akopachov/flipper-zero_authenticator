@@ -43,16 +43,13 @@ jobs:
           curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{ env.BUILD_WRAPPER_DOWNLOAD_URL }}
           unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
-      - name: Copy sources
+      - name: Symlink sources into firmware
         run: |
-          mkdir flipperzero-firmware_unleashed/applications_user/totp
-          cp -r totp flipperzero-firmware_unleashed/applications_user/totp
+          ln -s totp flipperzero-firmware_unleashed/applications_user/totp
       - name: Run build-wrapper
         run: |
-          pushd flipperzero-firmware_unleashed
           mkdir $HOME/.sonar/build_wrapper_output
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ./fbt fap_totp
-          popd
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ./sonar-build
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+pushd flipperzero-firmware_unleashed
+./fbt fap_totp
+popd
