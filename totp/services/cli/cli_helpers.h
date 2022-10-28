@@ -17,19 +17,19 @@
     _Pragma(STRINGIFY(GCC diagnostic push));                         \
     _Pragma(STRINGIFY(GCC diagnostic ignored "-Wdouble-promotion")); \
     printf(format, ##__VA_ARGS__);                                   \
-    _Pragma(STRINGIFY(GCC diagnostic pop));
+    _Pragma(STRINGIFY(GCC diagnostic pop))
 
 #define TOTP_CLI_DELETE_LAST_LINE()    \
     TOTP_CLI_PRINTF("\033[A\33[2K\r"); \
-    fflush(stdout);
+    fflush(stdout)
 
 #define TOTP_CLI_DELETE_CURRENT_LINE() \
     TOTP_CLI_PRINTF("\33[2K\r");       \
-    fflush(stdout);
+    fflush(stdout)
 
 #define TOTP_CLI_DELETE_LAST_CHAR() \
     TOTP_CLI_PRINTF("\b \b");       \
-    fflush(stdout);
+    fflush(stdout)
 
 #define TOTP_CLI_PRINT_INVALID_ARGUMENTS() \
     TOTP_CLI_PRINTF(                       \
