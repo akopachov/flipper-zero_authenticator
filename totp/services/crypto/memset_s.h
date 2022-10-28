@@ -13,4 +13,4 @@ typedef int16_t errno_t;
 #define _ERRNOT_DECLARED
 #endif
 
-errno_t memset_s(void *s, rsize_t smax, int c, rsize_t n);
+errno_t memset_s(void* s, rsize_t smax, int c, rsize_t n);

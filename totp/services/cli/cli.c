@@ -25,8 +25,7 @@ static void totp_cli_handler(Cli* cli, FuriString* args, void* context) {
 
     if(furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_HELP) == 0 ||
        furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_HELP_ALT) == 0 ||
-       furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_HELP_ALT2) == 0 || 
-       furi_string_empty(cmd)) {
+       furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_HELP_ALT2) == 0 || furi_string_empty(cmd)) {
         totp_cli_command_help_handle();
     } else if(
         furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_ADD) == 0 ||

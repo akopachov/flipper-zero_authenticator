@@ -356,7 +356,10 @@ TokenLoadingResult totp_config_file_load_tokens(PluginState* const plugin_state)
         if(secret_bytes_count == 1) { // Plain secret key
             if(flipper_format_read_string(fff_data_file, TOTP_CONFIG_KEY_TOKEN_SECRET, temp_str)) {
                 if(token_info_set_secret(
-                       tokenInfo, furi_string_get_cstr(temp_str), furi_string_size(temp_str), &plugin_state->iv[0])) {
+                       tokenInfo,
+                       furi_string_get_cstr(temp_str),
+                       furi_string_size(temp_str),
+                       &plugin_state->iv[0])) {
                     FURI_LOG_W(LOGGING_TAG, "Token \"%s\" has plain secret", tokenInfo->name);
                 } else {
                     tokenInfo->token = NULL;

@@ -80,7 +80,7 @@ void totp_cli_command_add_docopt_options() {
 }
 
 static void furi_string_secure_free(FuriString* str) {
-    for (long i = furi_string_size(str) - 1; i >= 0; i--) {
+    for(long i = furi_string_size(str) - 1; i >= 0; i--) {
         furi_string_set_char(str, i, '\0');
     }
 
@@ -191,7 +191,11 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         return;
     }
 
-    if(!token_info_set_secret(token_info, furi_string_get_cstr(temp_str), furi_string_size(temp_str), plugin_state->iv)) {
+    if(!token_info_set_secret(
+           token_info,
+           furi_string_get_cstr(temp_str),
+           furi_string_size(temp_str),
+           plugin_state->iv)) {
         TOTP_CLI_PRINTF("Token secret seems to be invalid and can not be parsed\r\n");
         furi_string_secure_free(temp_str);
         token_info_free(token_info);

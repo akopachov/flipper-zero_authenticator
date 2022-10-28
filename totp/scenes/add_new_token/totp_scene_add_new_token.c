@@ -235,7 +235,10 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
 
                     if(token_secret_set) {
                         tokenInfo->name = malloc(scene_state->token_name_length + 1);
-                        strlcpy(tokenInfo->name, scene_state->token_name, scene_state->token_name_length + 1);
+                        strlcpy(
+                            tokenInfo->name,
+                            scene_state->token_name,
+                            scene_state->token_name_length + 1);
                         tokenInfo->algo = scene_state->algo;
                         tokenInfo->digits = scene_state->digits_count;
 
