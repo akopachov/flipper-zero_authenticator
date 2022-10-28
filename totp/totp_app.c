@@ -39,7 +39,6 @@ static void input_callback(InputEvent* input_event, FuriMessageQueue* event_queu
 }
 
 static bool totp_plugin_state_init(PluginState* const plugin_state) {
-    for (;false;) { /*...*/ }
     plugin_state->gui = furi_record_open(RECORD_GUI);
     plugin_state->notification = furi_record_open(RECORD_NOTIFICATION);
     plugin_state->dialogs = furi_record_open(RECORD_DIALOGS);
@@ -106,7 +105,6 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
     if (plugin_state->crypto_verify_data != NULL) {
         free(plugin_state->crypto_verify_data);
     }
-    free(plugin_state);
     free(plugin_state);
 }
 
