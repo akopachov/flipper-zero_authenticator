@@ -10,7 +10,7 @@
 #define CONFIG_FILE_PATH CONFIG_FILE_DIRECTORY_PATH "/totp.conf"
 #define CONFIG_FILE_BACKUP_PATH CONFIG_FILE_PATH ".backup"
 
-static uint8_t token_info_get_digits_as_int(TokenInfo* token_info) {
+static uint8_t token_info_get_digits_as_int(const TokenInfo* token_info) {
     switch(token_info->digits) {
     case TOTP_6_DIGITS:
         return 6;
@@ -32,7 +32,7 @@ static void token_info_set_digits_from_int(TokenInfo* token_info, uint8_t digits
     }
 }
 
-static char* token_info_get_algo_as_cstr(TokenInfo* token_info) {
+static char* token_info_get_algo_as_cstr(const TokenInfo* token_info) {
     switch(token_info->algo) {
     case SHA1:
         return TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME;
@@ -45,7 +45,7 @@ static char* token_info_get_algo_as_cstr(TokenInfo* token_info) {
     return NULL;
 }
 
-static void token_info_set_algo_from_str(TokenInfo* token_info, FuriString* str) {
+static void token_info_set_algo_from_str(TokenInfo* token_info, const FuriString* str) {
     if(furi_string_cmpi_str(str, TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME) == 0) {
         token_info->algo = SHA1;
     } else if(furi_string_cmpi_str(str, TOTP_CONFIG_TOKEN_ALGO_SHA256_NAME) == 0) {
