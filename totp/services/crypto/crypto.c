@@ -3,6 +3,7 @@
 #include <furi_hal.h>
 #include "../config/config.h"
 #include "../../types/common.h"
+#include "memset_s.h"
 
 #define CRYPTO_KEY_SLOT 2
 #define CRYPTO_VERIFY_KEY "FFF_Crypto_pass"
@@ -29,7 +30,7 @@ uint8_t* totp_crypto_encrypt(
         furi_hal_crypto_encrypt(plain_data_aligned, encrypted_data, plain_data_aligned_length);
         furi_hal_crypto_store_unload_key(CRYPTO_KEY_SLOT);
 
-        memset(plain_data_aligned, 0, plain_data_aligned_length);
+        memset_s(plain_data_aligned, sizeof(plain_data_aligned), 0, plain_data_aligned_length);
         free(plain_data_aligned);
     } else {
         encrypted_data = malloc(plain_data_length);

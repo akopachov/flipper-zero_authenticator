@@ -80,7 +80,7 @@ void totp_cli_command_add_docopt_options() {
 }
 
 static void furi_string_secure_free(FuriString* str) {
-    for (size_t i = furi_string_size(str) - 1; i >= 0; i--) {
+    for (long i = furi_string_size(str) - 1; i >= 0; i--) {
         furi_string_set_char(str, i, '\0');
     }
 
@@ -89,8 +89,6 @@ static void furi_string_secure_free(FuriString* str) {
 
 void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
     FuriString* temp_str = furi_string_alloc();
-    const char* temp_cstr;
-
     TokenInfo* token_info = token_info_alloc();
 
     // Reading token name
@@ -101,9 +99,9 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         return;
     }
 
-    temp_cstr = furi_string_get_cstr(temp_str);
-    token_info->name = malloc(strlen(temp_cstr) + 1);
-    strcpy(token_info->name, temp_cstr);
+    size_t temp_cstr_len = furi_string_size(temp_str);
+    token_info->name = malloc(temp_cstr_len + 1);
+    strlcpy(token_info->name, furi_string_get_cstr(temp_str), temp_cstr_len + 1);
 
     // Read optional arguments
     bool mask_user_input = true;
@@ -185,8 +183,6 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         }
     }
 
-    temp_cstr = furi_string_get_cstr(temp_str);
-
     TOTP_CLI_DELETE_LAST_LINE();
 
     if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
@@ -195,7 +191,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         return;
     }
 
-    if(!token_info_set_secret(token_info, temp_cstr, strlen(temp_cstr), plugin_state->iv)) {
+    if(!token_info_set_secret(token_info, furi_string_get_cstr(temp_str), furi_string_size(temp_str), plugin_state->iv)) {
         TOTP_CLI_PRINTF("Token secret seems to be invalid and can not be parsed\r\n");
         furi_string_secure_free(temp_str);
         token_info_free(token_info);
