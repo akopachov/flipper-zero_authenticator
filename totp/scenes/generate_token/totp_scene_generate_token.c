@@ -181,7 +181,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
                              ->data);
 
         if(tokenInfo->token != NULL && tokenInfo->token_length > 0) {
-            uint8_t key_length;
+            size_t key_length;
             uint8_t* key = totp_crypto_decrypt(
                 tokenInfo->token, tokenInfo->token_length, &plugin_state->iv[0], &key_length);
 

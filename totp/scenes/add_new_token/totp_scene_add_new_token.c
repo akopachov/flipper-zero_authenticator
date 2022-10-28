@@ -25,9 +25,9 @@ typedef enum {
 
 typedef struct {
     char* token_name;
-    uint8_t token_name_length;
+    size_t token_name_length;
     char* token_secret;
-    uint8_t token_secret_length;
+    size_t token_secret_length;
     bool saved;
     Control selected_control;
     InputTextSceneContext* token_name_input_context;

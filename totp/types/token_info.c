@@ -24,7 +24,7 @@ void token_info_free(TokenInfo* token_info) {
 bool token_info_set_secret(
     TokenInfo* token_info,
     const char* base32_token_secret,
-    uint8_t token_secret_length,
+    size_t token_secret_length,
     uint8_t* iv) {
     uint8_t* plain_secret = malloc(token_secret_length);
     int plain_secret_length =

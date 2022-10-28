@@ -12,13 +12,13 @@
 
 uint8_t* totp_crypto_encrypt(
     const uint8_t* plain_data,
-    const uint8_t plain_data_length,
+    const size_t plain_data_length,
     const uint8_t* iv,
-    uint8_t* encrypted_data_length) {
+    size_t* encrypted_data_length) {
     uint8_t* encrypted_data;
     size_t remain = plain_data_length % CRYPTO_ALIGNMENT_FACTOR;
     if(remain) {
-        uint8_t plain_data_aligned_length = plain_data_length - remain + CRYPTO_ALIGNMENT_FACTOR;
+        size_t plain_data_aligned_length = plain_data_length - remain + CRYPTO_ALIGNMENT_FACTOR;
         uint8_t* plain_data_aligned = malloc(plain_data_aligned_length);
         memset(plain_data_aligned, 0, plain_data_aligned_length);
         memcpy(plain_data_aligned, plain_data, plain_data_length);
@@ -46,9 +46,9 @@ uint8_t* totp_crypto_encrypt(
 
 uint8_t* totp_crypto_decrypt(
     const uint8_t* encrypted_data,
-    const uint8_t encrypted_data_length,
+    const size_t encrypted_data_length,
     const uint8_t* iv,
-    uint8_t* decrypted_data_length) {
+    size_t* decrypted_data_length) {
     *decrypted_data_length = encrypted_data_length;
     uint8_t* decrypted_data = malloc(*decrypted_data_length);
     furi_hal_crypto_store_load_key(CRYPTO_KEY_SLOT, iv);
@@ -119,7 +119,7 @@ void totp_crypto_seed_iv(PluginState* plugin_state, uint8_t* pin, uint8_t pin_le
 }
 
 bool totp_crypto_verify_key(const PluginState* plugin_state) {
-    uint8_t decrypted_key_length;
+    size_t decrypted_key_length;
     uint8_t* decrypted_key = totp_crypto_decrypt(
         plugin_state->crypto_verify_data,
         plugin_state->crypto_verify_data_length,
