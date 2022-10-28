@@ -91,76 +91,81 @@ void totp_scene_app_settings_render(Canvas* const canvas, PluginState* plugin_st
 }
 
 bool totp_scene_app_settings_handle_event(const PluginEvent* const event, PluginState* plugin_state) {
-    if(event->type == EventTypeKey) {
-        SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
-        if(event->input.type == InputTypePress) {
-            switch(event->input.key) {
-            case InputKeyUp:
-                if(scene_state->selected_control > HoursInput) {
-                    scene_state->selected_control--;
-                }
-                break;
-            case InputKeyDown:
-                if(scene_state->selected_control < ConfirmButton) {
-                    scene_state->selected_control++;
-                }
-                break;
-            case InputKeyRight:
-                if(scene_state->selected_control == HoursInput) {
-                    if(scene_state->tz_offset_hours < 12) {
-                        scene_state->tz_offset_hours++;
-                    }
-                } else if(scene_state->selected_control == MinutesInput) {
-                    if(scene_state->tz_offset_minutes < 45) {
-                        scene_state->tz_offset_minutes += 15;
-                    } else {
-                        scene_state->tz_offset_minutes = 0;
-                    }
-                }
-                break;
-            case InputKeyLeft:
-                if(scene_state->selected_control == HoursInput) {
-                    if(scene_state->tz_offset_hours > -12) {
-                        scene_state->tz_offset_hours--;
-                    }
-                } else if(scene_state->selected_control == MinutesInput) {
-                    if(scene_state->tz_offset_minutes >= 15) {
-                        scene_state->tz_offset_minutes -= 15;
-                    } else {
-                        scene_state->tz_offset_minutes = 45;
-                    }
-                }
-                break;
-            case InputKeyOk:
-                if(scene_state->selected_control == ConfirmButton) {
-                    plugin_state->timezone_offset = (float)scene_state->tz_offset_hours +
-                                                    (float)scene_state->tz_offset_minutes / 60.0f;
-                    totp_config_file_update_timezone_offset(plugin_state->timezone_offset);
+    if(event->type != EventTypeKey) {
+        return true;
+    }
 
-                    if(scene_state->current_token_index >= 0) {
-                        TokenMenuSceneContext generate_scene_context = {
-                            .current_token_index = scene_state->current_token_index};
-                        totp_scene_director_activate_scene(
-                            plugin_state, TotpSceneTokenMenu, &generate_scene_context);
-                    } else {
-                        totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu, NULL);
-                    }
-                }
-                break;
-            case InputKeyBack: {
-                if(scene_state->current_token_index >= 0) {
-                    TokenMenuSceneContext generate_scene_context = {
-                        .current_token_index = scene_state->current_token_index};
-                    totp_scene_director_activate_scene(
-                        plugin_state, TotpSceneTokenMenu, &generate_scene_context);
-                } else {
-                    totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu, NULL);
-                }
-                break;
+    SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
+    if(event->input.type != InputTypePress) {
+        return true;
+    }
+    
+    switch(event->input.key) {
+    case InputKeyUp:
+        if(scene_state->selected_control > HoursInput) {
+            scene_state->selected_control--;
+        }
+        break;
+    case InputKeyDown:
+        if(scene_state->selected_control < ConfirmButton) {
+            scene_state->selected_control++;
+        }
+        break;
+    case InputKeyRight:
+        if(scene_state->selected_control == HoursInput) {
+            if(scene_state->tz_offset_hours < 12) {
+                scene_state->tz_offset_hours++;
             }
+        } else if(scene_state->selected_control == MinutesInput) {
+            if(scene_state->tz_offset_minutes < 45) {
+                scene_state->tz_offset_minutes += 15;
+            } else {
+                scene_state->tz_offset_minutes = 0;
             }
         }
+        break;
+    case InputKeyLeft:
+        if(scene_state->selected_control == HoursInput) {
+            if(scene_state->tz_offset_hours > -12) {
+                scene_state->tz_offset_hours--;
+            }
+        } else if(scene_state->selected_control == MinutesInput) {
+            if(scene_state->tz_offset_minutes >= 15) {
+                scene_state->tz_offset_minutes -= 15;
+            } else {
+                scene_state->tz_offset_minutes = 45;
+            }
+        }
+        break;
+    case InputKeyOk:
+        if(scene_state->selected_control == ConfirmButton) {
+            plugin_state->timezone_offset = (float)scene_state->tz_offset_hours +
+                                            (float)scene_state->tz_offset_minutes / 60.0f;
+            totp_config_file_update_timezone_offset(plugin_state->timezone_offset);
+
+            if(scene_state->current_token_index >= 0) {
+                TokenMenuSceneContext generate_scene_context = {
+                    .current_token_index = scene_state->current_token_index};
+                totp_scene_director_activate_scene(
+                    plugin_state, TotpSceneTokenMenu, &generate_scene_context);
+            } else {
+                totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu, NULL);
+            }
+        }
+        break;
+    case InputKeyBack: {
+        if(scene_state->current_token_index >= 0) {
+            TokenMenuSceneContext generate_scene_context = {
+                .current_token_index = scene_state->current_token_index};
+            totp_scene_director_activate_scene(
+                plugin_state, TotpSceneTokenMenu, &generate_scene_context);
+        } else {
+            totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu, NULL);
+        }
+        break;
     }
+    }
+    
     return true;
 }
 

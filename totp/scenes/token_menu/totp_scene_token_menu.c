@@ -85,103 +85,108 @@ void totp_scene_token_menu_render(Canvas* const canvas, PluginState* plugin_stat
 }
 
 bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginState* plugin_state) {
-    if(event->type == EventTypeKey) {
-        SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
-        if(event->input.type == InputTypePress) {
-            switch(event->input.key) {
-            case InputKeyUp:
-                if(scene_state->selected_control > AddNewToken) {
-                    scene_state->selected_control--;
-                    if(scene_state->selected_control == DeleteToken &&
-                       scene_state->current_token_index < 0) {
-                        scene_state->selected_control--;
-                    }
-                } else {
-                    scene_state->selected_control = AppSettings;
-                }
-                break;
-            case InputKeyDown:
-                if(scene_state->selected_control < AppSettings) {
-                    scene_state->selected_control++;
-                    if(scene_state->selected_control == DeleteToken &&
-                       scene_state->current_token_index < 0) {
-                        scene_state->selected_control++;
-                    }
-                } else {
-                    scene_state->selected_control = AddNewToken;
-                }
-                break;
-            case InputKeyRight:
-                break;
-            case InputKeyLeft:
-                break;
-            case InputKeyOk:
-                switch(scene_state->selected_control) {
-                case AddNewToken: {
-                    TokenAddEditSceneContext add_new_token_scene_context = {
-                        .current_token_index = scene_state->current_token_index};
-                    totp_scene_director_activate_scene(
-                        plugin_state, TotpSceneAddNewToken, &add_new_token_scene_context);
-                    break;
-                }
-                case DeleteToken: {
-                    DialogMessage* message = dialog_message_alloc();
-                    dialog_message_set_buttons(message, "No", NULL, "Yes");
-                    dialog_message_set_header(message, "Confirmation", 0, 0, AlignLeft, AlignTop);
-                    dialog_message_set_text(
-                        message,
-                        "Are you sure want to delete?",
-                        SCREEN_WIDTH_CENTER,
-                        SCREEN_HEIGHT_CENTER,
-                        AlignCenter,
-                        AlignCenter);
-                    DialogMessageButton dialog_result =
-                        dialog_message_show(plugin_state->dialogs, message);
-                    dialog_message_free(message);
-                    if(dialog_result == DialogMessageButtonRight) {
-                        ListNode* list_node = list_element_at(
-                            plugin_state->tokens_list, scene_state->current_token_index);
-
-                        TokenInfo* tokenInfo = list_node->data;
-                        token_info_free(tokenInfo);
-                        plugin_state->tokens_list =
-                            list_remove(plugin_state->tokens_list, list_node);
-                        plugin_state->tokens_count--;
-
-                        totp_full_save_config_file(plugin_state);
-                        totp_scene_director_activate_scene(
-                            plugin_state, TotpSceneGenerateToken, NULL);
-                    }
-                    break;
-                }
-                case AppSettings: {
-                    if(scene_state->current_token_index >= 0) {
-                        AppSettingsSceneContext app_settings_context = {
-                            .current_token_index = scene_state->current_token_index};
-                        totp_scene_director_activate_scene(
-                            plugin_state, TotpSceneAppSettings, &app_settings_context);
-                    } else {
-                        totp_scene_director_activate_scene(
-                            plugin_state, TotpSceneAppSettings, NULL);
-                    }
-                    break;
-                }
-                }
-                break;
-            case InputKeyBack: {
-                if(scene_state->current_token_index >= 0) {
-                    GenerateTokenSceneContext generate_scene_context = {
-                        .current_token_index = scene_state->current_token_index};
-                    totp_scene_director_activate_scene(
-                        plugin_state, TotpSceneGenerateToken, &generate_scene_context);
-                } else {
-                    totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
-                }
-                break;
-            }
-            }
-        }
+    if(event->type != EventTypeKey) {
+        return true;
     }
+
+    SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
+    if(event->input.type != InputTypePress) {
+        return true;
+    }
+    
+    switch(event->input.key) {
+    case InputKeyUp:
+        if(scene_state->selected_control > AddNewToken) {
+            scene_state->selected_control--;
+            if(scene_state->selected_control == DeleteToken &&
+                scene_state->current_token_index < 0) {
+                scene_state->selected_control--;
+            }
+        } else {
+            scene_state->selected_control = AppSettings;
+        }
+        break;
+    case InputKeyDown:
+        if(scene_state->selected_control < AppSettings) {
+            scene_state->selected_control++;
+            if(scene_state->selected_control == DeleteToken &&
+                scene_state->current_token_index < 0) {
+                scene_state->selected_control++;
+            }
+        } else {
+            scene_state->selected_control = AddNewToken;
+        }
+        break;
+    case InputKeyRight:
+        break;
+    case InputKeyLeft:
+        break;
+    case InputKeyOk:
+        switch(scene_state->selected_control) {
+        case AddNewToken: {
+            TokenAddEditSceneContext add_new_token_scene_context = {
+                .current_token_index = scene_state->current_token_index};
+            totp_scene_director_activate_scene(
+                plugin_state, TotpSceneAddNewToken, &add_new_token_scene_context);
+            break;
+        }
+        case DeleteToken: {
+            DialogMessage* message = dialog_message_alloc();
+            dialog_message_set_buttons(message, "No", NULL, "Yes");
+            dialog_message_set_header(message, "Confirmation", 0, 0, AlignLeft, AlignTop);
+            dialog_message_set_text(
+                message,
+                "Are you sure want to delete?",
+                SCREEN_WIDTH_CENTER,
+                SCREEN_HEIGHT_CENTER,
+                AlignCenter,
+                AlignCenter);
+            DialogMessageButton dialog_result =
+                dialog_message_show(plugin_state->dialogs, message);
+            dialog_message_free(message);
+            if(dialog_result == DialogMessageButtonRight) {
+                ListNode* list_node = list_element_at(
+                    plugin_state->tokens_list, scene_state->current_token_index);
+
+                TokenInfo* tokenInfo = list_node->data;
+                token_info_free(tokenInfo);
+                plugin_state->tokens_list =
+                    list_remove(plugin_state->tokens_list, list_node);
+                plugin_state->tokens_count--;
+
+                totp_full_save_config_file(plugin_state);
+                totp_scene_director_activate_scene(
+                    plugin_state, TotpSceneGenerateToken, NULL);
+            }
+            break;
+        }
+        case AppSettings: {
+            if(scene_state->current_token_index >= 0) {
+                AppSettingsSceneContext app_settings_context = {
+                    .current_token_index = scene_state->current_token_index};
+                totp_scene_director_activate_scene(
+                    plugin_state, TotpSceneAppSettings, &app_settings_context);
+            } else {
+                totp_scene_director_activate_scene(
+                    plugin_state, TotpSceneAppSettings, NULL);
+            }
+            break;
+        }
+        }
+        break;
+    case InputKeyBack: {
+        if(scene_state->current_token_index >= 0) {
+            GenerateTokenSceneContext generate_scene_context = {
+                .current_token_index = scene_state->current_token_index};
+            totp_scene_director_activate_scene(
+                plugin_state, TotpSceneGenerateToken, &generate_scene_context);
+        } else {
+            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+        }
+        break;
+    }
+    }
+
     return true;
 }
 
