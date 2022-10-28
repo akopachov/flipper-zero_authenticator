@@ -152,7 +152,7 @@ FlipperFormat* totp_open_config_file(Storage* storage) {
     return fff_data_file;
 }
 
-void totp_config_file_save_new_token_i(FlipperFormat* file, TokenInfo* token_info) {
+void totp_config_file_save_new_token_i(FlipperFormat* file, const TokenInfo* token_info) {
     flipper_format_seek_to_end(file);
     flipper_format_write_string_cstr(file, TOTP_CONFIG_KEY_TOKEN_NAME, token_info->name);
     bool token_is_valid = token_info->token != NULL && token_info->token_length > 0;
