@@ -9,6 +9,7 @@
 #include "../../services/config/config.h"
 #include "../../services/ui/ui_controls.h"
 #include "../../services/roll_value/roll_value.h"
+#include "../../services/nullable/nullable.h"
 #include "../generate_token/totp_scene_generate_token.h"
 
 #define TOKEN_ALGO_LIST_LENGTH 3
@@ -35,7 +36,7 @@ typedef struct {
     InputTextSceneContext* token_secret_input_context;
     InputTextSceneState* input_state;
     uint32_t input_started_at;
-    int16_t current_token_index;
+    TotpNullable_uint16_t current_token_index;
     int16_t screen_y_offset;
     TokenHashAlgo algo;
     TokenDigitsCount digits_count;
@@ -88,9 +89,9 @@ void totp_scene_add_new_token_activate(
     scene_state->input_state = NULL;
 
     if(context == NULL) {
-        scene_state->current_token_index = -1;
+        TOTP_NULLABLE_NULL(scene_state->current_token_index);
     } else {
-        scene_state->current_token_index = context->current_token_index;
+        TOTP_NULLABLE_VALUE(scene_state->current_token_index, context->current_token_index);
     }
 }
 
@@ -265,9 +266,9 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
         }
         break;
     case InputKeyBack:
-        if(scene_state->current_token_index >= 0) {
+        if(!scene_state->current_token_index.is_null) {
             GenerateTokenSceneContext generate_scene_context = {
-                .current_token_index = scene_state->current_token_index};
+                .current_token_index = scene_state->current_token_index.value};
             totp_scene_director_activate_scene(
                 plugin_state, TotpSceneGenerateToken, &generate_scene_context);
         } else {

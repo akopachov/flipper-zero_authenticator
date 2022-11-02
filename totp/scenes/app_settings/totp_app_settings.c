@@ -5,6 +5,7 @@
 #include "../../services/ui/constants.h"
 #include "../../services/config/config.h"
 #include "../../services/roll_value/roll_value.h"
+#include "../../services/nullable/nullable.h"
 
 #define DIGIT_TO_CHAR(digit) ((digit) + '0')
 
@@ -13,7 +14,7 @@ typedef enum { HoursInput, MinutesInput, ConfirmButton } Control;
 typedef struct {
     int8_t tz_offset_hours;
     uint8_t tz_offset_minutes;
-    int32_t current_token_index;
+    TotpNullable_uint16_t current_token_index;
     Control selected_control;
 } SceneState;
 
@@ -27,9 +28,9 @@ void totp_scene_app_settings_activate(
     SceneState* scene_state = malloc(sizeof(SceneState));
     plugin_state->current_scene_state = scene_state;
     if(context != NULL) {
-        scene_state->current_token_index = context->current_token_index;
+        TOTP_NULLABLE_VALUE(scene_state->current_token_index, context->current_token_index);
     } else {
-        scene_state->current_token_index = -1;
+        TOTP_NULLABLE_NULL(scene_state->current_token_index);
     }
 
     float off_int;
@@ -128,9 +129,9 @@ bool totp_scene_app_settings_handle_event(const PluginEvent* const event, Plugin
                                             (float)scene_state->tz_offset_minutes / 60.0f;
             totp_config_file_update_timezone_offset(plugin_state->timezone_offset);
 
-            if(scene_state->current_token_index >= 0) {
+            if(!scene_state->current_token_index.is_null) {
                 TokenMenuSceneContext generate_scene_context = {
-                    .current_token_index = scene_state->current_token_index};
+                    .current_token_index = scene_state->current_token_index.value};
                 totp_scene_director_activate_scene(
                     plugin_state, TotpSceneTokenMenu, &generate_scene_context);
             } else {
@@ -139,9 +140,9 @@ bool totp_scene_app_settings_handle_event(const PluginEvent* const event, Plugin
         }
         break;
     case InputKeyBack: {
-        if(scene_state->current_token_index >= 0) {
+        if(!scene_state->current_token_index.is_null) {
             TokenMenuSceneContext generate_scene_context = {
-                .current_token_index = scene_state->current_token_index};
+                .current_token_index = scene_state->current_token_index.value};
             totp_scene_director_activate_scene(
                 plugin_state, TotpSceneTokenMenu, &generate_scene_context);
         } else {
