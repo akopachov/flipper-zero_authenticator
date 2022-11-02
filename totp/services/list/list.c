@@ -66,8 +66,8 @@ ListNode* list_remove(ListNode* head, ListNode* ep) {
 }
 
 void list_free(ListNode* head) {
-    ListNode *it = head;
-    ListNode *tmp;
+    ListNode* it = head;
+    ListNode* tmp;
 
     while(it != NULL) {
         tmp = it;

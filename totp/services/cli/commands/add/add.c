@@ -185,8 +185,8 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     // Reading token secret
     furi_string_reset(temp_str);
     TOTP_CLI_PRINTF("Enter token secret and confirm with [ENTER]\r\n");
-    if (!totp_cli_read_secret(cli, temp_str, mask_user_input) ||
-        !totp_cli_ensure_authenticated(plugin_state, cli)) {
+    if(!totp_cli_read_secret(cli, temp_str, mask_user_input) ||
+       !totp_cli_ensure_authenticated(plugin_state, cli)) {
         furi_string_secure_free(temp_str);
         token_info_free(token_info);
         return;
