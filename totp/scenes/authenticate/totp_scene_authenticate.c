@@ -1,7 +1,7 @@
 #include "totp_scene_authenticate.h"
 #include <dialogs/dialogs.h>
+#include <totp_icons.h>
 #include "../../types/common.h"
-#include "../../services/ui/icons.h"
 #include "../../services/ui/constants.h"
 #include "../../services/config/config.h"
 #include "../scene_director.h"

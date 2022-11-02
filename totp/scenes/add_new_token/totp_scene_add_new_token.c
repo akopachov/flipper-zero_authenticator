@@ -8,6 +8,7 @@
 #include "../../services/base32/base32.h"
 #include "../../services/config/config.h"
 #include "../../services/ui/ui_controls.h"
+#include "../../services/roll_value/roll_value.h"
 #include "../generate_token/totp_scene_generate_token.h"
 
 #define TOKEN_ALGO_LIST_LENGTH 3
@@ -170,45 +171,25 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
     
     switch(event->input.key) {
     case InputKeyUp:
-        if(scene_state->selected_control > TokenNameTextBox) {
-            scene_state->selected_control--;
-            update_screen_y_offset(scene_state);
-        }
+        totp_roll_value_uint8_t(&scene_state->selected_control, -1, TokenNameTextBox, ConfirmButton, RollOverflowBehaviorStop);
+        update_screen_y_offset(scene_state);
         break;
     case InputKeyDown:
-        if(scene_state->selected_control < ConfirmButton) {
-            scene_state->selected_control++;
-            update_screen_y_offset(scene_state);
-        }
+        totp_roll_value_uint8_t(&scene_state->selected_control, 1, TokenNameTextBox, ConfirmButton, RollOverflowBehaviorStop);
+        update_screen_y_offset(scene_state);
         break;
     case InputKeyRight:
         if(scene_state->selected_control == TokenAlgoSelect) {
-            if(scene_state->algo < SHA512) {
-                scene_state->algo++;
-            } else {
-                scene_state->algo = SHA1;
-            }
+            totp_roll_value_uint8_t(&scene_state->algo, 1, SHA1, SHA512, RollOverflowBehaviorRoll);
         } else if(scene_state->selected_control == TokenLengthSelect) {
-            if(scene_state->digits_count < TOTP_8_DIGITS) {
-                scene_state->digits_count++;
-            } else {
-                scene_state->digits_count = TOTP_6_DIGITS;
-            }
+            totp_roll_value_uint8_t(&scene_state->digits_count, 1, TOTP_6_DIGITS, TOTP_8_DIGITS, RollOverflowBehaviorRoll);
         }
         break;
     case InputKeyLeft:
         if(scene_state->selected_control == TokenAlgoSelect) {
-            if(scene_state->algo > SHA1) {
-                scene_state->algo--;
-            } else {
-                scene_state->algo = SHA512;
-            }
+            totp_roll_value_uint8_t(&scene_state->algo, -1, SHA1, SHA512, RollOverflowBehaviorRoll);
         } else if(scene_state->selected_control == TokenLengthSelect) {
-            if(scene_state->digits_count > TOTP_6_DIGITS) {
-                scene_state->digits_count--;
-            } else {
-                scene_state->digits_count = TOTP_8_DIGITS;
-            }
+            totp_roll_value_uint8_t(&scene_state->digits_count, -1, TOTP_6_DIGITS, TOTP_8_DIGITS, RollOverflowBehaviorRoll);
         }
         break;
     case InputKeyOk:

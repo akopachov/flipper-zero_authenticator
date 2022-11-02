@@ -18,7 +18,7 @@ typedef enum { AddNewToken, DeleteToken, AppSettings } Control;
 
 typedef struct {
     Control selected_control;
-    int16_t current_token_index;
+    int32_t current_token_index;
 } SceneState;
 
 void totp_scene_token_menu_init(const PluginState* plugin_state) {
