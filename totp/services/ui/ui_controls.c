@@ -5,7 +5,11 @@
 #define TEXT_BOX_HEIGHT 13
 #define TEXT_BOX_MARGIN 4
 
-void ui_control_text_box_render(Canvas* const canvas, int16_t y, const char* text, bool is_selected) {
+void ui_control_text_box_render(
+    Canvas* const canvas,
+    int16_t y,
+    const char* text,
+    bool is_selected) {
     if(y < -TEXT_BOX_HEIGHT) {
         return;
     }
@@ -78,15 +82,9 @@ void ui_control_select_render(
     canvas_draw_str_aligned(
         canvas, x + (width >> 1), TEXT_BOX_MARGIN + 3 + y, AlignCenter, AlignTop, text);
     canvas_draw_icon(
-        canvas,
-        x + TEXT_BOX_MARGIN + 2,
-        TEXT_BOX_MARGIN + 2 + y,
-        &I_totp_arrow_left_8x9);
+        canvas, x + TEXT_BOX_MARGIN + 2, TEXT_BOX_MARGIN + 2 + y, &I_totp_arrow_left_8x9);
     canvas_draw_icon(
-        canvas,
-        x + width - TEXT_BOX_MARGIN - 10,
-        TEXT_BOX_MARGIN + 2 + y,
-        &I_totp_arrow_right_8x9);
+        canvas, x + width - TEXT_BOX_MARGIN - 10, TEXT_BOX_MARGIN + 2 + y, &I_totp_arrow_right_8x9);
 }
 
 void ui_control_button_render(

@@ -152,45 +152,66 @@ void update_screen_y_offset(SceneState* scene_state) {
 }
 
 bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState* plugin_state) {
-    if(event->type != EventTypeKey) { 
+    if(event->type != EventTypeKey) {
         return true;
     }
 
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
     if(scene_state->input_started_at > 0 &&
-        furi_get_tick() - scene_state->input_started_at > 300) {
+       furi_get_tick() - scene_state->input_started_at > 300) {
         return totp_input_text_handle_event(event, scene_state->input_state);
     }
 
     if(event->input.type == InputTypeLong && event->input.key == InputKeyBack) {
         return false;
-    } 
-    
+    }
+
     if(event->input.type != InputTypePress) {
         return true;
     }
-    
+
     switch(event->input.key) {
     case InputKeyUp:
-        totp_roll_value_uint8_t(&scene_state->selected_control, -1, TokenNameTextBox, ConfirmButton, RollOverflowBehaviorStop);
+        totp_roll_value_uint8_t(
+            &scene_state->selected_control,
+            -1,
+            TokenNameTextBox,
+            ConfirmButton,
+            RollOverflowBehaviorStop);
         update_screen_y_offset(scene_state);
         break;
     case InputKeyDown:
-        totp_roll_value_uint8_t(&scene_state->selected_control, 1, TokenNameTextBox, ConfirmButton, RollOverflowBehaviorStop);
+        totp_roll_value_uint8_t(
+            &scene_state->selected_control,
+            1,
+            TokenNameTextBox,
+            ConfirmButton,
+            RollOverflowBehaviorStop);
         update_screen_y_offset(scene_state);
         break;
     case InputKeyRight:
         if(scene_state->selected_control == TokenAlgoSelect) {
             totp_roll_value_uint8_t(&scene_state->algo, 1, SHA1, SHA512, RollOverflowBehaviorRoll);
         } else if(scene_state->selected_control == TokenLengthSelect) {
-            totp_roll_value_uint8_t(&scene_state->digits_count, 1, TOTP_6_DIGITS, TOTP_8_DIGITS, RollOverflowBehaviorRoll);
+            totp_roll_value_uint8_t(
+                &scene_state->digits_count,
+                1,
+                TOTP_6_DIGITS,
+                TOTP_8_DIGITS,
+                RollOverflowBehaviorRoll);
         }
         break;
     case InputKeyLeft:
         if(scene_state->selected_control == TokenAlgoSelect) {
-            totp_roll_value_uint8_t(&scene_state->algo, -1, SHA1, SHA512, RollOverflowBehaviorRoll);
+            totp_roll_value_uint8_t(
+                &scene_state->algo, -1, SHA1, SHA512, RollOverflowBehaviorRoll);
         } else if(scene_state->selected_control == TokenLengthSelect) {
-            totp_roll_value_uint8_t(&scene_state->digits_count, -1, TOTP_6_DIGITS, TOTP_8_DIGITS, RollOverflowBehaviorRoll);
+            totp_roll_value_uint8_t(
+                &scene_state->digits_count,
+                -1,
+                TOTP_6_DIGITS,
+                TOTP_8_DIGITS,
+                RollOverflowBehaviorRoll);
         }
         break;
     case InputKeyOk:
@@ -226,9 +247,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
             if(token_secret_set) {
                 tokenInfo->name = malloc(scene_state->token_name_length + 1);
                 strlcpy(
-                    tokenInfo->name,
-                    scene_state->token_name,
-                    scene_state->token_name_length + 1);
+                    tokenInfo->name, scene_state->token_name, scene_state->token_name_length + 1);
                 tokenInfo->algo = scene_state->algo;
                 tokenInfo->digits = scene_state->digits_count;
 
@@ -276,7 +295,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
         }
         break;
     }
-    
+
     return true;
 }
 

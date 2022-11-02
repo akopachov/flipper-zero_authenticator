@@ -95,18 +95,21 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
     if(event->input.type != InputTypePress) {
         return true;
     }
-    
+
     switch(event->input.key) {
     case InputKeyUp:
-        totp_roll_value_uint8_t(&scene_state->selected_control, -1, AddNewToken, AppSettings, RollOverflowBehaviorRoll);
-        if(scene_state->selected_control == DeleteToken && scene_state->current_token_index.is_null) {
+        totp_roll_value_uint8_t(
+            &scene_state->selected_control, -1, AddNewToken, AppSettings, RollOverflowBehaviorRoll);
+        if(scene_state->selected_control == DeleteToken &&
+           scene_state->current_token_index.is_null) {
             scene_state->selected_control--;
         }
         break;
     case InputKeyDown:
-        totp_roll_value_uint8_t(&scene_state->selected_control, 1, AddNewToken, AppSettings, RollOverflowBehaviorRoll);
+        totp_roll_value_uint8_t(
+            &scene_state->selected_control, 1, AddNewToken, AppSettings, RollOverflowBehaviorRoll);
         if(scene_state->selected_control == DeleteToken &&
-            scene_state->current_token_index.is_null) {
+           scene_state->current_token_index.is_null) {
             scene_state->selected_control++;
         }
         break;
@@ -117,7 +120,7 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
     case InputKeyOk:
         switch(scene_state->selected_control) {
         case AddNewToken: {
-            if (scene_state->current_token_index.is_null) {
+            if(scene_state->current_token_index.is_null) {
                 totp_scene_director_activate_scene(plugin_state, TotpSceneAddNewToken, NULL);
             } else {
                 TokenAddEditSceneContext add_new_token_scene_context = {
@@ -141,19 +144,18 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
             DialogMessageButton dialog_result =
                 dialog_message_show(plugin_state->dialogs, message);
             dialog_message_free(message);
-            if(dialog_result == DialogMessageButtonRight && !scene_state->current_token_index.is_null) {
+            if(dialog_result == DialogMessageButtonRight &&
+               !scene_state->current_token_index.is_null) {
                 ListNode* list_node = list_element_at(
                     plugin_state->tokens_list, scene_state->current_token_index.value);
 
                 TokenInfo* tokenInfo = list_node->data;
                 token_info_free(tokenInfo);
-                plugin_state->tokens_list =
-                    list_remove(plugin_state->tokens_list, list_node);
+                plugin_state->tokens_list = list_remove(plugin_state->tokens_list, list_node);
                 plugin_state->tokens_count--;
 
                 totp_full_save_config_file(plugin_state);
-                totp_scene_director_activate_scene(
-                    plugin_state, TotpSceneGenerateToken, NULL);
+                totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
             }
             break;
         }
@@ -164,8 +166,7 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
                 totp_scene_director_activate_scene(
                     plugin_state, TotpSceneAppSettings, &app_settings_context);
             } else {
-                totp_scene_director_activate_scene(
-                    plugin_state, TotpSceneAppSettings, NULL);
+                totp_scene_director_activate_scene(plugin_state, TotpSceneAppSettings, NULL);
             }
             break;
         }

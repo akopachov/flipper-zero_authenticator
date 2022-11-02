@@ -77,19 +77,21 @@ void totp_scene_authenticate_render(Canvas* const canvas, PluginState* plugin_st
     }
 }
 
-bool totp_scene_authenticate_handle_event(const PluginEvent* const event, PluginState* plugin_state) {       
-    if(event->type != EventTypeKey) { 
-        return true; 
+bool totp_scene_authenticate_handle_event(
+    const PluginEvent* const event,
+    PluginState* plugin_state) {
+    if(event->type != EventTypeKey) {
+        return true;
     }
 
     if(event->input.type == InputTypeLong && event->input.key == InputKeyBack) {
         return false;
-    }    
-    
+    }
+
     if(event->input.type != InputTypePress) {
         return true;
     }
-    
+
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
 
     switch(event->input.key) {
@@ -118,8 +120,7 @@ bool totp_scene_authenticate_handle_event(const PluginEvent* const event, Plugin
         }
         break;
     case InputKeyOk:
-        totp_crypto_seed_iv(
-            plugin_state, &scene_state->code_input[0], scene_state->code_length);
+        totp_crypto_seed_iv(plugin_state, &scene_state->code_input[0], scene_state->code_length);
 
         if(totp_crypto_verify_key(plugin_state)) {
             FURI_LOG_D(LOGGING_TAG, "PIN is valid");

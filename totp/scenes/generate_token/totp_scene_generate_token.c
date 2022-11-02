@@ -250,32 +250,27 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
     canvas_draw_box(canvas, barX, SCREEN_HEIGHT - BAR_MARGIN - BAR_HEIGHT, barWidth, BAR_HEIGHT);
 
     if(plugin_state->tokens_count > 1) {
+        canvas_draw_icon(canvas, 0, SCREEN_HEIGHT_CENTER - 24, &I_totp_arrow_left_8x9);
         canvas_draw_icon(
-            canvas,
-            0,
-            SCREEN_HEIGHT_CENTER - 24,
-            &I_totp_arrow_left_8x9);
-        canvas_draw_icon(
-            canvas,
-            SCREEN_WIDTH - 9,
-            SCREEN_HEIGHT_CENTER - 24,
-            &I_totp_arrow_right_8x9);
+            canvas, SCREEN_WIDTH - 9, SCREEN_HEIGHT_CENTER - 24, &I_totp_arrow_right_8x9);
     }
 }
 
-bool totp_scene_generate_token_handle_event(const PluginEvent* const event, PluginState* plugin_state) {
+bool totp_scene_generate_token_handle_event(
+    const PluginEvent* const event,
+    PluginState* plugin_state) {
     if(event->type != EventTypeKey) {
         return true;
     }
 
     if(event->input.type == InputTypeLong && event->input.key == InputKeyBack) {
         return false;
-    } 
-    
+    }
+
     if(event->input.type != InputTypePress) {
         return true;
     }
-    
+
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
     switch(event->input.key) {
     case InputKeyUp:
@@ -283,19 +278,28 @@ bool totp_scene_generate_token_handle_event(const PluginEvent* const event, Plug
     case InputKeyDown:
         break;
     case InputKeyRight:
-        totp_roll_value_uint16_t(&scene_state->current_token_index, 1, 0, plugin_state->tokens_count - 1, RollOverflowBehaviorRoll);
+        totp_roll_value_uint16_t(
+            &scene_state->current_token_index,
+            1,
+            0,
+            plugin_state->tokens_count - 1,
+            RollOverflowBehaviorRoll);
         update_totp_params(plugin_state);
         break;
     case InputKeyLeft:
-        totp_roll_value_uint16_t(&scene_state->current_token_index, -1, 0, plugin_state->tokens_count - 1, RollOverflowBehaviorRoll);
+        totp_roll_value_uint16_t(
+            &scene_state->current_token_index,
+            -1,
+            0,
+            plugin_state->tokens_count - 1,
+            RollOverflowBehaviorRoll);
         update_totp_params(plugin_state);
         break;
     case InputKeyOk:
         if(plugin_state->tokens_count == 0) {
             totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu, NULL);
         } else {
-            TokenMenuSceneContext ctx = {
-                .current_token_index = scene_state->current_token_index};
+            TokenMenuSceneContext ctx = {.current_token_index = scene_state->current_token_index};
             totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu, &ctx);
         }
         break;

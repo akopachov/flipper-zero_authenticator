@@ -92,7 +92,9 @@ void totp_scene_app_settings_render(Canvas* const canvas, PluginState* plugin_st
         scene_state->selected_control == ConfirmButton);
 }
 
-bool totp_scene_app_settings_handle_event(const PluginEvent* const event, PluginState* plugin_state) {
+bool totp_scene_app_settings_handle_event(
+    const PluginEvent* const event,
+    PluginState* plugin_state) {
     if(event->type != EventTypeKey) {
         return true;
     }
@@ -101,26 +103,36 @@ bool totp_scene_app_settings_handle_event(const PluginEvent* const event, Plugin
     if(event->input.type != InputTypePress) {
         return true;
     }
-    
+
     switch(event->input.key) {
     case InputKeyUp:
-        totp_roll_value_uint8_t(&scene_state->selected_control, -1, HoursInput, ConfirmButton, RollOverflowBehaviorStop);
+        totp_roll_value_uint8_t(
+            &scene_state->selected_control,
+            -1,
+            HoursInput,
+            ConfirmButton,
+            RollOverflowBehaviorStop);
         break;
     case InputKeyDown:
-        totp_roll_value_uint8_t(&scene_state->selected_control, 1, HoursInput, ConfirmButton, RollOverflowBehaviorStop);
+        totp_roll_value_uint8_t(
+            &scene_state->selected_control, 1, HoursInput, ConfirmButton, RollOverflowBehaviorStop);
         break;
     case InputKeyRight:
         if(scene_state->selected_control == HoursInput) {
-            totp_roll_value_int8_t(&scene_state->tz_offset_hours, 1, -12, 12, RollOverflowBehaviorStop);
+            totp_roll_value_int8_t(
+                &scene_state->tz_offset_hours, 1, -12, 12, RollOverflowBehaviorStop);
         } else if(scene_state->selected_control == MinutesInput) {
-            totp_roll_value_uint8_t(&scene_state->tz_offset_minutes, 15, 0, 45, RollOverflowBehaviorRoll);
+            totp_roll_value_uint8_t(
+                &scene_state->tz_offset_minutes, 15, 0, 45, RollOverflowBehaviorRoll);
         }
         break;
     case InputKeyLeft:
         if(scene_state->selected_control == HoursInput) {
-            totp_roll_value_int8_t(&scene_state->tz_offset_hours, -1, -12, 12, RollOverflowBehaviorStop);
+            totp_roll_value_int8_t(
+                &scene_state->tz_offset_hours, -1, -12, 12, RollOverflowBehaviorStop);
         } else if(scene_state->selected_control == MinutesInput) {
-            totp_roll_value_uint8_t(&scene_state->tz_offset_minutes, -15, 0, 45, RollOverflowBehaviorRoll);
+            totp_roll_value_uint8_t(
+                &scene_state->tz_offset_minutes, -15, 0, 45, RollOverflowBehaviorRoll);
         }
         break;
     case InputKeyOk:
@@ -151,7 +163,7 @@ bool totp_scene_app_settings_handle_event(const PluginEvent* const event, Plugin
         break;
     }
     }
-    
+
     return true;
 }
 
