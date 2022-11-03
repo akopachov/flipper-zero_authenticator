@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
-#include <furi/furi.h>
 #include "../hmac/hmac_sha1.h"
 #include "../hmac/hmac_sha256.h"
 #include "../hmac/hmac_sha512.h"
@@ -46,7 +45,7 @@ uint32_t otp_generate(
     size_t plain_secret_length,
     uint64_t input) {
     uint8_t* hmac = malloc(64);
-    furi_check(hmac != NULL);
+    if (hmac == NULL) return OTP_ERROR;
     memset(hmac, 0, 64);
 
     uint64_t input_swapped = swap_uint64(input);

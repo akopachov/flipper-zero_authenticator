@@ -37,24 +37,17 @@ static const NotificationSequence sequence_short_vibro_and_sound = {
 };
 
 static void i_token_to_str(uint32_t i_token_code, char* str, TokenDigitsCount len) {
+    uint8_t str_token_length = 0;
     if(len == TOTP_8_DIGITS) {
         str[8] = '\0';
+        str_token_length = 8;
     } else if(len == TOTP_6_DIGITS) {
         str[6] = '\0';
+        str_token_length = 6;
     }
 
-    if(i_token_code == 0) {
-        if(len > TOTP_6_DIGITS) {
-            str[7] = '-';
-            str[6] = '-';
-        }
-
-        str[5] = '-';
-        str[4] = '-';
-        str[3] = '-';
-        str[2] = '-';
-        str[1] = '-';
-        str[0] = '-';
+    if(i_token_code == OTP_ERROR) {
+        memset(&str[0], '-', str_token_length);
     } else {
         if(len == TOTP_8_DIGITS) {
             str[7] = DIGIT_TO_CHAR(i_token_code % 10);
