@@ -132,6 +132,7 @@ void totp_scene_generate_token_activate(
         }
     }
     SceneState* scene_state = malloc(sizeof(SceneState));
+    furi_check(scene_state != NULL);
     if(context == NULL || context->current_token_index > plugin_state->tokens_count) {
         scene_state->current_token_index = 0;
     } else {
@@ -197,7 +198,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
                     TOKEN_LIFETIME),
                 scene_state->last_code,
                 tokenInfo->digits);
-            memset_s(key, sizeof(key), 0, key_length);
+            memset_s(key, key_length, 0, key_length);
             free(key);
         } else {
             i_token_to_str(0, scene_state->last_code, tokenInfo->digits);
