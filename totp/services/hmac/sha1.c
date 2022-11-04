@@ -250,12 +250,12 @@ void sha1_process_block(const void* buffer, size_t len, struct sha1_ctx* ctx) {
                 break;
             }
             
-            uint32_t t = a;
+            uint32_t tt = a;
             a = e;
             e = d;
             d = c;
             c = b;
-            b = t;
+            b = tt;
         }
 
         a = ctx->A += a;

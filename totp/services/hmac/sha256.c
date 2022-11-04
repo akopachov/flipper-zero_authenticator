@@ -302,7 +302,7 @@ void sha256_process_block(const void* buffer, size_t len, struct sha256_ctx* ctx
         for (int i = 0; i < 64; i++) {
             uint32_t xx = i < 16 ? x[i] : M(i);
             R(a, b, c, d, e, f, g, h, K(i), xx);
-            uint32_t t = a;
+            uint32_t tt = a;
             a = h;
             h = g;
             g = f;
@@ -310,7 +310,7 @@ void sha256_process_block(const void* buffer, size_t len, struct sha256_ctx* ctx
             e = d;
             d = c;
             c = b;
-            b = t;
+            b = tt;
         }
 
         a = ctx->state[0] += a;

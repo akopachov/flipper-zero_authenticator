@@ -331,7 +331,7 @@ void sha512_process_block(const void* buffer, size_t len, struct sha512_ctx* ctx
         for (int i = 0; i < 80; i++) {
             u64 xx = i < 16 ? x[i] : M(i);
             R(a, b, c, d, e, f, g, h, K(i), xx);
-            u64 t = a;
+            u64 tt = a;
             a = h;
             h = g;
             g = f;
@@ -339,7 +339,7 @@ void sha512_process_block(const void* buffer, size_t len, struct sha512_ctx* ctx
             e = d;
             d = c;
             c = b;
-            b = t;
+            b = tt;
         }
 
         a = ctx->state[0] = u64plus(ctx->state[0], a);
