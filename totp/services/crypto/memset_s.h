@@ -9,7 +9,7 @@ typedef uint64_t rsize_t;
 #define _RSIZE_T_DECLARED
 #endif
 #ifndef _ERRNOT_DECLARED
-typedef int16_t errno_t; //-V677
+typedef int16_t errno_t;
 #define _ERRNOT_DECLARED
 #endif
 
