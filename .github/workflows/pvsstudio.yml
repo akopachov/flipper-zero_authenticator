@@ -35,11 +35,8 @@ jobs:
       - name: Convert report
         run: |
           plog-converter -t sarif -o pvs-report.sarif PVS-Studio.log
-      - name: Archive report
-        uses: actions/upload-artifact@v3
-        with:
-          name: pvs-studio-sarif
-          path: pvs-report.sarif
+          sed -i 's/"results": null/"results": []/g' pvs-report.sarif
+          sed -i 's/"rules": null/"rules": []/g' pvs-report.sarif
       - name: Publish report
         uses: github/codeql-action/upload-sarif@v2
         with:
