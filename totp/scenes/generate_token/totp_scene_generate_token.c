@@ -13,16 +13,18 @@
 #include "../../services/roll_value/roll_value.h"
 #include "../scene_director.h"
 #include "../token_menu/totp_scene_token_menu.h"
+#include "../../services/hid_worker/hid_worker.h"
 
 #define TOKEN_LIFETIME 30
 #define DIGIT_TO_CHAR(digit) ((digit) + '0')
 
 typedef struct {
     uint16_t current_token_index;
-    char last_code[9];
+    char last_code[TOTP_TOKEN_DIGITS_MAX_COUNT + 1];
     char* last_code_name;
     bool need_token_update;
     uint32_t last_token_gen_time;
+    TotpHidWorkerTypeContext* hid_worker_context;
 } SceneState;
 
 static const NotificationSequence sequence_short_vibro_and_sound = {
@@ -137,6 +139,9 @@ void totp_scene_generate_token_activate(
     plugin_state->current_scene_state = scene_state;
     FURI_LOG_D(LOGGING_TAG, "Timezone set to: %f", (double)plugin_state->timezone_offset);
     update_totp_params(plugin_state);
+    scene_state->hid_worker_context = totp_hid_worker_start();
+    scene_state->hid_worker_context->string = &scene_state->last_code[0];
+    scene_state->hid_worker_context->string_length = TOTP_TOKEN_DIGITS_MAX_COUNT + 1;
 }
 
 void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_state) {
@@ -263,11 +268,18 @@ bool totp_scene_generate_token_handle_event(
         return false;
     }
 
+    SceneState* scene_state;
+    if(event->input.type == InputTypeLong && event->input.key == InputKeyDown) {
+        scene_state = (SceneState*)plugin_state->current_scene_state;
+        totp_hid_worker_notify(scene_state->hid_worker_context, TotpHidWorkerEvtType);
+        return true;
+    }
+
     if(event->input.type != InputTypePress) {
         return true;
     }
 
-    SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
+    scene_state = (SceneState*)plugin_state->current_scene_state;
     switch(event->input.key) {
     case InputKeyUp:
         break;
@@ -311,6 +323,8 @@ bool totp_scene_generate_token_handle_event(
 void totp_scene_generate_token_deactivate(PluginState* plugin_state) {
     if(plugin_state->current_scene_state == NULL) return;
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
+
+    totp_hid_worker_stop(scene_state->hid_worker_context);
 
     free(scene_state);
     plugin_state->current_scene_state = NULL;
