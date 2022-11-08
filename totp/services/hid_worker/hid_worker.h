@@ -8,6 +8,7 @@ typedef struct {
     char* string;
     uint8_t string_length;
     FuriThread* thread;
+    FuriMutex* string_sync;
 } TotpHidWorkerTypeContext;
 
 typedef enum {

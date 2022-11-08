@@ -22,24 +22,20 @@ static void totp_hid_worker_type_code(TotpHidWorkerTypeContext* context) {
         i++;
     } while(!furi_hal_hid_is_connected() && i < 100);
 
-    if (furi_hal_hid_is_connected()) {
-        uint8_t str_to_type_length = context->string_length;
-        char* str_to_type = malloc(str_to_type_length + 1);
-        if (str_to_type != NULL) {
-            strlcpy(str_to_type, context->string, str_to_type_length + 1);
-            i = 0;
-            while(i < str_to_type_length && str_to_type[i] != 0) {
-                uint8_t digit = str_to_type[i] - '0';
-                if (digit > 9) break;
-                uint8_t hid_kb_key = hid_number_keys[digit];
-                furi_hal_hid_kb_press(hid_kb_key);
-                furi_delay_ms(30);
-                furi_hal_hid_kb_release(hid_kb_key);
-                i++;
-            }
-
-            free(str_to_type);
+    if (furi_hal_hid_is_connected() && 
+        furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
+        i = 0;
+        while(i < context->string_length && context->string[i] != 0) {
+            uint8_t digit = context->string[i] - '0';
+            if (digit > 9) break;
+            uint8_t hid_kb_key = hid_number_keys[digit];
+            furi_hal_hid_kb_press(hid_kb_key);
+            furi_delay_ms(30);
+            furi_hal_hid_kb_release(hid_kb_key);
+            i++;
         }
+
+        furi_mutex_release(context->string_sync);
 
         furi_hal_hid_kb_press(HID_KEYBOARD_RETURN);
         furi_delay_ms(30);
@@ -79,6 +75,7 @@ static int32_t totp_hid_worker_callback(void* context) {
 TotpHidWorkerTypeContext* totp_hid_worker_start() {
     TotpHidWorkerTypeContext* context = malloc(sizeof(TotpHidWorkerTypeContext));
     furi_check(context != NULL);
+    context->string_sync = furi_mutex_alloc(FuriMutexTypeNormal);
     context->thread = furi_thread_alloc();
     furi_thread_set_name(context->thread, "TOTPHidWorker");
     furi_thread_set_stack_size(context->thread, 1024);
@@ -93,6 +90,7 @@ void totp_hid_worker_stop(TotpHidWorkerTypeContext* context) {
     furi_thread_flags_set(furi_thread_get_id(context->thread), TotpHidWorkerEvtStop);
     furi_thread_join(context->thread);
     furi_thread_free(context->thread);
+    furi_mutex_free(context->string_sync);
     free(context);
 }
 

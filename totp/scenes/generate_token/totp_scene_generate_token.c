@@ -27,11 +27,24 @@ typedef struct {
     TotpHidWorkerTypeContext* hid_worker_context;
 } SceneState;
 
-static const NotificationSequence sequence_short_vibro_and_sound = {
+static const NotificationSequence notification_sequence_new_token = {
     &message_display_backlight_on,
     &message_green_255,
     &message_vibro_on,
     &message_note_c5,
+    &message_delay_50,
+    &message_vibro_off,
+    &message_sound_off,
+    NULL,
+};
+
+static const NotificationSequence notification_sequence_badusb = {
+    &message_vibro_on,
+    &message_note_d5,
+    &message_delay_50,
+    &message_note_e4,
+    &message_delay_50,
+    &message_note_f3,
     &message_delay_50,
     &message_vibro_off,
     &message_sound_off,
@@ -177,12 +190,13 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
         scene_state->need_token_update = false;
         scene_state->last_token_gen_time = curr_ts;
 
-        TokenInfo* tokenInfo =
+        const TokenInfo* tokenInfo =
             (TokenInfo*)(list_element_at(
                              plugin_state->tokens_list, scene_state->current_token_index)
                              ->data);
 
         if(tokenInfo->token != NULL && tokenInfo->token_length > 0) {
+            furi_mutex_acquire(scene_state->hid_worker_context->string_sync, FuriWaitForever);
             size_t key_length;
             uint8_t* key = totp_crypto_decrypt(
                 tokenInfo->token, tokenInfo->token_length, &plugin_state->iv[0], &key_length);
@@ -201,11 +215,14 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
             memset_s(key, key_length, 0, key_length);
             free(key);
         } else {
+            furi_mutex_acquire(scene_state->hid_worker_context->string_sync, FuriWaitForever);
             i_token_to_str(0, scene_state->last_code, tokenInfo->digits);
         }
 
+        furi_mutex_release(scene_state->hid_worker_context->string_sync);
+
         if(is_new_token_time) {
-            notification_message(plugin_state->notification, &sequence_short_vibro_and_sound);
+            notification_message(plugin_state->notification, &notification_sequence_new_token);
         }
     }
 
@@ -272,6 +289,7 @@ bool totp_scene_generate_token_handle_event(
     if(event->input.type == InputTypeLong && event->input.key == InputKeyDown) {
         scene_state = (SceneState*)plugin_state->current_scene_state;
         totp_hid_worker_notify(scene_state->hid_worker_context, TotpHidWorkerEvtType);
+        notification_message(plugin_state->notification, &notification_sequence_badusb);
         return true;
     }
 
