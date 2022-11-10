@@ -22,12 +22,12 @@ static void totp_hid_worker_type_code(TotpHidWorkerTypeContext* context) {
         i++;
     } while(!furi_hal_hid_is_connected() && i < 100);
 
-    if (furi_hal_hid_is_connected() && 
-        furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
+    if(furi_hal_hid_is_connected() &&
+       furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
         i = 0;
         while(i < context->string_length && context->string[i] != 0) {
             uint8_t digit = context->string[i] - '0';
-            if (digit > 9) break;
+            if(digit > 9) break;
             uint8_t hid_kb_key = hid_number_keys[digit];
             furi_hal_hid_kb_press(hid_kb_key);
             furi_delay_ms(30);
@@ -49,7 +49,7 @@ static void totp_hid_worker_type_code(TotpHidWorkerTypeContext* context) {
 
 static int32_t totp_hid_worker_callback(void* context) {
     ValueMutex context_mutex;
-    if (!init_mutex(&context_mutex, context, sizeof(TotpHidWorkerTypeContext))) {
+    if(!init_mutex(&context_mutex, context, sizeof(TotpHidWorkerTypeContext))) {
         return 251;
     }
 
