@@ -13,7 +13,7 @@ const uint8_t hid_number_keys[10] = {
     HID_KEYBOARD_9};
 
 static void totp_hid_worker_restore_usb_mode(TotpHidWorkerTypeContext* context) {
-    if (context->usb_mode_prev != NULL) {
+    if(context->usb_mode_prev != NULL) {
         furi_hal_usb_set_config(context->usb_mode_prev, NULL);
         context->usb_mode_prev = NULL;
     }
