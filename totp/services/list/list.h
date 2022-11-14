@@ -21,6 +21,8 @@ ListNode* list_element_at(
 ListNode* list_remove(
     ListNode* head,
     ListNode* ep); /* removes element from the list and returns new head node. */
+ListNode* list_remove_at(ListNode* head, uint16_t index);
+ListNode* list_insert_at(ListNode* head, uint16_t index, void* data);
 void list_free(ListNode* head); /* deletes all elements of the list. */
 
 #define TOTP_LIST_INIT_OR_ADD(head, item, assert) \
