@@ -130,8 +130,8 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
     }
 
     if (new_token_index > 0) {
-        list_remove_at(plugin_state->tokens_list, token_index - 1);
-        list_insert_at(plugin_state->tokens_list, new_token_index - 1, token_info);
+        plugin_state->tokens_list = list_remove_at(plugin_state->tokens_list, token_index - 1);
+        plugin_state->tokens_list = list_insert_at(plugin_state->tokens_list, new_token_index - 1, token_info);
         token_updated = true;
     }
 

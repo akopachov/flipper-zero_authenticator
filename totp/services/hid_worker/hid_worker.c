@@ -19,6 +19,10 @@ static void totp_hid_worker_restore_usb_mode(TotpHidWorkerTypeContext* context) 
     }
 }
 
+static inline bool totp_hid_worker_stop_requested() {
+    return furi_thread_flags_get() & TotpHidWorkerEvtStop;
+}
+
 static void totp_hid_worker_type_code(TotpHidWorkerTypeContext* context) {
     context->usb_mode_prev = furi_hal_usb_get_config();
     furi_hal_usb_unlock();
@@ -27,11 +31,11 @@ static void totp_hid_worker_type_code(TotpHidWorkerTypeContext* context) {
     do {
         furi_delay_ms(500);
         i++;
-    } while(!furi_hal_hid_is_connected() && i < 50);
-    furi_delay_ms(500);
-
+    } while(!furi_hal_hid_is_connected() && i < 50 && !totp_hid_worker_stop_requested());
+    
     if(furi_hal_hid_is_connected() &&
        furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
+        furi_delay_ms(500);
         i = 0;
         while(i < context->string_length && context->string[i] != 0) {
             uint8_t digit = context->string[i] - '0';
