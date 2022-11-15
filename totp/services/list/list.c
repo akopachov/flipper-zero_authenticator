@@ -77,11 +77,12 @@ ListNode* list_remove_at(ListNode* head, uint16_t index) {
 
     uint16_t i;
 
-    for(it = head, i = 0; it != NULL && i < index; prev = it, it = it->next, i++);
+    for(it = head, i = 0; it != NULL && i < index; prev = it, it = it->next, i++)
+        ;
 
-    if (it == NULL) return head;
+    if(it == NULL) return head;
 
-    if (prev == NULL) {
+    if(prev == NULL) {
         ListNode* new_head = it->next;
         free(it);
         return new_head;
@@ -96,7 +97,7 @@ ListNode* list_remove_at(ListNode* head, uint16_t index) {
 ListNode* list_insert_at(ListNode* head, uint16_t index, void* data) {
     if(index == 0 || head == NULL) {
         ListNode* new_head = list_init_head(data);
-        if (new_head != NULL) {
+        if(new_head != NULL) {
             new_head->next = head;
         }
         return new_head;
@@ -107,7 +108,8 @@ ListNode* list_insert_at(ListNode* head, uint16_t index, void* data) {
 
     uint16_t i;
 
-    for(it = head, i = 0; it != NULL && i < index; prev = it, it = it->next, i++);
+    for(it = head, i = 0; it != NULL && i < index; prev = it, it = it->next, i++)
+        ;
 
     ListNode* new = malloc(sizeof(ListNode));
     if(new == NULL) return NULL;

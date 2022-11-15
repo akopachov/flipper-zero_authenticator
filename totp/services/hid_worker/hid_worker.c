@@ -31,8 +31,8 @@ static void totp_hid_worker_type_code(TotpHidWorkerTypeContext* context) {
     do {
         furi_delay_ms(500);
         i++;
-    } while(!furi_hal_hid_is_connected() && i < 50 && !totp_hid_worker_stop_requested());
-    
+    } while(!furi_hal_hid_is_connected() && i < 100 && !totp_hid_worker_stop_requested());
+
     if(furi_hal_hid_is_connected() &&
        furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
         furi_delay_ms(500);
