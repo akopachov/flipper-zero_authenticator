@@ -32,7 +32,6 @@ void totp_cli_command_move_docopt_usage() {
 }
 
 void totp_cli_command_move_docopt_arguments() {
-    //TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_MOVE_ARG_INDEX "        Token name\r\n");
 }
 
 void totp_cli_command_move_docopt_options() {
@@ -73,7 +72,7 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
                     "Missed value for argument \"" TOTP_CLI_COMMAND_MOVE_ARG_NEW_NAME_PREFIX
                     "\"\r\n");
             } else {
-                if (new_token_name != NULL) {
+                if(new_token_name != NULL) {
                     free(new_token_name);
                 }
 
