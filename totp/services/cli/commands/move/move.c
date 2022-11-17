@@ -73,6 +73,10 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
                     "Missed value for argument \"" TOTP_CLI_COMMAND_MOVE_ARG_NEW_NAME_PREFIX
                     "\"\r\n");
             } else {
+                if (new_token_name != NULL) {
+                    free(new_token_name);
+                }
+
                 new_token_name = malloc(furi_string_size(temp_str) + 1);
                 if(new_token_name == NULL) {
                     furi_string_free(temp_str);
