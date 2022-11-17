@@ -31,9 +31,6 @@ void totp_cli_command_move_docopt_usage() {
                     TOTP_CLI_COMMAND_MOVE_ARG_NEW_NAME))) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX))) "\r\n");
 }
 
-void totp_cli_command_move_docopt_arguments() {
-}
-
 void totp_cli_command_move_docopt_options() {
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
         TOTP_CLI_COMMAND_MOVE_ARG_NEW_NAME_PREFIX,
