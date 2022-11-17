@@ -128,17 +128,21 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
     }
 
     bool token_updated = false;
-    TokenInfo* token_info = list_element_at(plugin_state->tokens_list, token_index - 1)->data;
+    TokenInfo* token_info = NULL;
+    if(new_token_index > 0) {
+        plugin_state->tokens_list =
+            list_remove_at(plugin_state->tokens_list, token_index - 1, (void**)&token_info);
+        furi_check(token_info != NULL);
+        plugin_state->tokens_list =
+            list_insert_at(plugin_state->tokens_list, new_token_index - 1, token_info);
+        token_updated = true;
+    } else {
+        token_info = list_element_at(plugin_state->tokens_list, token_index - 1)->data;
+    }
+
     if(new_token_name != NULL) {
         free(token_info->name);
         token_info->name = new_token_name;
-        token_updated = true;
-    }
-
-    if(new_token_index > 0) {
-        plugin_state->tokens_list = list_remove_at(plugin_state->tokens_list, token_index - 1);
-        plugin_state->tokens_list =
-            list_insert_at(plugin_state->tokens_list, new_token_index - 1, token_info);
         token_updated = true;
     }
 

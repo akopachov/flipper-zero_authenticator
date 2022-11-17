@@ -1,6 +1,6 @@
 #include "hid_worker.h"
 
-const uint8_t hid_number_keys[10] = {
+static const uint8_t hid_number_keys[10] = {
     HID_KEYBOARD_0,
     HID_KEYBOARD_1,
     HID_KEYBOARD_2,
@@ -95,7 +95,7 @@ TotpHidWorkerTypeContext* totp_hid_worker_start() {
 }
 
 void totp_hid_worker_stop(TotpHidWorkerTypeContext* context) {
-    furi_assert(context);
+    furi_assert(context != NULL);
     furi_thread_flags_set(furi_thread_get_id(context->thread), TotpHidWorkerEvtStop);
     furi_thread_join(context->thread);
     furi_thread_free(context->thread);
@@ -105,6 +105,6 @@ void totp_hid_worker_stop(TotpHidWorkerTypeContext* context) {
 }
 
 void totp_hid_worker_notify(TotpHidWorkerTypeContext* context, TotpHidWorkerEvtFlags event) {
-    furi_assert(context);
+    furi_assert(context != NULL);
     furi_thread_flags_set(furi_thread_get_id(context->thread), event);
 }

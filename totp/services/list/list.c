@@ -29,7 +29,7 @@ ListNode* list_add(ListNode* head, void* data) {
 }
 
 ListNode* list_find(ListNode* head, const void* data) {
-    ListNode* it;
+    ListNode* it = NULL;
 
     for(it = head; it != NULL; it = it->next)
         if(it->data == data) break;
@@ -67,7 +67,7 @@ ListNode* list_remove(ListNode* head, ListNode* ep) {
     return head;
 }
 
-ListNode* list_remove_at(ListNode* head, uint16_t index) {
+ListNode* list_remove_at(ListNode* head, uint16_t index, void** removed_node_data) {
     if(head == NULL) {
         return NULL;
     }
@@ -82,16 +82,20 @@ ListNode* list_remove_at(ListNode* head, uint16_t index) {
 
     if(it == NULL) return head;
 
+    ListNode* new_head = head;
     if(prev == NULL) {
-        ListNode* new_head = it->next;
-        free(it);
-        return new_head;
+        new_head = it->next;
+    } else {
+        prev->next = it->next;
     }
 
-    prev->next = it->next;
+    if(removed_node_data != NULL) {
+        *removed_node_data = it->data;
+    }
+
     free(it);
 
-    return head;
+    return new_head;
 }
 
 ListNode* list_insert_at(ListNode* head, uint16_t index, void* data) {
