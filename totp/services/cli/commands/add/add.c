@@ -94,7 +94,7 @@ static bool totp_cli_read_secret(Cli* cli, FuriString* out_str, bool mask_user_i
     while(cli_read(cli, &c, 1) == 1) {
         if(c == CliSymbolAsciiEsc) {
             // Some keys generating escape-sequences
-            // We need to ignore them as we case about alpha-numerics only
+            // We need to ignore them as we care about alpha-numerics only
             uint8_t c2;
             cli_read_timeout(cli, &c2, 1, 0);
             cli_read_timeout(cli, &c2, 1, 0);

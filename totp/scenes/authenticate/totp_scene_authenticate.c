@@ -7,15 +7,12 @@
 #include "../scene_director.h"
 #include "../totp_scenes_enum.h"
 #include "../../services/crypto/crypto.h"
+#include "../../types/user_pin_codes.h"
 
 #define MAX_CODE_LENGTH TOTP_IV_SIZE
-#define ARROW_UP_CODE 2
-#define ARROW_RIGHT_CODE 8
-#define ARROW_DOWN_CODE 11
-#define ARROW_LEFT_CODE 5
 
 typedef struct {
-    uint8_t code_input[MAX_CODE_LENGTH];
+    TotpUserPinCode code_input[MAX_CODE_LENGTH];
     uint8_t code_length;
 } SceneState;
 
@@ -98,25 +95,25 @@ bool totp_scene_authenticate_handle_event(
     switch(event->input.key) {
     case InputKeyUp:
         if(scene_state->code_length < MAX_CODE_LENGTH) {
-            scene_state->code_input[scene_state->code_length] = ARROW_UP_CODE;
+            scene_state->code_input[scene_state->code_length] = PinCodeArrowUp;
             scene_state->code_length++;
         }
         break;
     case InputKeyDown:
         if(scene_state->code_length < MAX_CODE_LENGTH) {
-            scene_state->code_input[scene_state->code_length] = ARROW_DOWN_CODE;
+            scene_state->code_input[scene_state->code_length] = PinCodeArrowDown;
             scene_state->code_length++;
         }
         break;
     case InputKeyRight:
         if(scene_state->code_length < MAX_CODE_LENGTH) {
-            scene_state->code_input[scene_state->code_length] = ARROW_RIGHT_CODE;
+            scene_state->code_input[scene_state->code_length] = PinCodeArrowRight;
             scene_state->code_length++;
         }
         break;
     case InputKeyLeft:
         if(scene_state->code_length < MAX_CODE_LENGTH) {
-            scene_state->code_input[scene_state->code_length] = ARROW_LEFT_CODE;
+            scene_state->code_input[scene_state->code_length] = PinCodeArrowLeft;
             scene_state->code_length++;
         }
         break;
