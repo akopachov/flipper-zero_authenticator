@@ -1,5 +1,6 @@
 #include "totp_app_settings.h"
 #include <math.h>
+#include <totp_icons.h>
 #include "../../ui_controls.h"
 #include "../../scene_director.h"
 #include "../token_menu/totp_scene_token_menu.h"
@@ -10,11 +11,16 @@
 
 #define DIGIT_TO_CHAR(digit) ((digit) + '0')
 
-typedef enum { HoursInput, MinutesInput, ConfirmButton } Control;
+char* YES_NO_LIST[] = {"NO", "YES"};
+
+typedef enum { HoursInput, MinutesInput, Sound, Vibro, ConfirmButton } Control;
 
 typedef struct {
     int8_t tz_offset_hours;
     uint8_t tz_offset_minutes;
+    bool notification_sound;
+    bool notification_vibro;
+    uint8_t y_offset;
     TotpNullable_uint16_t current_token_index;
     Control selected_control;
 } SceneState;
@@ -39,6 +45,8 @@ void totp_scene_app_settings_activate(
     float off_dec = modff(plugin_state->timezone_offset, &off_int);
     scene_state->tz_offset_hours = off_int;
     scene_state->tz_offset_minutes = 60.0f * off_dec;
+    scene_state->notification_sound = plugin_state->notification_sound;
+    scene_state->notification_vibro = plugin_state->notification_vibro;
 }
 
 static void two_digit_to_str(int8_t num, char* str) {
@@ -57,37 +65,61 @@ static void two_digit_to_str(int8_t num, char* str) {
 }
 
 void totp_scene_app_settings_render(Canvas* const canvas, PluginState* plugin_state) {
-    const SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
+    const SceneState* scene_state = plugin_state->current_scene_state;
 
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str_aligned(canvas, 0, 0, AlignLeft, AlignTop, "Timezone offset");
+    canvas_draw_str_aligned(canvas, 0, 0 - scene_state->y_offset, AlignLeft, AlignTop, "Timezone offset");
     canvas_set_font(canvas, FontSecondary);
 
     char tmp_str[4];
     two_digit_to_str(scene_state->tz_offset_hours, &tmp_str[0]);
-    canvas_draw_str_aligned(canvas, 0, 16, AlignLeft, AlignTop, "Hours:");
+    canvas_draw_str_aligned(canvas, 0, 16 - scene_state->y_offset, AlignLeft, AlignTop, "Hours:");
     ui_control_select_render(
         canvas,
         36,
-        10,
+        10 - scene_state->y_offset,
         SCREEN_WIDTH - 36,
         &tmp_str[0],
         scene_state->selected_control == HoursInput);
 
     two_digit_to_str(scene_state->tz_offset_minutes, &tmp_str[0]);
-    canvas_draw_str_aligned(canvas, 0, 34, AlignLeft, AlignTop, "Minutes:");
+    canvas_draw_str_aligned(canvas, 0, 34 - scene_state->y_offset, AlignLeft, AlignTop, "Minutes:");
     ui_control_select_render(
         canvas,
         36,
-        28,
+        28 - scene_state->y_offset,
         SCREEN_WIDTH - 36,
         &tmp_str[0],
         scene_state->selected_control == MinutesInput);
 
+    canvas_draw_icon(canvas, SCREEN_WIDTH_CENTER - 5, SCREEN_HEIGHT - 5 - scene_state->y_offset, &I_totp_arrow_bottom_10x5);
+
+    canvas_set_font(canvas, FontPrimary);
+    canvas_draw_str_aligned(canvas, 0, 64 - scene_state->y_offset, AlignLeft, AlignTop, "Notifications");
+    canvas_set_font(canvas, FontSecondary);
+
+    canvas_draw_str_aligned(canvas, 0, 80 - scene_state->y_offset, AlignLeft, AlignTop, "Sound:");
+    ui_control_select_render(
+        canvas,
+        36,
+        74 - scene_state->y_offset,
+        SCREEN_WIDTH - 36,
+        YES_NO_LIST[scene_state->notification_sound],
+        scene_state->selected_control == Sound);
+
+    canvas_draw_str_aligned(canvas, 0, 98 - scene_state->y_offset, AlignLeft, AlignTop, "Vibro:");
+    ui_control_select_render(
+        canvas,
+        36,
+        92 - scene_state->y_offset,
+        SCREEN_WIDTH - 36,
+        YES_NO_LIST[scene_state->notification_vibro],
+        scene_state->selected_control == Vibro);
+
     ui_control_button_render(
         canvas,
         SCREEN_WIDTH_CENTER - 24,
-        50,
+        115 - scene_state->y_offset,
         48,
         13,
         "Confirm",
@@ -114,10 +146,20 @@ bool totp_scene_app_settings_handle_event(
             HoursInput,
             ConfirmButton,
             RollOverflowBehaviorStop);
+        if (scene_state->selected_control > MinutesInput) {
+            scene_state->y_offset = 64;
+        } else {
+            scene_state->y_offset = 0;
+        }
         break;
     case InputKeyDown:
         totp_roll_value_uint8_t(
             &scene_state->selected_control, 1, HoursInput, ConfirmButton, RollOverflowBehaviorStop);
+        if (scene_state->selected_control > MinutesInput) {
+            scene_state->y_offset = 64;
+        } else {
+            scene_state->y_offset = 0;
+        }
         break;
     case InputKeyRight:
         if(scene_state->selected_control == HoursInput) {
@@ -126,6 +168,10 @@ bool totp_scene_app_settings_handle_event(
         } else if(scene_state->selected_control == MinutesInput) {
             totp_roll_value_uint8_t(
                 &scene_state->tz_offset_minutes, 15, 0, 45, RollOverflowBehaviorRoll);
+        } else if (scene_state->selected_control == Sound) {
+            scene_state->notification_sound = !scene_state->notification_sound;
+        } else if (scene_state->selected_control == Vibro) {
+            scene_state->notification_vibro = !scene_state->notification_vibro;
         }
         break;
     case InputKeyLeft:
@@ -135,13 +181,20 @@ bool totp_scene_app_settings_handle_event(
         } else if(scene_state->selected_control == MinutesInput) {
             totp_roll_value_uint8_t(
                 &scene_state->tz_offset_minutes, -15, 0, 45, RollOverflowBehaviorRoll);
+        } else if (scene_state->selected_control == Sound) {
+            scene_state->notification_sound = !scene_state->notification_sound;
+        } else if (scene_state->selected_control == Vibro) {
+            scene_state->notification_vibro = !scene_state->notification_vibro;
         }
         break;
     case InputKeyOk:
         if(scene_state->selected_control == ConfirmButton) {
             plugin_state->timezone_offset = (float)scene_state->tz_offset_hours +
                                             (float)scene_state->tz_offset_minutes / 60.0f;
-            totp_config_file_update_timezone_offset(plugin_state->timezone_offset);
+
+            plugin_state->notification_sound = scene_state->notification_sound;
+            plugin_state->notification_vibro = scene_state->notification_vibro;
+            totp_config_file_update_user_settings(plugin_state);
 
             if(!scene_state->current_token_index.is_null) {
                 TokenMenuSceneContext generate_scene_context = {

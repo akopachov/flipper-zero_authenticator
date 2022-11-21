@@ -14,21 +14,6 @@
 #define TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX "-d"
 #define TOTP_CLI_COMMAND_ADD_ARG_UNSECURE_PREFIX "-u"
 
-static bool token_info_set_digits_from_str(TokenInfo* token_info, const FuriString* str) {
-    switch(furi_string_get_char(str, 0)) {
-    case '6':
-        token_info->digits = TOTP_6_DIGITS;
-        return true;
-    case '8':
-        token_info->digits = TOTP_8_DIGITS;
-        return true;
-    default:
-        break;
-    }
-
-    return false;
-}
-
 static bool token_info_set_algo_from_str(TokenInfo* token_info, const FuriString* str) {
     if(furi_string_cmpi_str(str, TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME) == 0) {
         token_info->algo = SHA1;
@@ -164,7 +149,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
                 TOTP_CLI_PRINTF(
                     "Missed value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX
                     "\"\r\n");
-            } else if(!token_info_set_digits_from_str(token_info, temp_str)) {
+            } else if(!token_info_set_digits_from_int(token_info, furi_string_get_char(temp_str, 0) - '0')) {
                 TOTP_CLI_PRINTF(
                     "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX
                     "\"\r\n",

@@ -29,12 +29,12 @@ typedef enum {
     /**
      * @brief 6 digits
      */
-    TOTP_6_DIGITS,
+    TOTP_6_DIGITS = 6,
 
     /**
      * @brief 8 digits
      */
-    TOTP_8_DIGITS
+    TOTP_8_DIGITS = 8
 } TokenDigitsCount;
 
 #define TOTP_TOKEN_DIGITS_MAX_COUNT 8
@@ -96,8 +96,9 @@ bool token_info_set_secret(
     const uint8_t* iv);
 
 /**
- * @brief Gets token digits count as \c uint8_t type
- * @param token_info instance which's desired digits count should be returned
- * @return Token digits length as \c uint8_t type
+ * @brief Sets token digits count from \c uint8_t value
+ * @param token_info instance whichs token digits count length should be updated
+ * @param digits desired token digits count length
+ * @return \c true if token digits count length has been updated; \c false p
  */
-uint8_t token_info_get_digits_count(const TokenInfo* token_info);
+bool token_info_set_digits_from_int(TokenInfo* token_info, uint8_t digits);

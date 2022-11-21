@@ -86,4 +86,14 @@ typedef struct {
      * @brief Basic randomly-generated initialization vector (IV)
      */
     uint8_t base_iv[TOTP_IV_SIZE];
+
+    /**
+     * @brief Whether to use sound when notifying user
+     */
+    bool notification_sound;
+
+    /**
+     * @brief Whether to use vibro when notifying user
+     */
+    bool notification_vibro;
 } PluginState;

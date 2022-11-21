@@ -10,32 +10,6 @@
 #define CONFIG_FILE_PATH CONFIG_FILE_DIRECTORY_PATH "/totp.conf"
 #define CONFIG_FILE_BACKUP_PATH CONFIG_FILE_PATH ".backup"
 
-static uint8_t token_info_get_digits_as_int(const TokenInfo* token_info) {
-    switch(token_info->digits) {
-    case TOTP_6_DIGITS:
-        return 6;
-    case TOTP_8_DIGITS:
-        return 8;
-    default:
-        break;
-    }
-
-    return 6;
-}
-
-static void token_info_set_digits_from_int(TokenInfo* token_info, uint8_t digits) {
-    switch(digits) {
-    case 6:
-        token_info->digits = TOTP_6_DIGITS;
-        break;
-    case 8:
-        token_info->digits = TOTP_8_DIGITS;
-        break;
-    default:
-        break;
-    }
-}
-
 static char* token_info_get_algo_as_cstr(const TokenInfo* token_info) {
     switch(token_info->algo) {
     case SHA1:
@@ -106,6 +80,16 @@ FlipperFormat* totp_open_config_file(Storage* storage) {
             fff_data_file,
             "Timezone offset in hours. Important note: do not put '+' sign for positive values");
         flipper_format_write_float(fff_data_file, TOTP_CONFIG_KEY_TIMEZONE, &tmp_tz, 1);
+
+        bool temp_bool = true;
+        flipper_format_write_comment_cstr(fff_data_file, " ");
+        flipper_format_write_comment_cstr(fff_data_file, "Whether to use sound when notifying user");
+        flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_SOUND, &temp_bool, 1);
+
+        flipper_format_write_comment_cstr(fff_data_file, " ");
+        flipper_format_write_comment_cstr(fff_data_file, "Whether to use vibro when notifying user");
+        flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_VIBRO, &temp_bool, 1);
+
         FuriString* temp_str = furi_string_alloc();
 
         flipper_format_write_comment_cstr(fff_data_file, " ");
@@ -172,8 +156,7 @@ void totp_config_file_save_new_token_i(FlipperFormat* file, const TokenInfo* tok
     }
     flipper_format_write_string_cstr(
         file, TOTP_CONFIG_KEY_TOKEN_ALGO, token_info_get_algo_as_cstr(token_info));
-    uint32_t digits_count_as_uint32 = token_info_get_digits_as_int(token_info);
-    flipper_format_write_uint32(file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &digits_count_as_uint32, 1);
+    flipper_format_write_uint32(file, TOTP_CONFIG_KEY_TOKEN_DIGITS, (uint32_t* )&token_info->digits, 1);
 }
 
 void totp_config_file_save_new_token(const TokenInfo* token_info) {
@@ -196,6 +179,18 @@ void totp_config_file_update_timezone_offset(float new_timezone_offset) {
     totp_close_storage();
 }
 
+void totp_config_file_update_user_settings(const PluginState* plugin_state) {
+    Storage* cfg_storage = totp_open_storage();
+    FlipperFormat* file = totp_open_config_file(cfg_storage);
+
+    flipper_format_insert_or_update_float(file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1);
+    flipper_format_insert_or_update_bool(file, TOTP_CONFIG_KEY_NOTIFICATION_SOUND, &plugin_state->notification_sound, 1);
+    flipper_format_insert_or_update_bool(file, TOTP_CONFIG_KEY_NOTIFICATION_VIBRO, &plugin_state->notification_vibro, 1);
+
+    totp_close_config_file(file);
+    totp_close_storage();
+}
+
 void totp_full_save_config_file(const PluginState* const plugin_state) {
     Storage* storage = totp_open_storage();
     FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
@@ -213,6 +208,8 @@ void totp_full_save_config_file(const PluginState* const plugin_state) {
     flipper_format_write_float(
         fff_data_file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1);
     flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_PINSET, &plugin_state->pin_set, 1);
+    flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_SOUND, &plugin_state->notification_sound, 1);
+    flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_VIBRO, &plugin_state->notification_vibro, 1);
 
     TOTP_LIST_FOREACH(plugin_state->tokens_list, node, {
         const TokenInfo* token_info = node->data;
@@ -320,6 +317,20 @@ void totp_config_file_load_base(PluginState* const plugin_state) {
         plugin_state->pin_set = true;
     }
 
+    flipper_format_rewind(fff_data_file);
+
+    if(!flipper_format_read_bool(
+           fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_SOUND, &plugin_state->notification_sound, 1)) {
+        plugin_state->notification_sound = true;
+    }
+
+    flipper_format_rewind(fff_data_file);
+
+    if(!flipper_format_read_bool(
+           fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_VIBRO, &plugin_state->notification_vibro, 1)) {
+        plugin_state->notification_vibro = true;
+    }
+
     furi_string_free(temp_str);
     totp_close_config_file(fff_data_file);
     totp_close_storage();
@@ -408,10 +419,8 @@ TokenLoadingResult totp_config_file_load_tokens(PluginState* const plugin_state)
             tokenInfo->algo = SHA1;
         }
 
-        if(flipper_format_read_uint32(
-               fff_data_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &temp_data32, 1)) {
-            token_info_set_digits_from_int(tokenInfo, temp_data32);
-        } else {
+        if(!flipper_format_read_uint32(fff_data_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &temp_data32, 1) || 
+            !token_info_set_digits_from_int(tokenInfo, temp_data32)) {
             tokenInfo->digits = TOTP_6_DIGITS;
         }
 

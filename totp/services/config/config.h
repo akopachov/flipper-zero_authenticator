@@ -80,3 +80,9 @@ void totp_config_file_save_new_token(const TokenInfo* token_info);
  * @param new_timezone_offset new timezone offset to be set
  */
 void totp_config_file_update_timezone_offset(float new_timezone_offset);
+
+/**
+ * @brief Updates application user settings
+ * @param plugin_state application state
+ */
+void totp_config_file_update_user_settings(const PluginState* plugin_state);

@@ -205,7 +205,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
             i_token_to_str(
                 totp_at(
                     get_totp_algo_impl(tokenInfo->algo),
-                    token_info_get_digits_count(tokenInfo),
+                    tokenInfo->digits,
                     key,
                     key_length,
                     curr_ts,
