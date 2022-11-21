@@ -92,3 +92,9 @@ void list_free(ListNode* head);
             assert(list_add(head, item) != NULL); \
         }                                         \
     } while(false)
+
+#define TOTP_LIST_FOREACH(head, node, action) \
+    ListNode* node = head;                    \
+    while(node != NULL) {                     \
+        action node = node->next;             \
+    }

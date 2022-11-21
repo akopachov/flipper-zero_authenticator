@@ -22,6 +22,28 @@ void totp_cli_command_pin_docopt_usage() {
         TOTP_CLI_COMMAND_PIN_COMMAND_SET " | " TOTP_CLI_COMMAND_PIN_COMMAND_REMOVE) "\r\n");
 }
 
+static inline uint8_t totp_cli_key_to_pin_code(uint8_t key) {
+    uint8_t code = 0;
+    switch(key) {
+    case 0x44: // left
+        code = PinCodeArrowLeft;
+        break;
+    case 0x41: // up
+        code = PinCodeArrowUp;
+        break;
+    case 0x43: // right
+        code = PinCodeArrowRight;
+        break;
+    case 0x42: // down
+        code = PinCodeArrowDown;
+        break;
+    default:
+        break;
+    }
+
+    return code;
+}
+
 static bool totp_cli_read_pin(Cli* cli, uint8_t* pin, uint8_t* pin_length) {
     TOTP_CLI_PRINTF("Enter new PIN (use arrow keys on your keyboard): ");
     fflush(stdout);
@@ -33,24 +55,7 @@ static bool totp_cli_read_pin(Cli* cli, uint8_t* pin, uint8_t* pin_length) {
             uint8_t c3;
             if(cli_read_timeout(cli, &c2, 1, 0) == 1 && cli_read_timeout(cli, &c3, 1, 0) == 1 &&
                c2 == 0x5b) {
-                uint8_t code = 0;
-                switch(c3) {
-                case 0x44: // left
-                    code = PinCodeArrowLeft;
-                    break;
-                case 0x41: // up
-                    code = PinCodeArrowUp;
-                    break;
-                case 0x43: // right
-                    code = PinCodeArrowRight;
-                    break;
-                case 0x42: // down
-                    code = PinCodeArrowDown;
-                    break;
-                default:
-                    break;
-                }
-
+                uint8_t code = totp_cli_key_to_pin_code(c3);
                 if(code > 0) {
                     pin[*pin_length] = code;
                     *pin_length = *pin_length + 1;
@@ -85,21 +90,17 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
     bool do_change = false;
     bool do_remove = false;
     UNUSED(do_remove);
-    do {
-        if(!args_read_string_and_trim(args, temp_str)) {
-            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
-            break;
-        }
-
+    if(args_read_string_and_trim(args, temp_str)) {
         if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_PIN_COMMAND_SET) == 0) {
             do_change = true;
         } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_PIN_COMMAND_REMOVE) == 0) {
             do_remove = true;
         } else {
             TOTP_CLI_PRINT_INVALID_ARGUMENTS();
-            break;
         }
-    } while(false);
+    } else {
+        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+    }
 
     if((do_change || do_remove) && totp_cli_ensure_authenticated(plugin_state, cli)) {
         bool load_generate_token_scene = false;
@@ -135,8 +136,8 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
             totp_crypto_seed_iv(
                 plugin_state, new_pin_length > 0 ? &new_pin[0] : NULL, new_pin_length);
-            ListNode* node = plugin_state->tokens_list;
-            while(node != NULL) {
+
+            TOTP_LIST_FOREACH(plugin_state->tokens_list, node, {
                 TokenInfo* token_info = node->data;
                 size_t plain_token_length;
                 uint8_t* plain_token = totp_crypto_decrypt(
@@ -149,8 +150,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                     &token_info->token_length);
                 memset_s(plain_token, plain_token_length, 0, plain_token_length);
                 free(plain_token);
-                node = node->next;
-            }
+            });
 
             totp_full_save_config_file(plugin_state);
 
