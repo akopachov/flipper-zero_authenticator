@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cli/cli.h>
-#include "../../../../types/plugin_state.h"
+#include "../../../types/plugin_state.h"
 
 #define TOTP_CLI_COMMAND_ADD "add"
 #define TOTP_CLI_COMMAND_ADD_ALT "mk"

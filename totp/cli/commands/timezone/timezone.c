@@ -1,7 +1,7 @@
 #include "timezone.h"
 #include <lib/toolbox/args.h>
-#include "../../../config/config.h"
-#include "../../../../scenes/scene_director.h"
+#include "../../../services/config/config.h"
+#include "../../../ui/scene_director.h"
 #include "../../cli_helpers.h"
 
 #define TOTP_CLI_COMMAND_TIMEZONE_ARG_TIMEZONE "timezone"

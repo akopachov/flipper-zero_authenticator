@@ -2,11 +2,11 @@
 
 #include <stdlib.h>
 #include <lib/toolbox/args.h>
-#include "../../../list/list.h"
-#include "../../../../types/token_info.h"
-#include "../../../config/config.h"
+#include "../../../services/list/list.h"
+#include "../../../types/token_info.h"
+#include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
-#include "../../../../scenes/scene_director.h"
+#include "../../../ui/scene_director.h"
 
 #define TOTP_CLI_COMMAND_MOVE_ARG_INDEX "index"
 

@@ -2,13 +2,13 @@
 
 #include <stdlib.h>
 #include <lib/toolbox/args.h>
-#include "../../../../types/token_info.h"
-#include "../../../../types/user_pin_codes.h"
-#include "../../../config/config.h"
+#include "../../../types/token_info.h"
+#include "../../../types/user_pin_codes.h"
+#include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
-#include "../../../../services/crypto/memset_s.h"
-#include "../../../../services/crypto/crypto.h"
-#include "../../../../scenes/scene_director.h"
+#include "../../../services/crypto/memset_s.h"
+#include "../../../services/crypto/crypto.h"
+#include "../../../ui/scene_director.h"
 
 #define TOTP_CLI_COMMAND_PIN_COMMAND_SET "set"
 #define TOTP_CLI_COMMAND_PIN_COMMAND_REMOVE "remove"

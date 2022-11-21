@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <lib/toolbox/args.h>
-#include "../../../list/list.h"
-#include "../../../config/config.h"
+#include "../../../services/list/list.h"
+#include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
-#include "../../../../scenes/scene_director.h"
+#include "../../../ui/scene_director.h"
 
 #define TOTP_CLI_COMMAND_DELETE_ARG_INDEX "index"
 #define TOTP_CLI_COMMAND_DELETE_ARG_FORCE_SUFFIX "-f"

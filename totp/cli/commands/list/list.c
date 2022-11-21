@@ -1,8 +1,8 @@
 #include "list.h"
 #include <stdlib.h>
-#include "../../../list/list.h"
-#include "../../../../types/token_info.h"
-#include "../../../config/constants.h"
+#include "../../../services/list/list.h"
+#include "../../../types/token_info.h"
+#include "../../../services/config/constants.h"
 #include "../../cli_helpers.h"
 
 static char* get_algo_as_cstr(TokenHashAlgo algo) {
