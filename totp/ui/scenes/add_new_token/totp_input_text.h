@@ -3,10 +3,8 @@
 #include <gui/gui.h>
 #include <gui/view.h>
 #include <gui/modules/text_input.h>
-#include <furi.h>
-#include <furi_hal.h>
-#include "../../types/plugin_state.h"
-#include "../../types/plugin_event.h"
+#include "../../../types/plugin_state.h"
+#include "../../../types/plugin_event.h"
 
 typedef struct {
     char* user_input;

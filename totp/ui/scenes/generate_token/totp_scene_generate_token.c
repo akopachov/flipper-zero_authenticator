@@ -3,17 +3,17 @@
 #include <notification/notification_messages.h>
 #include <totp_icons.h>
 #include "totp_scene_generate_token.h"
-#include "../../types/token_info.h"
-#include "../../types/common.h"
-#include "../../services/ui/constants.h"
-#include "../../services/totp/totp.h"
-#include "../../services/config/config.h"
-#include "../../services/crypto/crypto.h"
-#include "../../services/crypto/memset_s.h"
-#include "../../services/roll_value/roll_value.h"
-#include "../scene_director.h"
+#include "../../../types/token_info.h"
+#include "../../../types/common.h"
+#include "../../constants.h"
+#include "../../../services/totp/totp.h"
+#include "../../../services/config/config.h"
+#include "../../../services/crypto/crypto.h"
+#include "../../../lib/polyfills/memset_s.h"
+#include "../../../lib/roll_value/roll_value.h"
+#include "../../scene_director.h"
 #include "../token_menu/totp_scene_token_menu.h"
-#include "../../services/hid_worker/hid_worker.h"
+#include "../../../workers/type_code/type_code.h"
 
 #define TOKEN_LIFETIME 30
 #define DIGIT_TO_CHAR(digit) ((digit) + '0')
@@ -24,7 +24,7 @@ typedef struct {
     char* last_code_name;
     bool need_token_update;
     uint32_t last_token_gen_time;
-    TotpHidWorkerTypeContext* hid_worker_context;
+    TotpTypeCodeWorkerContext* type_code_worker_context;
 } SceneState;
 
 static const NotificationSequence notification_sequence_new_token = {
@@ -152,9 +152,9 @@ void totp_scene_generate_token_activate(
     plugin_state->current_scene_state = scene_state;
     FURI_LOG_D(LOGGING_TAG, "Timezone set to: %f", (double)plugin_state->timezone_offset);
     update_totp_params(plugin_state);
-    scene_state->hid_worker_context = totp_hid_worker_start();
-    scene_state->hid_worker_context->string = &scene_state->last_code[0];
-    scene_state->hid_worker_context->string_length = TOTP_TOKEN_DIGITS_MAX_COUNT + 1;
+    scene_state->type_code_worker_context = totp_type_code_worker_start();
+    scene_state->type_code_worker_context->string = &scene_state->last_code[0];
+    scene_state->type_code_worker_context->string_length = TOTP_TOKEN_DIGITS_MAX_COUNT + 1;
 }
 
 void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_state) {
@@ -196,7 +196,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
                              ->data);
 
         if(tokenInfo->token != NULL && tokenInfo->token_length > 0) {
-            furi_mutex_acquire(scene_state->hid_worker_context->string_sync, FuriWaitForever);
+            furi_mutex_acquire(scene_state->type_code_worker_context->string_sync, FuriWaitForever);
             size_t key_length;
             uint8_t* key = totp_crypto_decrypt(
                 tokenInfo->token, tokenInfo->token_length, &plugin_state->iv[0], &key_length);
@@ -215,11 +215,11 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
             memset_s(key, key_length, 0, key_length);
             free(key);
         } else {
-            furi_mutex_acquire(scene_state->hid_worker_context->string_sync, FuriWaitForever);
+            furi_mutex_acquire(scene_state->type_code_worker_context->string_sync, FuriWaitForever);
             i_token_to_str(0, scene_state->last_code, tokenInfo->digits);
         }
 
-        furi_mutex_release(scene_state->hid_worker_context->string_sync);
+        furi_mutex_release(scene_state->type_code_worker_context->string_sync);
 
         if(is_new_token_time) {
             notification_message(plugin_state->notification, &notification_sequence_new_token);
@@ -288,7 +288,7 @@ bool totp_scene_generate_token_handle_event(
     SceneState* scene_state;
     if(event->input.type == InputTypeLong && event->input.key == InputKeyDown) {
         scene_state = (SceneState*)plugin_state->current_scene_state;
-        totp_hid_worker_notify(scene_state->hid_worker_context, TotpHidWorkerEvtType);
+        totp_type_code_worker_notify(scene_state->type_code_worker_context, TotpTypeCodeWorkerEvtType);
         notification_message(plugin_state->notification, &notification_sequence_badusb);
         return true;
     }
@@ -342,7 +342,7 @@ void totp_scene_generate_token_deactivate(PluginState* plugin_state) {
     if(plugin_state->current_scene_state == NULL) return;
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
 
-    totp_hid_worker_stop(scene_state->hid_worker_context);
+    totp_type_code_worker_stop(scene_state->type_code_worker_context);
 
     free(scene_state);
     plugin_state->current_scene_state = NULL;

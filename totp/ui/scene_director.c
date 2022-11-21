@@ -1,10 +1,10 @@
 #include "../types/common.h"
 #include "scene_director.h"
-#include "authenticate/totp_scene_authenticate.h"
-#include "generate_token/totp_scene_generate_token.h"
-#include "add_new_token/totp_scene_add_new_token.h"
-#include "token_menu/totp_scene_token_menu.h"
-#include "app_settings/totp_app_settings.h"
+#include "scenes/authenticate/totp_scene_authenticate.h"
+#include "scenes/generate_token/totp_scene_generate_token.h"
+#include "scenes/add_new_token/totp_scene_add_new_token.h"
+#include "scenes/token_menu/totp_scene_token_menu.h"
+#include "scenes/app_settings/totp_app_settings.h"
 
 void totp_scene_director_activate_scene(
     PluginState* const plugin_state,

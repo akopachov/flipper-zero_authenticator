@@ -14,7 +14,7 @@
 #include "types/event_type.h"
 #include "types/common.h"
 #include "ui/scene_director.h"
-#include "services/ui/constants.h"
+#include "ui/constants.h"
 #include "services/crypto/crypto.h"
 #include "cli/cli.h"
 

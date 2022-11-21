@@ -3,7 +3,7 @@
 #include <notification/notification.h>
 #include <gui/gui.h>
 #include <dialogs/dialogs.h>
-#include "../services/list/list.h"
+#include "../lib/list/list.h"
 #include "../ui/totp_scenes_enum.h"
 
 #define TOTP_IV_SIZE 16

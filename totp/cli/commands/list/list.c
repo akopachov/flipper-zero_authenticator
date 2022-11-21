@@ -1,6 +1,6 @@
 #include "list.h"
 #include <stdlib.h>
-#include "../../../services/list/list.h"
+#include "../../../lib/list/list.h"
 #include "../../../types/token_info.h"
 #include "../../../services/config/constants.h"
 #include "../../cli_helpers.h"

@@ -1,17 +1,17 @@
 #include "totp_scene_token_menu.h"
 #include <gui/gui.h>
 #include <dialogs/dialogs.h>
-#include "../../services/ui/ui_controls.h"
-#include "../../services/ui/constants.h"
-#include "../scene_director.h"
-#include "../../services/config/config.h"
-#include "../../services/list/list.h"
-#include "../../types/token_info.h"
+#include "../../ui_controls.h"
+#include "../../constants.h"
+#include "../../scene_director.h"
+#include "../../../services/config/config.h"
+#include "../../../lib/list/list.h"
+#include "../../../types/token_info.h"
 #include "../generate_token/totp_scene_generate_token.h"
 #include "../add_new_token/totp_scene_add_new_token.h"
 #include "../app_settings/totp_app_settings.h"
-#include "../../services/nullable/nullable.h"
-#include "../../services/roll_value/roll_value.h"
+#include "../../../types/nullable.h"
+#include "../../../lib/roll_value/roll_value.h"
 
 #define SCREEN_HEIGHT_THIRD (SCREEN_HEIGHT / 3)
 #define SCREEN_HEIGHT_THIRD_CENTER (SCREEN_HEIGHT_THIRD >> 1)

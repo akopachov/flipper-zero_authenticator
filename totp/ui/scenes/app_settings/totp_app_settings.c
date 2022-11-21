@@ -1,11 +1,12 @@
 #include "totp_app_settings.h"
-#include "../../services/ui/ui_controls.h"
-#include "../scene_director.h"
+#include <math.h>
+#include "../../ui_controls.h"
+#include "../../scene_director.h"
 #include "../token_menu/totp_scene_token_menu.h"
-#include "../../services/ui/constants.h"
-#include "../../services/config/config.h"
-#include "../../services/roll_value/roll_value.h"
-#include "../../services/nullable/nullable.h"
+#include "../../constants.h"
+#include "../../../services/config/config.h"
+#include "../../../lib/roll_value/roll_value.h"
+#include "../../../types/nullable.h"
 
 #define DIGIT_TO_CHAR(digit) ((digit) + '0')
 

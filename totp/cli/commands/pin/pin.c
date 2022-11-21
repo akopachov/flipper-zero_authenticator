@@ -6,7 +6,7 @@
 #include "../../../types/user_pin_codes.h"
 #include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
-#include "../../../services/crypto/memset_s.h"
+#include "../../../lib/polyfills/memset_s.h"
 #include "../../../services/crypto/crypto.h"
 #include "../../../ui/scene_director.h"
 

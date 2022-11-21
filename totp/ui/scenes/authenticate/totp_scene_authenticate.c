@@ -1,13 +1,13 @@
 #include "totp_scene_authenticate.h"
 #include <dialogs/dialogs.h>
 #include <totp_icons.h>
-#include "../../types/common.h"
-#include "../../services/ui/constants.h"
-#include "../../services/config/config.h"
-#include "../scene_director.h"
-#include "../totp_scenes_enum.h"
-#include "../../services/crypto/crypto.h"
-#include "../../types/user_pin_codes.h"
+#include "../../../types/common.h"
+#include "../../constants.h"
+#include "../../../services/config/config.h"
+#include "../../scene_director.h"
+#include "../../totp_scenes_enum.h"
+#include "../../../services/crypto/crypto.h"
+#include "../../../types/user_pin_codes.h"
 
 #define MAX_CODE_LENGTH TOTP_IV_SIZE
 

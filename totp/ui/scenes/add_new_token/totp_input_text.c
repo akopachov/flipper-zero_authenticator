@@ -1,6 +1,5 @@
 #include "totp_input_text.h"
 #include <gui/view_i.h>
-#include "../../types/common.h"
 
 size_t strnlen(const char* s, size_t maxlen) {
     size_t len;
