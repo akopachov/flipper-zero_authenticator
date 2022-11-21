@@ -11,7 +11,6 @@
 #include "../../../types/nullable.h"
 #include "../generate_token/totp_scene_generate_token.h"
 
-#define TOKEN_ALGO_LIST_LENGTH 3
 char* TOKEN_ALGO_LIST[] = {"SHA1", "SHA256", "SHA512"};
 char* TOKEN_DIGITS_TEXT_LIST[] = {"6 digits", "8 digits"};
 TokenDigitsCount TOKEN_DIGITS_VALUE_LIST[] = {TOTP_6_DIGITS, TOTP_8_DIGITS};

@@ -27,7 +27,7 @@ typedef struct {
     TotpTypeCodeWorkerContext* type_code_worker_context;
 } SceneState;
 
-static const NotificationSequence notification_sequence_new_token = {
+static const NotificationSequence notification_sequence_new_token_vibro_and_sound = {
     &message_display_backlight_on,
     &message_green_255,
     &message_vibro_on,
@@ -38,7 +38,33 @@ static const NotificationSequence notification_sequence_new_token = {
     NULL,
 };
 
-static const NotificationSequence notification_sequence_badusb = {
+static const NotificationSequence notification_sequence_new_token_vibro_no_sound = {
+    &message_display_backlight_on,
+    &message_green_255,
+    &message_vibro_on,
+    &message_delay_50,
+    &message_vibro_off,
+    NULL,
+};
+
+static const NotificationSequence notification_sequence_new_token_no_vibro_sound = {
+    &message_display_backlight_on,
+    &message_green_255,
+    &message_note_c5,
+    &message_delay_50,
+    &message_sound_off,
+    NULL,
+};
+
+static const NotificationSequence notification_sequence_new_token_no_vibro_no_sound = {
+    &message_display_backlight_on,
+    &message_green_255,
+    &message_delay_50,
+    NULL,
+};
+
+static const NotificationSequence notification_sequence_badusb_vibro_and_sound = {
+    &message_blue_255,
     &message_vibro_on,
     &message_note_d5,
     &message_delay_50,
@@ -50,6 +76,64 @@ static const NotificationSequence notification_sequence_badusb = {
     &message_sound_off,
     NULL,
 };
+
+static const NotificationSequence notification_sequence_badusb_vibro_no_sound = {
+    &message_blue_255,
+    &message_vibro_on,
+    &message_delay_50,
+    &message_vibro_off,
+    NULL,
+};
+
+static const NotificationSequence notification_sequence_badusb_no_vibro_sound = {
+    &message_blue_255,
+    &message_note_d5,
+    &message_delay_50,
+    &message_note_e4,
+    &message_delay_50,
+    &message_note_f3,
+    &message_delay_50,
+    &message_sound_off,
+    NULL,
+};
+
+static const NotificationSequence notification_sequence_badusb_no_vibro_no_sound = {
+    &message_blue_255,
+    &message_delay_50,
+    NULL,
+};
+
+static const NotificationSequence* get_notification_sequence_new_token(const PluginState* plugin_state) {
+    if (plugin_state->notification_vibro && plugin_state->notification_sound) {
+        return &notification_sequence_new_token_vibro_and_sound;
+    }
+
+    if (plugin_state->notification_vibro) {
+        return &notification_sequence_new_token_vibro_no_sound;
+    }
+
+    if (plugin_state->notification_sound) {
+        return &notification_sequence_new_token_no_vibro_sound;
+    }
+
+    return &notification_sequence_new_token_no_vibro_no_sound;
+}
+
+static const NotificationSequence* get_notification_sequence_badusb(const PluginState* plugin_state) {
+    if (plugin_state->notification_vibro && plugin_state->notification_sound) {
+        return &notification_sequence_badusb_vibro_and_sound;
+    }
+
+    if (plugin_state->notification_vibro) {
+        return &notification_sequence_badusb_vibro_no_sound;
+    }
+
+    if (plugin_state->notification_sound) {
+        return &notification_sequence_badusb_no_vibro_sound;
+    }
+
+    return &notification_sequence_badusb_no_vibro_no_sound;
+}
 
 static void i_token_to_str(uint32_t i_token_code, char* str, TokenDigitsCount len) {
     uint8_t str_token_length = 0;
@@ -224,7 +308,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
         furi_mutex_release(scene_state->type_code_worker_context->string_sync);
 
         if(is_new_token_time) {
-            notification_message(plugin_state->notification, &notification_sequence_new_token);
+            notification_message(plugin_state->notification, get_notification_sequence_new_token(plugin_state));
         }
     }
 
@@ -292,7 +376,7 @@ bool totp_scene_generate_token_handle_event(
         scene_state = (SceneState*)plugin_state->current_scene_state;
         totp_type_code_worker_notify(
             scene_state->type_code_worker_context, TotpTypeCodeWorkerEvtType);
-        notification_message(plugin_state->notification, &notification_sequence_badusb);
+        notification_message(plugin_state->notification, get_notification_sequence_badusb(plugin_state));
         return true;
     }
 
