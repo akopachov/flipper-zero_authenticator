@@ -22,6 +22,8 @@ void totp_cli_command_pin_docopt_usage() {
 }
 
 static bool totp_cli_read_pin(Cli* cli, uint8_t* pin, uint8_t* pin_length) {
+    TOTP_CLI_PRINTF("Enter new PIN (use arrow keys on your keyboard): ");
+    fflush(stdout);
     uint8_t c;
     *pin_length = 0;
     while(cli_read(cli, &c, 1) == 1) {
@@ -101,19 +103,14 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
     if ((do_change || do_remove) && totp_cli_ensure_authenticated(plugin_state, cli)) {
         bool load_generate_token_scene = false;
-        if(plugin_state->current_scene == TotpSceneGenerateToken) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneNone, NULL);
-            load_generate_token_scene = true;
-        }
         do {
             uint8_t old_iv[TOTP_IV_SIZE];
             memcpy(&old_iv[0], &plugin_state->iv[0], TOTP_IV_SIZE);
             uint8_t new_pin[TOTP_IV_SIZE];
             uint8_t new_pin_length = 0;
             if (do_change) {
-                TOTP_CLI_PRINTF("Enter new PIN (use arrow keys on your keyboard): ");
-                fflush(stdout);
-                if (!totp_cli_read_pin(cli, &new_pin[0], &new_pin_length)) {
+                if (!totp_cli_read_pin(cli, &new_pin[0], &new_pin_length) ||
+                    !totp_cli_ensure_authenticated(plugin_state, cli)) {
                     memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
                     break;
                 }
@@ -121,6 +118,13 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                 new_pin_length = 0;
                 memset(&new_pin[0], 0, TOTP_IV_SIZE);
             }
+
+            if(plugin_state->current_scene == TotpSceneGenerateToken) {
+                totp_scene_director_activate_scene(plugin_state, TotpSceneNone, NULL);
+                load_generate_token_scene = true;
+            }
+
+            TOTP_CLI_PRINTF("Encrypting, please wait...\r\n");
 
             memset(&plugin_state->iv[0], 0, TOTP_IV_SIZE);
             memset(&plugin_state->base_iv[0], 0, TOTP_IV_SIZE);
@@ -143,6 +147,8 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
             }
 
             totp_full_save_config_file(plugin_state);
+
+            TOTP_CLI_DELETE_LAST_LINE();
 
             if (do_change) {
                 TOTP_CLI_PRINTF("PIN has been successfully changed\r\n");
