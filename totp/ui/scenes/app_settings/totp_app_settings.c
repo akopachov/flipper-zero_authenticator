@@ -6,10 +6,9 @@
 #include "../token_menu/totp_scene_token_menu.h"
 #include "../../constants.h"
 #include "../../../services/config/config.h"
+#include "../../../services/convert/convert.h"
 #include "../../../lib/roll_value/roll_value.h"
 #include "../../../types/nullable.h"
-
-#define DIGIT_TO_CHAR(digit) ((digit) + '0')
 
 char* YES_NO_LIST[] = {"NO", "YES"};
 
@@ -52,16 +51,15 @@ void totp_scene_app_settings_activate(
 static void two_digit_to_str(int8_t num, char* str) {
     uint8_t index = 0;
     if(num < 0) {
-        str[0] = '-';
-        index++;
+        str[index++] = '-';
         num = -num;
     }
 
     uint8_t d1 = (num / 10) % 10;
     uint8_t d2 = num % 10;
-    str[index] = DIGIT_TO_CHAR(d1);
-    str[index + 1] = DIGIT_TO_CHAR(d2);
-    str[index + 2] = '\0';
+    str[index++] = CONVERT_DIGIT_TO_CHAR(d1);
+    str[index++] = CONVERT_DIGIT_TO_CHAR(d2);
+    str[index++] = '\0';
 }
 
 void totp_scene_app_settings_render(Canvas* const canvas, PluginState* plugin_state) {

@@ -4,6 +4,7 @@
 #include "../../../lib/list/list.h"
 #include "../../../types/token_info.h"
 #include "../../../services/config/config.h"
+#include "../../../services/convert/convert.h"
 #include "../../cli_helpers.h"
 #include "../../../ui/scene_director.h"
 
@@ -149,7 +150,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
                 TOTP_CLI_PRINTF(
                     "Missed value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX
                     "\"\r\n");
-            } else if(!token_info_set_digits_from_int(token_info, furi_string_get_char(temp_str, 0) - '0')) {
+            } else if(!token_info_set_digits_from_int(token_info, CONVERT_CHAR_TO_DIGIT(furi_string_get_char(temp_str, 0)))) {
                 TOTP_CLI_PRINTF(
                     "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX
                     "\"\r\n",
