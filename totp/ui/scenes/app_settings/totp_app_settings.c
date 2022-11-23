@@ -62,7 +62,7 @@ static void two_digit_to_str(int8_t num, char* str) {
     str[index++] = '\0';
 }
 
-void totp_scene_app_settings_render(Canvas* const canvas, PluginState* plugin_state) {
+void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plugin_state) {
     const SceneState* scene_state = plugin_state->current_scene_state;
 
     canvas_set_font(canvas, FontPrimary);
