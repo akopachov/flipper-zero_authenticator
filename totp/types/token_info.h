@@ -2,10 +2,13 @@
 
 #include <inttypes.h>
 
+typedef uint8_t TokenHashAlgo;
+typedef uint8_t TokenDigitsCount;
+
 /**
  * @brief Hashing algorithm to be used to generate token
  */
-typedef enum {
+enum TokenHashAlgos {
     /**
      * @brief SHA1 hashing algorithm
      */
@@ -20,12 +23,12 @@ typedef enum {
      * @brief SHA512 hashing algorithm
      */
     SHA512
-} TokenHashAlgo;
+};
 
 /**
  * @brief Token digits count to be generated.
  */
-typedef enum {
+enum TokenDigitsCounts {
     /**
      * @brief 6 digits
      */
@@ -35,7 +38,7 @@ typedef enum {
      * @brief 8 digits
      */
     TOTP_8_DIGITS = 8
-} TokenDigitsCount;
+};
 
 #define TOTP_TOKEN_DIGITS_MAX_COUNT 8
 

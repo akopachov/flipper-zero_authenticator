@@ -5,6 +5,7 @@
 #include <dialogs/dialogs.h>
 #include "../lib/list/list.h"
 #include "../ui/totp_scenes_enum.h"
+#include "notification_method.h"
 
 #define TOTP_IV_SIZE 16
 
@@ -23,19 +24,14 @@ typedef struct {
     void* current_scene_state;
 
     /**
-     * @brief Whether scene is changing now 
-     */
-    bool changing_scene;
-
-    /**
      * @brief Reference to the firmware notification subsystem
      */
-    NotificationApp* notification;
+    NotificationApp* notification_app;
 
     /**
      * @brief Reference to the firmware dialogs subsystem 
      */
-    DialogsApp* dialogs;
+    DialogsApp* dialogs_app;
 
     /**
      * @brief Reference to the firmware GUI subsystem
@@ -88,12 +84,7 @@ typedef struct {
     uint8_t base_iv[TOTP_IV_SIZE];
 
     /**
-     * @brief Whether to use sound when notifying user
+     * @brief Notification method
      */
-    bool notification_sound;
-
-    /**
-     * @brief Whether to use vibro when notifying user
-     */
-    bool notification_vibro;
+    NotificationMethod notification_method;
 } PluginState;

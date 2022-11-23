@@ -81,14 +81,13 @@ FlipperFormat* totp_open_config_file(Storage* storage) {
             "Timezone offset in hours. Important note: do not put '+' sign for positive values");
         flipper_format_write_float(fff_data_file, TOTP_CONFIG_KEY_TIMEZONE, &tmp_tz, 1);
 
-        bool temp_bool = true;
+        uint32_t tmp_uint32 = NotificationMethodSound | NotificationMethodVibro;
         flipper_format_write_comment_cstr(fff_data_file, " ");
-        flipper_format_write_comment_cstr(fff_data_file, "Whether to use sound when notifying user");
-        flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_SOUND, &temp_bool, 1);
-
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-        flipper_format_write_comment_cstr(fff_data_file, "Whether to use vibro when notifying user");
-        flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_VIBRO, &temp_bool, 1);
+        flipper_format_write_comment_cstr(
+            fff_data_file,
+            "How to notify user when new token is generated or badusb mode is activated (possible values: 0 - do not notify, 1 - sound, 2 - vibro, 3 sound and vibro)");
+        flipper_format_write_uint32(
+            fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1);
 
         FuriString* temp_str = furi_string_alloc();
 
@@ -156,7 +155,8 @@ void totp_config_file_save_new_token_i(FlipperFormat* file, const TokenInfo* tok
     }
     flipper_format_write_string_cstr(
         file, TOTP_CONFIG_KEY_TOKEN_ALGO, token_info_get_algo_as_cstr(token_info));
-    flipper_format_write_uint32(file, TOTP_CONFIG_KEY_TOKEN_DIGITS, (uint32_t* )&token_info->digits, 1);
+    uint32_t tmp_uint32 = token_info->digits;
+    flipper_format_write_uint32(file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &tmp_uint32, 1);
 }
 
 void totp_config_file_save_new_token(const TokenInfo* token_info) {
@@ -179,13 +179,27 @@ void totp_config_file_update_timezone_offset(float new_timezone_offset) {
     totp_close_storage();
 }
 
+void totp_config_file_update_notification_method(NotificationMethod new_notification_method) {
+    Storage* cfg_storage = totp_open_storage();
+    FlipperFormat* file = totp_open_config_file(cfg_storage);
+
+    uint32_t tmp_uint32 = new_notification_method;
+    flipper_format_insert_or_update_uint32(
+        file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1);
+
+    totp_close_config_file(file);
+    totp_close_storage();
+}
+
 void totp_config_file_update_user_settings(const PluginState* plugin_state) {
     Storage* cfg_storage = totp_open_storage();
     FlipperFormat* file = totp_open_config_file(cfg_storage);
 
-    flipper_format_insert_or_update_float(file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1);
-    flipper_format_insert_or_update_bool(file, TOTP_CONFIG_KEY_NOTIFICATION_SOUND, &plugin_state->notification_sound, 1);
-    flipper_format_insert_or_update_bool(file, TOTP_CONFIG_KEY_NOTIFICATION_VIBRO, &plugin_state->notification_vibro, 1);
+    flipper_format_insert_or_update_float(
+        file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1);
+    uint32_t tmp_uint32 = plugin_state->notification_method;
+    flipper_format_insert_or_update_uint32(
+        file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1);
 
     totp_close_config_file(file);
     totp_close_storage();
@@ -208,8 +222,9 @@ void totp_full_save_config_file(const PluginState* const plugin_state) {
     flipper_format_write_float(
         fff_data_file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1);
     flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_PINSET, &plugin_state->pin_set, 1);
-    flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_SOUND, &plugin_state->notification_sound, 1);
-    flipper_format_write_bool(fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_VIBRO, &plugin_state->notification_vibro, 1);
+    uint32_t tmp_uint32 = plugin_state->notification_method;
+    flipper_format_write_uint32(
+        fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1);
 
     TOTP_LIST_FOREACH(plugin_state->tokens_list, node, {
         const TokenInfo* token_info = node->data;
@@ -319,17 +334,13 @@ void totp_config_file_load_base(PluginState* const plugin_state) {
 
     flipper_format_rewind(fff_data_file);
 
-    if(!flipper_format_read_bool(
-           fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_SOUND, &plugin_state->notification_sound, 1)) {
-        plugin_state->notification_sound = true;
+    uint32_t tmp_uint32;
+    if(!flipper_format_read_uint32(
+           fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1)) {
+        tmp_uint32 = NotificationMethodSound | NotificationMethodVibro;
     }
 
-    flipper_format_rewind(fff_data_file);
-
-    if(!flipper_format_read_bool(
-           fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_VIBRO, &plugin_state->notification_vibro, 1)) {
-        plugin_state->notification_vibro = true;
-    }
+    plugin_state->notification_method = tmp_uint32;
 
     furi_string_free(temp_str);
     totp_close_config_file(fff_data_file);
@@ -419,8 +430,9 @@ TokenLoadingResult totp_config_file_load_tokens(PluginState* const plugin_state)
             tokenInfo->algo = SHA1;
         }
 
-        if(!flipper_format_read_uint32(fff_data_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &temp_data32, 1) || 
-            !token_info_set_digits_from_int(tokenInfo, temp_data32)) {
+        if(!flipper_format_read_uint32(
+               fff_data_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &temp_data32, 1) ||
+           !token_info_set_digits_from_int(tokenInfo, temp_data32)) {
             tokenInfo->digits = TOTP_6_DIGITS;
         }
 

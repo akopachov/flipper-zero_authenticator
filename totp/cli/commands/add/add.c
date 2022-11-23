@@ -59,6 +59,7 @@ void totp_cli_command_add_docopt_options() {
         DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ADD_ARG_ALGO)) "      Token hashing algorithm.\r\n");
     TOTP_CLI_PRINTF(
         "                 Could be one of: sha1, sha256, sha512 " DOCOPT_DEFAULT("sha1") "\r\n");
+    cli_nl();
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
         TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX,
         DOCOPT_ARGUMENT(
@@ -150,7 +151,8 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
                 TOTP_CLI_PRINTF(
                     "Missed value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX
                     "\"\r\n");
-            } else if(!token_info_set_digits_from_int(token_info, CONVERT_CHAR_TO_DIGIT(furi_string_get_char(temp_str, 0)))) {
+            } else if(!token_info_set_digits_from_int(
+                          token_info, CONVERT_CHAR_TO_DIGIT(furi_string_get_char(temp_str, 0)))) {
                 TOTP_CLI_PRINTF(
                     "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX
                     "\"\r\n",

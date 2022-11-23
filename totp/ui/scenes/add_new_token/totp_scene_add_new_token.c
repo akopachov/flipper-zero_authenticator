@@ -195,11 +195,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
             totp_roll_value_uint8_t(&scene_state->algo, 1, SHA1, SHA512, RollOverflowBehaviorRoll);
         } else if(scene_state->selected_control == TokenLengthSelect) {
             totp_roll_value_uint8_t(
-                &scene_state->digits_count_index,
-                1,
-                0,
-                1,
-                RollOverflowBehaviorRoll);
+                &scene_state->digits_count_index, 1, 0, 1, RollOverflowBehaviorRoll);
         }
         break;
     case InputKeyLeft:
@@ -208,11 +204,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
                 &scene_state->algo, -1, SHA1, SHA512, RollOverflowBehaviorRoll);
         } else if(scene_state->selected_control == TokenLengthSelect) {
             totp_roll_value_uint8_t(
-                &scene_state->digits_count_index,
-                -1,
-                0,
-                1,
-                RollOverflowBehaviorRoll);
+                &scene_state->digits_count_index, -1, 0, 1, RollOverflowBehaviorRoll);
         }
         break;
     case InputKeyOk:
@@ -273,7 +265,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
                     SCREEN_HEIGHT_CENTER,
                     AlignCenter,
                     AlignCenter);
-                dialog_message_show(plugin_state->dialogs, message);
+                dialog_message_show(plugin_state->dialogs_app, message);
                 dialog_message_free(message);
                 scene_state->selected_control = TokenSecretTextBox;
                 update_screen_y_offset(scene_state);

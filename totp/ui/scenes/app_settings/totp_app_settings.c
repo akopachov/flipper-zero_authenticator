@@ -44,8 +44,8 @@ void totp_scene_app_settings_activate(
     float off_dec = modff(plugin_state->timezone_offset, &off_int);
     scene_state->tz_offset_hours = off_int;
     scene_state->tz_offset_minutes = 60.0f * off_dec;
-    scene_state->notification_sound = plugin_state->notification_sound;
-    scene_state->notification_vibro = plugin_state->notification_vibro;
+    scene_state->notification_sound = plugin_state->notification_method & NotificationMethodSound;
+    scene_state->notification_vibro = plugin_state->notification_method & NotificationMethodVibro;
 }
 
 static void two_digit_to_str(int8_t num, char* str) {
@@ -66,7 +66,8 @@ void totp_scene_app_settings_render(Canvas* const canvas, PluginState* plugin_st
     const SceneState* scene_state = plugin_state->current_scene_state;
 
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str_aligned(canvas, 0, 0 - scene_state->y_offset, AlignLeft, AlignTop, "Timezone offset");
+    canvas_draw_str_aligned(
+        canvas, 0, 0 - scene_state->y_offset, AlignLeft, AlignTop, "Timezone offset");
     canvas_set_font(canvas, FontSecondary);
 
     char tmp_str[4];
@@ -81,7 +82,8 @@ void totp_scene_app_settings_render(Canvas* const canvas, PluginState* plugin_st
         scene_state->selected_control == HoursInput);
 
     two_digit_to_str(scene_state->tz_offset_minutes, &tmp_str[0]);
-    canvas_draw_str_aligned(canvas, 0, 34 - scene_state->y_offset, AlignLeft, AlignTop, "Minutes:");
+    canvas_draw_str_aligned(
+        canvas, 0, 34 - scene_state->y_offset, AlignLeft, AlignTop, "Minutes:");
     ui_control_select_render(
         canvas,
         36,
@@ -90,10 +92,15 @@ void totp_scene_app_settings_render(Canvas* const canvas, PluginState* plugin_st
         &tmp_str[0],
         scene_state->selected_control == MinutesInput);
 
-    canvas_draw_icon(canvas, SCREEN_WIDTH_CENTER - 5, SCREEN_HEIGHT - 5 - scene_state->y_offset, &I_totp_arrow_bottom_10x5);
+    canvas_draw_icon(
+        canvas,
+        SCREEN_WIDTH_CENTER - 5,
+        SCREEN_HEIGHT - 5 - scene_state->y_offset,
+        &I_totp_arrow_bottom_10x5);
 
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str_aligned(canvas, 0, 64 - scene_state->y_offset, AlignLeft, AlignTop, "Notifications");
+    canvas_draw_str_aligned(
+        canvas, 0, 64 - scene_state->y_offset, AlignLeft, AlignTop, "Notifications");
     canvas_set_font(canvas, FontSecondary);
 
     canvas_draw_str_aligned(canvas, 0, 80 - scene_state->y_offset, AlignLeft, AlignTop, "Sound:");
@@ -144,7 +151,7 @@ bool totp_scene_app_settings_handle_event(
             HoursInput,
             ConfirmButton,
             RollOverflowBehaviorStop);
-        if (scene_state->selected_control > MinutesInput) {
+        if(scene_state->selected_control > MinutesInput) {
             scene_state->y_offset = 64;
         } else {
             scene_state->y_offset = 0;
@@ -153,7 +160,7 @@ bool totp_scene_app_settings_handle_event(
     case InputKeyDown:
         totp_roll_value_uint8_t(
             &scene_state->selected_control, 1, HoursInput, ConfirmButton, RollOverflowBehaviorStop);
-        if (scene_state->selected_control > MinutesInput) {
+        if(scene_state->selected_control > MinutesInput) {
             scene_state->y_offset = 64;
         } else {
             scene_state->y_offset = 0;
@@ -166,9 +173,9 @@ bool totp_scene_app_settings_handle_event(
         } else if(scene_state->selected_control == MinutesInput) {
             totp_roll_value_uint8_t(
                 &scene_state->tz_offset_minutes, 15, 0, 45, RollOverflowBehaviorRoll);
-        } else if (scene_state->selected_control == Sound) {
+        } else if(scene_state->selected_control == Sound) {
             scene_state->notification_sound = !scene_state->notification_sound;
-        } else if (scene_state->selected_control == Vibro) {
+        } else if(scene_state->selected_control == Vibro) {
             scene_state->notification_vibro = !scene_state->notification_vibro;
         }
         break;
@@ -179,9 +186,9 @@ bool totp_scene_app_settings_handle_event(
         } else if(scene_state->selected_control == MinutesInput) {
             totp_roll_value_uint8_t(
                 &scene_state->tz_offset_minutes, -15, 0, 45, RollOverflowBehaviorRoll);
-        } else if (scene_state->selected_control == Sound) {
+        } else if(scene_state->selected_control == Sound) {
             scene_state->notification_sound = !scene_state->notification_sound;
-        } else if (scene_state->selected_control == Vibro) {
+        } else if(scene_state->selected_control == Vibro) {
             scene_state->notification_vibro = !scene_state->notification_vibro;
         }
         break;
@@ -190,8 +197,11 @@ bool totp_scene_app_settings_handle_event(
             plugin_state->timezone_offset = (float)scene_state->tz_offset_hours +
                                             (float)scene_state->tz_offset_minutes / 60.0f;
 
-            plugin_state->notification_sound = scene_state->notification_sound;
-            plugin_state->notification_vibro = scene_state->notification_vibro;
+            plugin_state->notification_method =
+                (scene_state->notification_sound ? NotificationMethodSound :
+                                                   NotificationMethodNone) |
+                (scene_state->notification_vibro ? NotificationMethodVibro :
+                                                   NotificationMethodNone);
             totp_config_file_update_user_settings(plugin_state);
 
             if(!scene_state->current_token_index.is_null) {

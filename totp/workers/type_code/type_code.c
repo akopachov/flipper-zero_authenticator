@@ -21,7 +21,7 @@ static void totp_type_code_worker_restore_usb_mode(TotpTypeCodeWorkerContext* co
 }
 
 static inline bool totp_type_code_worker_stop_requested() {
-    return furi_thread_flags_get() & TotpTypeCodeWorkerEvtStop;
+    return furi_thread_flags_get() & TotpTypeCodeWorkerEventStop;
 }
 
 static void totp_type_code_worker_type_code(TotpTypeCodeWorkerContext* context) {
@@ -64,14 +64,14 @@ static int32_t totp_type_code_worker_callback(void* context) {
 
     while(true) {
         uint32_t flags = furi_thread_flags_wait(
-            TotpTypeCodeWorkerEvtStop | TotpTypeCodeWorkerEvtType,
+            TotpTypeCodeWorkerEventStop | TotpTypeCodeWorkerEventType,
             FuriFlagWaitAny,
             FuriWaitForever);
         furi_check((flags & FuriFlagError) == 0); //-V562
-        if(flags & TotpTypeCodeWorkerEvtStop) break;
+        if(flags & TotpTypeCodeWorkerEventStop) break;
 
         TotpTypeCodeWorkerContext* h_context = acquire_mutex_block(&context_mutex);
-        if(flags & TotpTypeCodeWorkerEvtType) {
+        if(flags & TotpTypeCodeWorkerEventType) {
             totp_type_code_worker_type_code(h_context);
         }
 
@@ -99,7 +99,7 @@ TotpTypeCodeWorkerContext* totp_type_code_worker_start() {
 
 void totp_type_code_worker_stop(TotpTypeCodeWorkerContext* context) {
     furi_assert(context != NULL);
-    furi_thread_flags_set(furi_thread_get_id(context->thread), TotpTypeCodeWorkerEvtStop);
+    furi_thread_flags_set(furi_thread_get_id(context->thread), TotpTypeCodeWorkerEventStop);
     furi_thread_join(context->thread);
     furi_thread_free(context->thread);
     furi_mutex_free(context->string_sync);
@@ -109,7 +109,7 @@ void totp_type_code_worker_stop(TotpTypeCodeWorkerContext* context) {
 
 void totp_type_code_worker_notify(
     TotpTypeCodeWorkerContext* context,
-    TotpTypeCodeWorkerEvtFlags event) {
+    TotpTypeCodeWorkerEvent event) {
     furi_assert(context != NULL);
     furi_thread_flags_set(furi_thread_get_id(context->thread), event);
 }

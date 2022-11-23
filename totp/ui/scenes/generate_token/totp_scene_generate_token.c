@@ -29,95 +29,112 @@ typedef struct {
     NotificationMessage** notification_sequence_badusb;
 } SceneState;
 
-static const NotificationSequence* get_notification_sequence_new_token(const PluginState* plugin_state, SceneState* scene_state) {
-    if (scene_state->notification_sequence_new_token == NULL) {
+static const NotificationSequence*
+    get_notification_sequence_new_token(const PluginState* plugin_state, SceneState* scene_state) {
+    if(scene_state->notification_sequence_new_token == NULL) {
         uint8_t i = 0;
         uint8_t length = 4;
-        if (plugin_state->notification_vibro) {
+        if(plugin_state->notification_method & NotificationMethodVibro) {
             length += 2;
         }
 
-        if (plugin_state->notification_sound) {
+        if(plugin_state->notification_method & NotificationMethodSound) {
             length += 2;
         }
 
         scene_state->notification_sequence_new_token = malloc(sizeof(void*) * length);
         furi_check(scene_state->notification_sequence_new_token != NULL);
-        scene_state->notification_sequence_new_token[i++] = (NotificationMessage *)&message_display_backlight_on;
-        scene_state->notification_sequence_new_token[i++] = (NotificationMessage *)&message_green_255;
-        if (plugin_state->notification_vibro) {
-            scene_state->notification_sequence_new_token[i++] = (NotificationMessage *)&message_vibro_on;
+        scene_state->notification_sequence_new_token[i++] =
+            (NotificationMessage*)&message_display_backlight_on;
+        scene_state->notification_sequence_new_token[i++] =
+            (NotificationMessage*)&message_green_255;
+        if(plugin_state->notification_method & NotificationMethodVibro) {
+            scene_state->notification_sequence_new_token[i++] =
+                (NotificationMessage*)&message_vibro_on;
         }
 
-        if (plugin_state->notification_sound) {
-            scene_state->notification_sequence_new_token[i++] = (NotificationMessage *)&message_note_c5;
+        if(plugin_state->notification_method & NotificationMethodSound) {
+            scene_state->notification_sequence_new_token[i++] =
+                (NotificationMessage*)&message_note_c5;
         }
 
-        scene_state->notification_sequence_new_token[i++] = (NotificationMessage *)&message_delay_50;
-        
-        if (plugin_state->notification_vibro) {
-            scene_state->notification_sequence_new_token[i++] = (NotificationMessage *)&message_vibro_off;
+        scene_state->notification_sequence_new_token[i++] =
+            (NotificationMessage*)&message_delay_50;
+
+        if(plugin_state->notification_method & NotificationMethodVibro) {
+            scene_state->notification_sequence_new_token[i++] =
+                (NotificationMessage*)&message_vibro_off;
         }
 
-        if (plugin_state->notification_sound) {
-            scene_state->notification_sequence_new_token[i++] = (NotificationMessage *)&message_sound_off;
+        if(plugin_state->notification_method & NotificationMethodSound) {
+            scene_state->notification_sequence_new_token[i++] =
+                (NotificationMessage*)&message_sound_off;
         }
 
         scene_state->notification_sequence_new_token[i++] = NULL;
     }
 
-    return (NotificationSequence *)scene_state->notification_sequence_new_token;
+    return (NotificationSequence*)scene_state->notification_sequence_new_token;
 }
 
-static const NotificationSequence* get_notification_sequence_badusb(const PluginState* plugin_state, SceneState* scene_state) {
-    if (scene_state->notification_sequence_badusb == NULL) {
+static const NotificationSequence*
+    get_notification_sequence_badusb(const PluginState* plugin_state, SceneState* scene_state) {
+    if(scene_state->notification_sequence_badusb == NULL) {
         uint8_t i = 0;
         uint8_t length = 3;
-        if (plugin_state->notification_vibro) {
+        if(plugin_state->notification_method & NotificationMethodVibro) {
             length += 2;
         }
 
-        if (plugin_state->notification_sound) {
+        if(plugin_state->notification_method & NotificationMethodSound) {
             length += 6;
         }
 
         scene_state->notification_sequence_badusb = malloc(sizeof(void*) * length);
         furi_check(scene_state->notification_sequence_badusb != NULL);
 
-        scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_blue_255;
-        if (plugin_state->notification_vibro) {
-            scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_vibro_on;
+        scene_state->notification_sequence_badusb[i++] = (NotificationMessage*)&message_blue_255;
+        if(plugin_state->notification_method & NotificationMethodVibro) {
+            scene_state->notification_sequence_badusb[i++] =
+                (NotificationMessage*)&message_vibro_on;
         }
 
-        if (plugin_state->notification_sound) {
-            scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_note_d5;
-            scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_delay_50;
-            scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_note_e4;
-            scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_delay_50;
-            scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_note_f3;
+        if(plugin_state->notification_method & NotificationMethodSound) {
+            scene_state->notification_sequence_badusb[i++] =
+                (NotificationMessage*)&message_note_d5; //-V525
+            scene_state->notification_sequence_badusb[i++] =
+                (NotificationMessage*)&message_delay_50;
+            scene_state->notification_sequence_badusb[i++] =
+                (NotificationMessage*)&message_note_e4;
+            scene_state->notification_sequence_badusb[i++] =
+                (NotificationMessage*)&message_delay_50;
+            scene_state->notification_sequence_badusb[i++] =
+                (NotificationMessage*)&message_note_f3;
         }
 
-        scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_delay_50;
+        scene_state->notification_sequence_badusb[i++] = (NotificationMessage*)&message_delay_50;
 
-        if (plugin_state->notification_vibro) {
-            scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_vibro_off;
+        if(plugin_state->notification_method & NotificationMethodVibro) {
+            scene_state->notification_sequence_badusb[i++] =
+                (NotificationMessage*)&message_vibro_off;
         }
 
-        if (plugin_state->notification_sound) {
-            scene_state->notification_sequence_badusb[i++] = (NotificationMessage *)&message_sound_off;
+        if(plugin_state->notification_method & NotificationMethodSound) {
+            scene_state->notification_sequence_badusb[i++] =
+                (NotificationMessage*)&message_sound_off;
         }
 
         scene_state->notification_sequence_badusb[i++] = NULL;
     }
 
-    return (NotificationSequence *)scene_state->notification_sequence_badusb;
+    return (NotificationSequence*)scene_state->notification_sequence_badusb;
 }
 
 static void int_token_to_str(uint32_t i_token_code, char* str, TokenDigitsCount len) {
     if(i_token_code == OTP_ERROR) {
         memset(&str[0], '-', len);
     } else {
-        for (int i = len - 1; i >= 0; i--) {
+        for(int i = len - 1; i >= 0; i--) {
             str[i] = CONVERT_DIGIT_TO_CHAR(i_token_code % 10);
             i_token_code = i_token_code / 10;
         }
@@ -183,7 +200,7 @@ void totp_scene_generate_token_activate(
                     AlignCenter);
             }
 
-            dialog_message_show(plugin_state->dialogs, message);
+            dialog_message_show(plugin_state->dialogs_app, message);
             dialog_message_free(message);
         }
     }
@@ -270,7 +287,9 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
         furi_mutex_release(scene_state->type_code_worker_context->string_sync);
 
         if(is_new_token_time) {
-            notification_message(plugin_state->notification, get_notification_sequence_new_token(plugin_state, scene_state));
+            notification_message(
+                plugin_state->notification_app,
+                get_notification_sequence_new_token(plugin_state, scene_state));
         }
     }
 
@@ -337,8 +356,10 @@ bool totp_scene_generate_token_handle_event(
     if(event->input.type == InputTypeLong && event->input.key == InputKeyDown) {
         scene_state = (SceneState*)plugin_state->current_scene_state;
         totp_type_code_worker_notify(
-            scene_state->type_code_worker_context, TotpTypeCodeWorkerEvtType);
-        notification_message(plugin_state->notification, get_notification_sequence_badusb(plugin_state, scene_state));
+            scene_state->type_code_worker_context, TotpTypeCodeWorkerEventType);
+        notification_message(
+            plugin_state->notification_app,
+            get_notification_sequence_badusb(plugin_state, scene_state));
         return true;
     }
 
@@ -393,11 +414,11 @@ void totp_scene_generate_token_deactivate(PluginState* plugin_state) {
 
     totp_type_code_worker_stop(scene_state->type_code_worker_context);
 
-    if (scene_state->notification_sequence_new_token != NULL) {
+    if(scene_state->notification_sequence_new_token != NULL) {
         free(scene_state->notification_sequence_new_token);
     }
 
-    if (scene_state->notification_sequence_badusb != NULL) {
+    if(scene_state->notification_sequence_badusb != NULL) {
         free(scene_state->notification_sequence_badusb);
     }
 
