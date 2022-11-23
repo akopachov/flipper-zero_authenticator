@@ -7,7 +7,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 ## Available keys
 
 <details>
-<summary><h3 style="display: inline" name="configkey_Filetype">Filetype</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_Filetype">Filetype</h3></summary>
 <p>
 
 **Type:** const string
@@ -20,7 +20,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_Version">Version</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_Version">Version</h3></summary>
 <p>
 
 **Type:** const unsigned int
@@ -33,7 +33,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_BaseIV">BaseIV</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_BaseIV">BaseIV</h3></summary>
 <p>
 
 **Type:** array of bytes
@@ -48,7 +48,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_Crypto">Crypto</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_Crypto">Crypto</h3></summary>
 <p>
 
 **Type:** array of bytes
@@ -63,7 +63,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_Timezone">Timezone</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_Timezone">Timezone</h3></summary>
 <p>
 
 **Type:** float
@@ -78,7 +78,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_PinIsSet">PinIsSet</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_PinIsSet">PinIsSet</h3></summary>
 <p>
 
 **Type:** bool
@@ -93,7 +93,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_NotificationMethod">NotificationMethod</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_NotificationMethod">NotificationMethod</h3></summary>
 <p>
 
 **Type:** enum (available options are `0`, `1`, `2`, `3`)
@@ -111,7 +111,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_TokenName">TokenName</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_TokenName">TokenName</h3></summary>
 <p>
 
 **Type:** string
@@ -124,7 +124,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_TokenSecret">TokenSecret</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_TokenSecret">TokenSecret</h3></summary>
 <p>
 
 **Type:** array of bytes OR string
@@ -139,7 +139,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_TokenAlgo">TokenAlgo</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_TokenAlgo">TokenAlgo</h3></summary>
 <p>
 
 **Type:** enum (available options are: `sha1`, `sha256`, `sha512`)
@@ -152,7 +152,7 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
-<summary><h3 style="display: inline" name="configkey_TokenDigits">TokenDigits</h3></summary>
+<summary><h3 style="display: inline; margin: 0" name="configkey_TokenDigits">TokenDigits</h3></summary>
 <p>
 
 **Type:** enum (available options are `6` and `8`)
