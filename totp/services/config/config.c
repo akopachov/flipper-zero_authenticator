@@ -66,8 +66,10 @@ FlipperFormat* totp_open_config_file(Storage* storage) {
                 return NULL;
             }
         }
-        storage_common_copy(storage, CONFIG_FILE_PATH_PREVIOUS, CONFIG_FILE_PATH);
-        storage_simply_remove(storage, CONFIG_FILE_PATH_PREVIOUS);
+        if(storage_common_rename(storage, CONFIG_FILE_PATH_PREVIOUS, CONFIG_FILE_PATH) != FSE_OK) {
+            FURI_LOG_E(LOGGING_TAG, "Error moving config to %s", CONFIG_FILE_PATH);
+            return NULL;
+        }
         FURI_LOG_I(LOGGING_TAG, "Applied config file path migration");
         return totp_open_config_file(storage);
     } else {
