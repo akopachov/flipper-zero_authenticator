@@ -37,7 +37,7 @@ static void input_callback(InputEvent* input_event, FuriMessageQueue* event_queu
     furi_message_queue_put(event_queue, &event, FuriWaitForever);
 }
 
-static bool totp_activate_initial_scene() {
+static bool totp_activate_initial_scene(PluginState* const plugin_state) {
     if(plugin_state->crypto_verify_data == NULL) {
         DialogMessage* message = dialog_message_alloc();
         dialog_message_set_buttons(message, "No", NULL, "Yes");
@@ -145,7 +145,7 @@ int32_t totp_app() {
 
     totp_cli_register_command_handler(plugin_state);
     totp_scene_director_init_scenes(plugin_state);
-    if (!totp_activate_initial_scene()) {
+    if (!totp_activate_initial_scene(plugin_state)) {
         FURI_LOG_E(LOGGING_TAG, "An error ocurred during activating initial scene\r\n");
         totp_plugin_state_free(plugin_state);
         return 253;
