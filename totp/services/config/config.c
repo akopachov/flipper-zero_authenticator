@@ -66,7 +66,8 @@ static void totp_close_config_file(FlipperFormat* file) {
 /**
  * @brief Opens or creates TOTP application standard config file
  * @param storage storage record to use
- * @return Config file reference
+ * @param[out] file opened config file
+ * @return Config file open result
  */
 static TotpConfigFileOpenResult totp_open_config_file(Storage* storage, FlipperFormat** file) {
     FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
