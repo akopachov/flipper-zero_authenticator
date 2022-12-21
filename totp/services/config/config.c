@@ -10,6 +10,7 @@
 #define CONFIG_FILE_PATH CONFIG_FILE_DIRECTORY_PATH "/totp.conf"
 #define CONFIG_FILE_BACKUP_PATH CONFIG_FILE_PATH ".backup"
 #define CONFIG_FILE_TEMP_PATH CONFIG_FILE_PATH ".tmp"
+#define CONFIG_FILE_ORIG_PATH CONFIG_FILE_PATH ".orig"
 #define CONFIG_FILE_PATH_PREVIOUS EXT_PATH("apps/Misc") "/totp.conf"
 
 static char* token_info_get_algo_as_cstr(const TokenInfo* token_info) {
@@ -409,9 +410,18 @@ TotpConfigFileUpdateResult totp_full_save_config_file(const PluginState* const p
     totp_close_config_file(fff_data_file);
 
     if(result == TotpConfigFileUpdateSuccess) {
-        if(storage_common_rename(storage, CONFIG_FILE_TEMP_PATH, CONFIG_FILE_PATH) != FSE_OK) {
+        if (storage_file_exists(storage, CONFIG_FILE_ORIG_PATH)) {
+            storage_simply_remove(storage, CONFIG_FILE_ORIG_PATH);
+        }
+
+        if (storage_common_rename(storage, CONFIG_FILE_PATH, CONFIG_FILE_ORIG_PATH) != FSE_OK) {
             result = TotpConfigFileUpdateError;
-            storage_common_remove(storage, CONFIG_FILE_TEMP_PATH);
+        }
+        else if(storage_common_rename(storage, CONFIG_FILE_TEMP_PATH, CONFIG_FILE_PATH) != FSE_OK) {
+            result = TotpConfigFileUpdateError;
+        }
+        else if (!storage_simply_remove(storage, CONFIG_FILE_ORIG_PATH)) {
+            result = TotpConfigFileUpdateError;
         }
     }
 
