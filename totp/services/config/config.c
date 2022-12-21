@@ -202,7 +202,8 @@ TotpConfigFileUpdateResult
         }
 
         bool token_is_valid = token_info->token != NULL && token_info->token_length > 0;
-        if(!token_is_valid && !flipper_format_write_comment_cstr(file, "!!! WARNING BEGIN: INVALID TOKEN !!!")) {
+        if(!token_is_valid &&
+           !flipper_format_write_comment_cstr(file, "!!! WARNING BEGIN: INVALID TOKEN !!!")) {
             update_result = TotpConfigFileUpdateError;
             break;
         }
@@ -410,17 +411,15 @@ TotpConfigFileUpdateResult totp_full_save_config_file(const PluginState* const p
     totp_close_config_file(fff_data_file);
 
     if(result == TotpConfigFileUpdateSuccess) {
-        if (storage_file_exists(storage, CONFIG_FILE_ORIG_PATH)) {
+        if(storage_file_exists(storage, CONFIG_FILE_ORIG_PATH)) {
             storage_simply_remove(storage, CONFIG_FILE_ORIG_PATH);
         }
 
-        if (storage_common_rename(storage, CONFIG_FILE_PATH, CONFIG_FILE_ORIG_PATH) != FSE_OK) {
+        if(storage_common_rename(storage, CONFIG_FILE_PATH, CONFIG_FILE_ORIG_PATH) != FSE_OK) {
             result = TotpConfigFileUpdateError;
-        }
-        else if(storage_common_rename(storage, CONFIG_FILE_TEMP_PATH, CONFIG_FILE_PATH) != FSE_OK) {
+        } else if(storage_common_rename(storage, CONFIG_FILE_TEMP_PATH, CONFIG_FILE_PATH) != FSE_OK) {
             result = TotpConfigFileUpdateError;
-        }
-        else if (!storage_simply_remove(storage, CONFIG_FILE_ORIG_PATH)) {
+        } else if(!storage_simply_remove(storage, CONFIG_FILE_ORIG_PATH)) {
             result = TotpConfigFileUpdateError;
         }
     }
