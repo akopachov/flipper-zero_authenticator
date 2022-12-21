@@ -5,12 +5,7 @@ static DialogMessageButton totp_dialogs_common(PluginState* plugin_state, char* 
     DialogMessage* message = dialog_message_alloc();
     dialog_message_set_buttons(message, "Exit", NULL, NULL);
     dialog_message_set_text(
-        message,
-        text,
-        SCREEN_WIDTH_CENTER,
-        SCREEN_HEIGHT_CENTER,
-        AlignCenter,
-        AlignCenter);
+        message, text, SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, AlignCenter, AlignCenter);
     DialogMessageButton result = dialog_message_show(plugin_state->dialogs_app, message);
     dialog_message_free(message);
     return result;

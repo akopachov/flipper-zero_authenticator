@@ -134,8 +134,8 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                 plugin_state->crypto_verify_data = NULL;
             }
 
-            if (!totp_crypto_seed_iv(
-                plugin_state, new_pin_length > 0 ? &new_pin[0] : NULL, new_pin_length)) {
+            if(!totp_crypto_seed_iv(
+                   plugin_state, new_pin_length > 0 ? &new_pin[0] : NULL, new_pin_length)) {
                 memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
                 TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
                 break;
@@ -160,7 +160,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
             TOTP_CLI_DELETE_LAST_LINE();
 
-            if (totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
+            if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
                 if(do_change) {
                     TOTP_CLI_PRINTF("PIN has been successfully changed\r\n");
                 } else if(do_remove) {

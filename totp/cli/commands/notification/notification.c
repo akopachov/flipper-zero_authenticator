@@ -86,7 +86,8 @@ void totp_cli_command_notification_handle(PluginState* plugin_state, FuriString*
             }
 
             plugin_state->notification_method = new_method;
-            if (totp_config_file_update_notification_method(new_method) == TotpConfigFileUpdateSuccess) {
+            if(totp_config_file_update_notification_method(new_method) ==
+               TotpConfigFileUpdateSuccess) {
                 TOTP_CLI_PRINTF("Notification method is set to ");
                 totp_cli_command_notification_print_method(new_method);
                 cli_nl();

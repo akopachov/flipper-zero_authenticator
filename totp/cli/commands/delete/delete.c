@@ -93,7 +93,7 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
         plugin_state->tokens_list = list_remove(plugin_state->tokens_list, list_node);
         plugin_state->tokens_count--;
 
-        if (totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
+        if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
             TOTP_CLI_PRINTF("Token \"%s\" has been successfully deleted\r\n", token_info->name);
         } else {
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();

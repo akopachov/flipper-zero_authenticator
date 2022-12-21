@@ -206,7 +206,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
 
     TOTP_LIST_INIT_OR_ADD(plugin_state->tokens_list, token_info, furi_check);
     plugin_state->tokens_count++;
-    if (totp_config_file_save_new_token(token_info) == TotpConfigFileUpdateSuccess) {
+    if(totp_config_file_save_new_token(token_info) == TotpConfigFileUpdateSuccess) {
         TOTP_CLI_PRINTF("Token \"%s\" has been successfully added\r\n", token_info->name);
     } else {
         TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();

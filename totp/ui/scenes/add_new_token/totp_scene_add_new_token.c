@@ -249,7 +249,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
                 TOTP_LIST_INIT_OR_ADD(plugin_state->tokens_list, tokenInfo, furi_check);
                 plugin_state->tokens_count++;
 
-                if (totp_config_file_save_new_token(tokenInfo) != TotpConfigFileUpdateSuccess) {
+                if(totp_config_file_save_new_token(tokenInfo) != TotpConfigFileUpdateSuccess) {
                     token_info_free(tokenInfo);
                     totp_dialogs_config_updating_error(plugin_state);
                     return false;

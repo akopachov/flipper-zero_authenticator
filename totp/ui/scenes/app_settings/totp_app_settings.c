@@ -204,7 +204,8 @@ bool totp_scene_app_settings_handle_event(
                 (scene_state->notification_vibro ? NotificationMethodVibro :
                                                    NotificationMethodNone);
 
-            if (totp_config_file_update_user_settings(plugin_state) != TotpConfigFileUpdateSuccess) {
+            if(totp_config_file_update_user_settings(plugin_state) !=
+               TotpConfigFileUpdateSuccess) {
                 totp_dialogs_config_updating_error(plugin_state);
                 return false;
             }

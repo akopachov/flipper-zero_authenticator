@@ -157,7 +157,7 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
                 furi_check(tokenInfo != NULL);
                 token_info_free(tokenInfo);
 
-                if (totp_full_save_config_file(plugin_state) != TotpConfigFileUpdateSuccess) {
+                if(totp_full_save_config_file(plugin_state) != TotpConfigFileUpdateSuccess) {
                     totp_dialogs_config_updating_error(plugin_state);
                     return false;
                 }

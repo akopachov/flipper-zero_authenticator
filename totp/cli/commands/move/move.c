@@ -147,7 +147,7 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
     }
 
     if(token_updated) {
-        if (totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
+        if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
             TOTP_CLI_PRINTF("Token \"%s\" has been successfully updated\r\n", token_info->name);
         } else {
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();

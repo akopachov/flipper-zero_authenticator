@@ -100,7 +100,7 @@ bool totp_crypto_seed_iv(PluginState* plugin_state, const uint8_t* pin, uint8_t 
         plugin_state->crypto_verify_data = malloc(CRYPTO_VERIFY_KEY_LENGTH);
         furi_check(plugin_state->crypto_verify_data != NULL);
         plugin_state->crypto_verify_data_length = CRYPTO_VERIFY_KEY_LENGTH;
-        
+
         plugin_state->crypto_verify_data = totp_crypto_encrypt(
             (uint8_t*)CRYPTO_VERIFY_KEY,
             CRYPTO_VERIFY_KEY_LENGTH,
@@ -109,7 +109,8 @@ bool totp_crypto_seed_iv(PluginState* plugin_state, const uint8_t* pin, uint8_t 
 
         plugin_state->pin_set = pin != NULL && pin_length > 0;
 
-        result = totp_config_file_update_crypto_signatures(plugin_state) == TotpConfigFileUpdateSuccess;
+        result = totp_config_file_update_crypto_signatures(plugin_state) ==
+                 TotpConfigFileUpdateSuccess;
     }
 
     return result;

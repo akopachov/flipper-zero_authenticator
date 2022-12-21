@@ -95,7 +95,8 @@ TotpConfigFileUpdateResult totp_config_file_update_timezone_offset(float new_tim
  * @brief Updates notification method in an application config file
  * @param new_notification_method new notification method to be set
  */
-TotpConfigFileUpdateResult totp_config_file_update_notification_method(NotificationMethod new_notification_method);
+TotpConfigFileUpdateResult
+    totp_config_file_update_notification_method(NotificationMethod new_notification_method);
 
 /**
  * @brief Updates application user settings
@@ -107,4 +108,5 @@ TotpConfigFileUpdateResult totp_config_file_update_user_settings(const PluginSta
  * @brief Updates crypto signatures information
  * @param plugin_state application state
  */
-TotpConfigFileUpdateResult totp_config_file_update_crypto_signatures(const PluginState* plugin_state);
+TotpConfigFileUpdateResult
+    totp_config_file_update_crypto_signatures(const PluginState* plugin_state);

@@ -54,7 +54,7 @@ static bool totp_activate_initial_scene(PluginState* const plugin_state) {
         if(dialog_result == DialogMessageButtonRight) {
             totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication, NULL);
         } else {
-            if (!totp_crypto_seed_iv(plugin_state, NULL, 0)) {
+            if(!totp_crypto_seed_iv(plugin_state, NULL, 0)) {
                 totp_dialogs_config_loading_error(plugin_state);
                 return false;
             }
@@ -63,7 +63,7 @@ static bool totp_activate_initial_scene(PluginState* const plugin_state) {
     } else if(plugin_state->pin_set) {
         totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication, NULL);
     } else {
-        if (!totp_crypto_seed_iv(plugin_state, NULL, 0)) {
+        if(!totp_crypto_seed_iv(plugin_state, NULL, 0)) {
             totp_dialogs_config_loading_error(plugin_state);
             return false;
         }
@@ -96,7 +96,7 @@ static bool totp_plugin_state_init(PluginState* const plugin_state) {
     plugin_state->notification_app = furi_record_open(RECORD_NOTIFICATION);
     plugin_state->dialogs_app = furi_record_open(RECORD_DIALOGS);
 
-    if (totp_config_file_load_base(plugin_state) != TotpConfigFileOpenSuccess) {
+    if(totp_config_file_load_base(plugin_state) != TotpConfigFileOpenSuccess) {
         totp_dialogs_config_loading_error(plugin_state);
         return false;
     }
@@ -145,7 +145,7 @@ int32_t totp_app() {
 
     totp_cli_register_command_handler(plugin_state);
     totp_scene_director_init_scenes(plugin_state);
-    if (!totp_activate_initial_scene(plugin_state)) {
+    if(!totp_activate_initial_scene(plugin_state)) {
         FURI_LOG_E(LOGGING_TAG, "An error ocurred during activating initial scene\r\n");
         totp_plugin_state_free(plugin_state);
         return 253;
