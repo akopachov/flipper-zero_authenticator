@@ -1,7 +1,7 @@
 #include "common_dialogs.h"
 #include "constants.h"
 
-static DialogMessageButton totp_dialogs_common(PluginState* plugin_state, char* text) {
+static DialogMessageButton totp_dialogs_common(PluginState* plugin_state, const char* text) {
     DialogMessage* message = dialog_message_alloc();
     dialog_message_set_buttons(message, "Exit", NULL, NULL);
     dialog_message_set_text(

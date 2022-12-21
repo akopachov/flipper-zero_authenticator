@@ -201,11 +201,9 @@ TotpConfigFileUpdateResult
         }
 
         bool token_is_valid = token_info->token != NULL && token_info->token_length > 0;
-        if(!token_is_valid) {
-            if(!flipper_format_write_comment_cstr(file, "!!! WARNING BEGIN: INVALID TOKEN !!!")) {
-                update_result = TotpConfigFileUpdateError;
-                break;
-            }
+        if(!token_is_valid && !flipper_format_write_comment_cstr(file, "!!! WARNING BEGIN: INVALID TOKEN !!!")) {
+            update_result = TotpConfigFileUpdateError;
+            break;
         }
 
         if(!flipper_format_write_hex(
@@ -214,11 +212,9 @@ TotpConfigFileUpdateResult
             break;
         }
 
-        if(!token_is_valid) {
-            if(!flipper_format_write_comment_cstr(file, "!!! WARNING END !!!")) {
-                update_result = TotpConfigFileUpdateError;
-                break;
-            }
+        if(!token_is_valid && !flipper_format_write_comment_cstr(file, "!!! WARNING END !!!")) {
+            update_result = TotpConfigFileUpdateError;
+            break;
         }
 
         if(!flipper_format_write_string_cstr(
