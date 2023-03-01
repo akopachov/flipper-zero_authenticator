@@ -1,5 +1,10 @@
-#include "type_code.h"
+#include "bt_type_code.h"
+#include <furi_hal_bt_hid.h>
+#include <storage/storage.h>
+#include "../../types/common.h"
 #include "../../services/convert/convert.h"
+
+#define HID_BT_KEYS_STORAGE_PATH EXT_PATH("authenticator/.bt_hid.keys")
 
 static const uint8_t hid_number_keys[10] = {
     HID_KEYBOARD_0,
@@ -13,28 +18,18 @@ static const uint8_t hid_number_keys[10] = {
     HID_KEYBOARD_8,
     HID_KEYBOARD_9};
 
-static void totp_type_code_worker_restore_usb_mode(TotpTypeCodeWorkerContext* context) {
-    if(context->usb_mode_prev != NULL) {
-        furi_hal_usb_set_config(context->usb_mode_prev, NULL);
-        context->usb_mode_prev = NULL;
-    }
-}
-
 static inline bool totp_type_code_worker_stop_requested() {
-    return furi_thread_flags_get() & TotpTypeCodeWorkerEventStop;
+    return furi_thread_flags_get() & TotpBtTypeCodeWorkerEventStop;
 }
 
-static void totp_type_code_worker_type_code(TotpTypeCodeWorkerContext* context) {
-    context->usb_mode_prev = furi_hal_usb_get_config();
-    furi_hal_usb_unlock();
-    furi_check(furi_hal_usb_set_config(&usb_hid, NULL) == true);
+static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context) {
     uint8_t i = 0;
     do {
         furi_delay_ms(500);
         i++;
-    } while(!furi_hal_hid_is_connected() && i < 100 && !totp_type_code_worker_stop_requested());
+    } while(!furi_hal_bt_is_active() && i < 100 && !totp_type_code_worker_stop_requested());
 
-    if(furi_hal_hid_is_connected() &&
+    if(furi_hal_bt_is_active() &&
        furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
         furi_delay_ms(500);
         i = 0;
@@ -42,9 +37,9 @@ static void totp_type_code_worker_type_code(TotpTypeCodeWorkerContext* context) 
             uint8_t digit = CONVERT_CHAR_TO_DIGIT(context->string[i]);
             if(digit > 9) break;
             uint8_t hid_kb_key = hid_number_keys[digit];
-            furi_hal_hid_kb_press(hid_kb_key);
+            furi_hal_bt_hid_kb_press(hid_kb_key);
             furi_delay_ms(30);
-            furi_hal_hid_kb_release(hid_kb_key);
+            furi_hal_bt_hid_kb_release(hid_kb_key);
             i++;
         }
 
@@ -52,26 +47,24 @@ static void totp_type_code_worker_type_code(TotpTypeCodeWorkerContext* context) 
 
         furi_delay_ms(100);
     }
-
-    totp_type_code_worker_restore_usb_mode(context);
 }
 
 static int32_t totp_type_code_worker_callback(void* context) {
     ValueMutex context_mutex;
-    if(!init_mutex(&context_mutex, context, sizeof(TotpTypeCodeWorkerContext))) {
+    if(!init_mutex(&context_mutex, context, sizeof(TotpBtTypeCodeWorkerContext))) {
         return 251;
     }
 
     while(true) {
         uint32_t flags = furi_thread_flags_wait(
-            TotpTypeCodeWorkerEventStop | TotpTypeCodeWorkerEventType,
+            TotpBtTypeCodeWorkerEventStop | TotpBtTypeCodeWorkerEventType,
             FuriFlagWaitAny,
             FuriWaitForever);
         furi_check((flags & FuriFlagError) == 0); //-V562
-        if(flags & TotpTypeCodeWorkerEventStop) break;
+        if(flags & TotpBtTypeCodeWorkerEventStop) break;
 
-        TotpTypeCodeWorkerContext* h_context = acquire_mutex_block(&context_mutex);
-        if(flags & TotpTypeCodeWorkerEventType) {
+        TotpBtTypeCodeWorkerContext* h_context = acquire_mutex_block(&context_mutex);
+        if(flags & TotpBtTypeCodeWorkerEventType) {
             totp_type_code_worker_type_code(h_context);
         }
 
@@ -83,13 +76,20 @@ static int32_t totp_type_code_worker_callback(void* context) {
     return 0;
 }
 
-TotpTypeCodeWorkerContext* totp_type_code_worker_start() {
-    TotpTypeCodeWorkerContext* context = malloc(sizeof(TotpTypeCodeWorkerContext));
+TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_start() {
+    TotpBtTypeCodeWorkerContext* context = malloc(sizeof(TotpBtTypeCodeWorkerContext));
     furi_check(context != NULL);
     context->string_sync = furi_mutex_alloc(FuriMutexTypeNormal);
     context->thread = furi_thread_alloc();
-    context->usb_mode_prev = NULL;
-    furi_thread_set_name(context->thread, "TOTPHidWorker");
+    context->bt = furi_record_open(RECORD_BT);
+    bt_disconnect(context->bt);
+    furi_delay_ms(200);
+    bt_keys_storage_set_storage_path(context->bt, HID_BT_KEYS_STORAGE_PATH);
+    if(!bt_set_profile(context->bt, BtProfileHidKeyboard)) {
+        FURI_LOG_E(LOGGING_TAG, "Failed to switch BT to keyboard HID profile");
+    }
+    furi_hal_bt_start_advertising();
+    furi_thread_set_name(context->thread, "TOTPBtHidWorker");
     furi_thread_set_stack_size(context->thread, 1024);
     furi_thread_set_context(context->thread, context);
     furi_thread_set_callback(context->thread, totp_type_code_worker_callback);
@@ -97,19 +97,23 @@ TotpTypeCodeWorkerContext* totp_type_code_worker_start() {
     return context;
 }
 
-void totp_type_code_worker_stop(TotpTypeCodeWorkerContext* context) {
+void totp_bt_type_code_worker_stop(TotpBtTypeCodeWorkerContext* context) {
     furi_assert(context != NULL);
-    furi_thread_flags_set(furi_thread_get_id(context->thread), TotpTypeCodeWorkerEventStop);
+    bt_disconnect(context->bt);
+    furi_delay_ms(200);
+    bt_keys_storage_set_default_path(context->bt);
+    if(!bt_set_profile(context->bt, BtProfileSerial)) {
+        FURI_LOG_E(LOGGING_TAG, "Failed to switch BT to Serial profile");
+    }
+    furi_record_close(RECORD_BT);
+    furi_thread_flags_set(furi_thread_get_id(context->thread), TotpBtTypeCodeWorkerEventStop);
     furi_thread_join(context->thread);
     furi_thread_free(context->thread);
     furi_mutex_free(context->string_sync);
-    totp_type_code_worker_restore_usb_mode(context);
     free(context);
 }
 
-void totp_type_code_worker_notify(
-    TotpTypeCodeWorkerContext* context,
-    TotpTypeCodeWorkerEvent event) {
+void totp_bt_type_code_worker_notify(TotpBtTypeCodeWorkerContext* context, TotpBtTypeCodeWorkerEvent event) {
     furi_assert(context != NULL);
     furi_thread_flags_set(furi_thread_get_id(context->thread), event);
 }
