@@ -10,7 +10,8 @@ App(
         "dialogs",
         "storage",
         "input", 
-        "notification"
+        "notification",
+        "bt"
     ],
     stack_size=2 * 1024,
     order=20,

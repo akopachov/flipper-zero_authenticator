@@ -55,6 +55,18 @@ static int32_t totp_type_code_worker_callback(void* context) {
         return 251;
     }
 
+    TotpBtTypeCodeWorkerContext *t_context = context;
+
+    t_context->bt = furi_record_open(RECORD_BT);
+    bt_disconnect(t_context->bt);
+    furi_hal_bt_reinit();
+    furi_delay_ms(200);
+    bt_keys_storage_set_storage_path(t_context->bt, HID_BT_KEYS_STORAGE_PATH);
+    if(!bt_set_profile(t_context->bt, BtProfileHidKeyboard)) {
+        FURI_LOG_E(LOGGING_TAG, "Failed to switch BT to keyboard HID profile");
+    }
+
+    furi_hal_bt_start_advertising();
     while(true) {
         uint32_t flags = furi_thread_flags_wait(
             TotpBtTypeCodeWorkerEventStop | TotpBtTypeCodeWorkerEventType,
@@ -71,6 +83,15 @@ static int32_t totp_type_code_worker_callback(void* context) {
         release_mutex(&context_mutex, h_context);
     }
 
+    bt_disconnect(t_context->bt);
+    furi_delay_ms(200);
+    bt_keys_storage_set_default_path(t_context->bt);
+
+    if(!bt_set_profile(t_context->bt, BtProfileSerial)) {
+        FURI_LOG_E(LOGGING_TAG, "Failed to switch BT to Serial profile");
+    }
+    furi_record_close(RECORD_BT);
+
     delete_mutex(&context_mutex);
 
     return 0;
@@ -81,31 +102,17 @@ TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_start() {
     furi_check(context != NULL);
     context->string_sync = furi_mutex_alloc(FuriMutexTypeNormal);
     context->thread = furi_thread_alloc();
-    context->bt = furi_record_open(RECORD_BT);
-    bt_disconnect(context->bt);
-    furi_delay_ms(200);
-    bt_keys_storage_set_storage_path(context->bt, HID_BT_KEYS_STORAGE_PATH);
-    if(!bt_set_profile(context->bt, BtProfileHidKeyboard)) {
-        FURI_LOG_E(LOGGING_TAG, "Failed to switch BT to keyboard HID profile");
-    }
-    furi_hal_bt_start_advertising();
     furi_thread_set_name(context->thread, "TOTPBtHidWorker");
     furi_thread_set_stack_size(context->thread, 1024);
     furi_thread_set_context(context->thread, context);
     furi_thread_set_callback(context->thread, totp_type_code_worker_callback);
     furi_thread_start(context->thread);
+
     return context;
 }
 
 void totp_bt_type_code_worker_stop(TotpBtTypeCodeWorkerContext* context) {
     furi_assert(context != NULL);
-    bt_disconnect(context->bt);
-    furi_delay_ms(200);
-    bt_keys_storage_set_default_path(context->bt);
-    if(!bt_set_profile(context->bt, BtProfileSerial)) {
-        FURI_LOG_E(LOGGING_TAG, "Failed to switch BT to Serial profile");
-    }
-    furi_record_close(RECORD_BT);
     furi_thread_flags_set(furi_thread_get_id(context->thread), TotpBtTypeCodeWorkerEventStop);
     furi_thread_join(context->thread);
     furi_thread_free(context->thread);
