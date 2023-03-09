@@ -26,10 +26,7 @@ static void render_callback(Canvas* const canvas, void* ctx) {
     furi_assert(ctx);
     PluginState* plugin_state = ctx;
     if (furi_mutex_acquire(plugin_state->mutex, 25) == FuriStatusOk) {
-        if(plugin_state != NULL) {
-            totp_scene_director_render(canvas, plugin_state);
-        }
-
+        totp_scene_director_render(canvas, plugin_state);
         furi_mutex_release(plugin_state->mutex);
     }
 }
