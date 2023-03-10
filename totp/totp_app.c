@@ -108,6 +108,8 @@ static bool totp_plugin_state_init(PluginState* const plugin_state) {
         return false;
     }
 
+    plugin_state->bt_type_code_worker_context = totp_bt_type_code_worker_init();
+
     return true;
 }
 
@@ -129,6 +131,8 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
     if(plugin_state->crypto_verify_data != NULL) {
         free(plugin_state->crypto_verify_data);
     }
+
+    totp_bt_type_code_worker_free(plugin_state->bt_type_code_worker_context);
 
     furi_mutex_free(plugin_state->mutex);
     free(plugin_state);

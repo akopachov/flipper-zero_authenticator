@@ -27,7 +27,6 @@ typedef struct {
     TokenInfo* current_token;
     uint32_t last_token_gen_time;
     TotpUsbTypeCodeWorkerContext* usb_type_code_worker_context;
-    TotpBtTypeCodeWorkerContext* bt_type_code_worker_context;
     NotificationMessage const** notification_sequence_new_token;
     NotificationMessage const** notification_sequence_badusb;
     FuriMutex* last_code_update_sync;
@@ -207,7 +206,7 @@ void totp_scene_generate_token_activate(
 
     scene_state->last_code_update_sync = furi_mutex_alloc(FuriMutexTypeNormal);
     scene_state->usb_type_code_worker_context = totp_usb_type_code_worker_start(&scene_state->last_code[0], TOTP_TOKEN_DIGITS_MAX_COUNT + 1, scene_state->last_code_update_sync);
-    scene_state->bt_type_code_worker_context = totp_bt_type_code_worker_start(&scene_state->last_code[0], TOTP_TOKEN_DIGITS_MAX_COUNT + 1, scene_state->last_code_update_sync);
+    totp_bt_type_code_worker_start(plugin_state->bt_type_code_worker_context, &scene_state->last_code[0], TOTP_TOKEN_DIGITS_MAX_COUNT + 1, scene_state->last_code_update_sync);
 }
 
 void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_state) {
@@ -358,7 +357,7 @@ bool totp_scene_generate_token_handle_event(
     if(event->input.type == InputTypeLong && event->input.key == InputKeyUp) {
         scene_state = (SceneState*)plugin_state->current_scene_state;
         totp_bt_type_code_worker_notify(
-            scene_state->bt_type_code_worker_context, TotpBtTypeCodeWorkerEventType);
+            plugin_state->bt_type_code_worker_context, TotpBtTypeCodeWorkerEventType);
         notification_message(
             plugin_state->notification_app,
             get_notification_sequence_badusb(plugin_state, scene_state));
@@ -415,7 +414,7 @@ void totp_scene_generate_token_deactivate(PluginState* plugin_state) {
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
 
     totp_usb_type_code_worker_stop(scene_state->usb_type_code_worker_context);
-    totp_bt_type_code_worker_stop(scene_state->bt_type_code_worker_context);
+    totp_bt_type_code_worker_stop(plugin_state->bt_type_code_worker_context);
 
     if(scene_state->notification_sequence_new_token != NULL) {
         free(scene_state->notification_sequence_new_token);

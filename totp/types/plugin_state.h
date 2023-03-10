@@ -6,6 +6,7 @@
 #include "../lib/list/list.h"
 #include "../ui/totp_scenes_enum.h"
 #include "notification_method.h"
+#include "../workers/bt_type_code/bt_type_code.h"
 
 #define TOTP_IV_SIZE 16
 
@@ -92,4 +93,9 @@ typedef struct {
      * @brief Main rendering loop mutex
      */
     FuriMutex* mutex;
+
+    /**
+     * @brief Bad-Bluetooth worker context
+     */
+    TotpBtTypeCodeWorkerContext* bt_type_code_worker_context;
 } PluginState;
