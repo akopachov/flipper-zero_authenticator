@@ -20,7 +20,7 @@ enum TotpUsbTypeCodeWorkerEvents {
     TotpUsbTypeCodeWorkerEventType = (1 << 2)
 };
 
-TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start();
+TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(char* code_buf, size_t code_buf_length, FuriMutex* code_buf_update_sync);
 void totp_usb_type_code_worker_stop(TotpUsbTypeCodeWorkerContext* context);
 void totp_usb_type_code_worker_notify(
     TotpUsbTypeCodeWorkerContext* context,

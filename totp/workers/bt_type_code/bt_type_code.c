@@ -50,6 +50,7 @@ static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context
 }
 
 static int32_t totp_type_code_worker_callback(void* context) {
+    furi_assert(context);
     FuriMutex* context_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     if(context_mutex == NULL) {
         return 251;
@@ -98,10 +99,12 @@ static int32_t totp_type_code_worker_callback(void* context) {
     return 0;
 }
 
-TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_start() {
+TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_start(char* code_buf, size_t code_buf_length, FuriMutex* code_buf_update_sync) {
     TotpBtTypeCodeWorkerContext* context = malloc(sizeof(TotpBtTypeCodeWorkerContext));
     furi_check(context != NULL);
-    context->string_sync = furi_mutex_alloc(FuriMutexTypeNormal);
+    context->string = code_buf;
+    context->string_length = code_buf_length;
+    context->string_sync = code_buf_update_sync;
     context->thread = furi_thread_alloc();
     furi_thread_set_name(context->thread, "TOTPBtHidWorker");
     furi_thread_set_stack_size(context->thread, 1024);
@@ -117,7 +120,6 @@ void totp_bt_type_code_worker_stop(TotpBtTypeCodeWorkerContext* context) {
     furi_thread_flags_set(furi_thread_get_id(context->thread), TotpBtTypeCodeWorkerEventStop);
     furi_thread_join(context->thread);
     furi_thread_free(context->thread);
-    furi_mutex_free(context->string_sync);
     free(context);
 }
 

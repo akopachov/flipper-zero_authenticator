@@ -30,6 +30,7 @@ typedef struct {
     TotpBtTypeCodeWorkerContext* bt_type_code_worker_context;
     NotificationMessage const** notification_sequence_new_token;
     NotificationMessage const** notification_sequence_badusb;
+    FuriMutex* last_code_update_sync;
 } SceneState;
 
 static const NotificationSequence*
@@ -203,13 +204,10 @@ void totp_scene_generate_token_activate(
     plugin_state->current_scene_state = scene_state;
     FURI_LOG_D(LOGGING_TAG, "Timezone set to: %f", (double)plugin_state->timezone_offset);
     update_totp_params(plugin_state);
-    scene_state->usb_type_code_worker_context = totp_usb_type_code_worker_start();
-    scene_state->usb_type_code_worker_context->string = &scene_state->last_code[0];
-    scene_state->usb_type_code_worker_context->string_length = TOTP_TOKEN_DIGITS_MAX_COUNT + 1;
 
-    scene_state->bt_type_code_worker_context = totp_bt_type_code_worker_start();
-    scene_state->bt_type_code_worker_context->string = &scene_state->last_code[0];
-    scene_state->bt_type_code_worker_context->string_length = TOTP_TOKEN_DIGITS_MAX_COUNT + 1;
+    scene_state->last_code_update_sync = furi_mutex_alloc(FuriMutexTypeNormal);
+    scene_state->usb_type_code_worker_context = totp_usb_type_code_worker_start(&scene_state->last_code[0], TOTP_TOKEN_DIGITS_MAX_COUNT + 1, scene_state->last_code_update_sync);
+    scene_state->bt_type_code_worker_context = totp_bt_type_code_worker_start(&scene_state->last_code[0], TOTP_TOKEN_DIGITS_MAX_COUNT + 1, scene_state->last_code_update_sync);
 }
 
 void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_state) {
@@ -249,7 +247,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
 
         if(tokenInfo->token != NULL && tokenInfo->token_length > 0) {
             furi_mutex_acquire(
-                scene_state->usb_type_code_worker_context->string_sync, FuriWaitForever);
+                scene_state->last_code_update_sync, FuriWaitForever);
             size_t key_length;
             uint8_t* key = totp_crypto_decrypt(
                 tokenInfo->token, tokenInfo->token_length, &plugin_state->iv[0], &key_length);
@@ -269,11 +267,11 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
             free(key);
         } else {
             furi_mutex_acquire(
-                scene_state->usb_type_code_worker_context->string_sync, FuriWaitForever);
+                scene_state->last_code_update_sync, FuriWaitForever);
             int_token_to_str(0, scene_state->last_code, tokenInfo->digits);
         }
 
-        furi_mutex_release(scene_state->usb_type_code_worker_context->string_sync);
+        furi_mutex_release(scene_state->last_code_update_sync);
 
         if(is_new_token_time) {
             notification_message(
@@ -426,6 +424,8 @@ void totp_scene_generate_token_deactivate(PluginState* plugin_state) {
     if(scene_state->notification_sequence_badusb != NULL) {
         free(scene_state->notification_sequence_badusb);
     }
+
+    furi_mutex_free(scene_state->last_code_update_sync);
 
     free(scene_state);
     plugin_state->current_scene_state = NULL;

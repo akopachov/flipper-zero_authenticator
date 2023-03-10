@@ -21,7 +21,7 @@ enum TotpBtTypeCodeWorkerEvents {
     TotpBtTypeCodeWorkerEventType = (1 << 2)
 };
 
-TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_start();
+TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_start(char* code_buf, size_t code_buf_length, FuriMutex* code_buf_update_sync);
 void totp_bt_type_code_worker_stop(TotpBtTypeCodeWorkerContext* context);
 void totp_bt_type_code_worker_notify(
     TotpBtTypeCodeWorkerContext* context,
