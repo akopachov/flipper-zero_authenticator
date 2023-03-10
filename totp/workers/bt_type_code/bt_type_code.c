@@ -50,8 +50,8 @@ static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context
 }
 
 static int32_t totp_type_code_worker_callback(void* context) {
-    ValueMutex context_mutex;
-    if(!init_mutex(&context_mutex, context, sizeof(TotpBtTypeCodeWorkerContext))) {
+    FuriMutex* context_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
+    if(context_mutex == NULL) {
         return 251;
     }
 
@@ -75,12 +75,13 @@ static int32_t totp_type_code_worker_callback(void* context) {
         furi_check((flags & FuriFlagError) == 0); //-V562
         if(flags & TotpBtTypeCodeWorkerEventStop) break;
 
-        TotpBtTypeCodeWorkerContext* h_context = acquire_mutex_block(&context_mutex);
-        if(flags & TotpBtTypeCodeWorkerEventType) {
-            totp_type_code_worker_type_code(h_context);
-        }
+        if (furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
+            if(flags & TotpBtTypeCodeWorkerEventType) {
+                totp_type_code_worker_type_code(t_context);
+            }
 
-        release_mutex(&context_mutex, h_context);
+            furi_mutex_release(context_mutex);
+        }
     }
 
     bt_disconnect(t_context->bt);
@@ -92,7 +93,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
     }
     furi_record_close(RECORD_BT);
 
-    delete_mutex(&context_mutex);
+    furi_mutex_free(context_mutex);
 
     return 0;
 }
