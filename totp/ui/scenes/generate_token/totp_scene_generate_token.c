@@ -16,7 +16,7 @@
 #include "../token_menu/totp_scene_token_menu.h"
 #include "../../../features_config.h"
 #include "../../../workers/usb_type_code/usb_type_code.h"
-#if TOTP_BADBT_TYPE_ENABLED >= 1
+#ifdef TOTP_BADBT_TYPE_ENABLED
 #include "../../../workers/bt_type_code/bt_type_code.h"
 #endif
 
@@ -209,7 +209,7 @@ void totp_scene_generate_token_activate(
 
     scene_state->last_code_update_sync = furi_mutex_alloc(FuriMutexTypeNormal);
     scene_state->usb_type_code_worker_context = totp_usb_type_code_worker_start(&scene_state->last_code[0], TOTP_TOKEN_DIGITS_MAX_COUNT + 1, scene_state->last_code_update_sync);
-    #if TOTP_BADBT_TYPE_ENABLED >= 1
+    #ifdef TOTP_BADBT_TYPE_ENABLED
     totp_bt_type_code_worker_start(plugin_state->bt_type_code_worker_context, &scene_state->last_code[0], TOTP_TOKEN_DIGITS_MAX_COUNT + 1, scene_state->last_code_update_sync);
     #endif
 }
@@ -336,7 +336,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
             canvas, SCREEN_WIDTH - 9, SCREEN_HEIGHT_CENTER - 24, &I_totp_arrow_right_8x9);
     }
 
-    #if TOTP_BADBT_TYPE_ENABLED >= 1 && TOTP_BADBT_ICON_ENABLED >= 1
+    #if defined(TOTP_BADBT_TYPE_ENABLED) && defined(TOTP_BADBT_TYPE_ICON_ENABLED)
     canvas_draw_icon(canvas, SCREEN_WIDTH_CENTER - 5, SCREEN_HEIGHT_CENTER + 13, &I_hid_ble_10x7);
     #endif
 }
@@ -363,7 +363,7 @@ bool totp_scene_generate_token_handle_event(
         return true;
     }
 
-    #if TOTP_BADBT_TYPE_ENABLED >= 1
+    #ifdef TOTP_BADBT_TYPE_ENABLED
     if(event->input.type == InputTypeLong && event->input.key == InputKeyUp) {
         scene_state = (SceneState*)plugin_state->current_scene_state;
         totp_bt_type_code_worker_notify(
@@ -425,7 +425,7 @@ void totp_scene_generate_token_deactivate(PluginState* plugin_state) {
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
 
     totp_usb_type_code_worker_stop(scene_state->usb_type_code_worker_context);
-    #if TOTP_BADBT_TYPE_ENABLED >= 1
+    #ifdef TOTP_BADBT_TYPE_ENABLED
     totp_bt_type_code_worker_stop(plugin_state->bt_type_code_worker_context);
     #endif
 

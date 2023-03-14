@@ -7,7 +7,7 @@
 #include "../lib/list/list.h"
 #include "../ui/totp_scenes_enum.h"
 #include "notification_method.h"
-#if TOTP_BADBT_TYPE_ENABLED >= 1
+#ifdef TOTP_BADBT_TYPE_ENABLED
 #include "../workers/bt_type_code/bt_type_code.h"
 #endif
 
@@ -97,7 +97,7 @@ typedef struct {
      */
     FuriMutex* mutex;
 
-    #if TOTP_BADBT_TYPE_ENABLED >= 1
+    #ifdef TOTP_BADBT_TYPE_ENABLED
     /**
      * @brief Bad-Bluetooth worker context
      */

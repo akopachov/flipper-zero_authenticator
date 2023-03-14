@@ -109,7 +109,7 @@ static bool totp_plugin_state_init(PluginState* const plugin_state) {
         return false;
     }
 
-    #if TOTP_BADBT_TYPE_ENABLED >= 1
+    #ifdef TOTP_BADBT_TYPE_ENABLED
     plugin_state->bt_type_code_worker_context = totp_bt_type_code_worker_init();
     #endif
 
@@ -135,7 +135,7 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
         free(plugin_state->crypto_verify_data);
     }
 
-    #if TOTP_BADBT_TYPE_ENABLED >= 1
+    #ifdef TOTP_BADBT_TYPE_ENABLED
     totp_bt_type_code_worker_free(plugin_state->bt_type_code_worker_context);
     #endif
 
