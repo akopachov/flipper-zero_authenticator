@@ -29,7 +29,26 @@ if (!(Test-Path -PathType Container "build")) {
     Remove-Item "build\*" -Recurse -Force
 }
 
-function Build-Run() {
+function Features-Configure {
+    param (
+        [string[]]$enable,
+        [string[]]$disable
+    )
+
+    $featuresConfigContent = Get-Content "totp/features_config.h" -Raw
+
+    foreach ($feature in $enable) {
+        $featuresConfigContent = $featuresConfigContent -replace "(#undef)(\s+$feature(\s|$)+)", '#define$2'
+    }
+
+    foreach ($feature in $disable) {
+        $featuresConfigContent = $featuresConfigContent -replace "(#define)(\s+$feature(\s|$)+)", '#undef$2'
+    }
+
+    Set-Content -Path "totp/features_config.h" -NoNewline -Value $featuresConfigContent
+}
+
+function Build-Run {
     param (
         [string]$FeaturesSuffix
     )
@@ -52,17 +71,17 @@ function Build-Run() {
 }
 
 Write-Information 'Building with all the features enables'
-./features-config.ps1 -enable TOTP_BADBT_TYPE_ENABLED,TOTP_BADBT_TYPE_ICON_ENABLED
+Features-Configure -enable TOTP_BADBT_TYPE_ENABLED,TOTP_BADBT_TYPE_ICON_ENABLED
 Build-Run -FeaturesSuffix ''
 
 Write-Information 'Building with BadBT but without BadBT icon'
-./features-config.ps1 -disable TOTP_BADBT_TYPE_ICON_ENABLED
+Features-Configure -disable TOTP_BADBT_TYPE_ICON_ENABLED
 Build-Run -FeaturesSuffix '_badbt-wo-icon'
 
 Write-Information 'Building without BadBT'
-./features-config.ps1 -disable TOTP_BADBT_TYPE_ENABLED,TOTP_BADBT_TYPE_ICON_ENABLED
+Features-Configure -disable TOTP_BADBT_TYPE_ENABLED,TOTP_BADBT_TYPE_ICON_ENABLED
 Build-Run -FeaturesSuffix '_no-badbt'
 
-./features-config.ps1 -enable TOTP_BADBT_TYPE_ENABLED,TOTP_BADBT_TYPE_ICON_ENABLED
+Features-Configure -enable TOTP_BADBT_TYPE_ENABLED,TOTP_BADBT_TYPE_ICON_ENABLED
 
 Pop-Location
