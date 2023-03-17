@@ -110,7 +110,9 @@ static bool totp_plugin_state_init(PluginState* const plugin_state) {
     }
 
     #ifdef TOTP_BADBT_TYPE_ENABLED
-    plugin_state->bt_type_code_worker_context = totp_bt_type_code_worker_init();
+    if (plugin_state->automation_method & AutomationMethodBadBt) {
+        plugin_state->bt_type_code_worker_context = totp_bt_type_code_worker_init();
+    }
     #endif
 
     return true;
@@ -136,7 +138,10 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
     }
 
     #ifdef TOTP_BADBT_TYPE_ENABLED
-    totp_bt_type_code_worker_free(plugin_state->bt_type_code_worker_context);
+    if (plugin_state->bt_type_code_worker_context != NULL) { 
+        totp_bt_type_code_worker_free(plugin_state->bt_type_code_worker_context);
+        plugin_state->bt_type_code_worker_context = NULL;
+    }
     #endif
 
     furi_mutex_free(plugin_state->mutex);

@@ -7,6 +7,7 @@
 #include "../lib/list/list.h"
 #include "../ui/totp_scenes_enum.h"
 #include "notification_method.h"
+#include "automation_method.h"
 #ifdef TOTP_BADBT_TYPE_ENABLED
 #include "../workers/bt_type_code/bt_type_code.h"
 #endif
@@ -96,6 +97,11 @@ typedef struct {
      * @brief Main rendering loop mutex
      */
     FuriMutex* mutex;
+
+    /**
+     * @brief Automation method
+     */
+    AutomationMethod automation_method;
 
     #ifdef TOTP_BADBT_TYPE_ENABLED
     /**
