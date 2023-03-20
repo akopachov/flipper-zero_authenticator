@@ -338,6 +338,33 @@ TotpConfigFileUpdateResult
     return update_result;
 }
 
+TotpConfigFileUpdateResult
+    totp_config_file_update_automation_method(AutomationMethod new_automation_method) {
+    Storage* cfg_storage = totp_open_storage();
+    FlipperFormat* file;
+    TotpConfigFileUpdateResult update_result;
+
+    if(totp_open_config_file(cfg_storage, &file) == TotpConfigFileOpenSuccess) {
+        do {
+            uint32_t tmp_uint32 = new_automation_method;
+            if(!flipper_format_insert_or_update_uint32(
+                   file, TOTP_CONFIG_KEY_AUTOMATION_METHOD, &tmp_uint32, 1)) {
+                update_result = TotpConfigFileUpdateError;
+                break;
+            }
+
+            update_result = TotpConfigFileUpdateSuccess;
+        } while(false);
+
+        totp_close_config_file(file);
+    } else {
+        update_result = TotpConfigFileUpdateError;
+    }
+
+    totp_close_storage();
+    return update_result;
+}
+
 TotpConfigFileUpdateResult totp_config_file_update_user_settings(const PluginState* plugin_state) {
     Storage* cfg_storage = totp_open_storage();
     FlipperFormat* file;

@@ -60,7 +60,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
         furi_check((flags & FuriFlagError) == 0); //-V562
         if(flags & TotpUsbTypeCodeWorkerEventStop) break;
 
-        if (furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
+        if(furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
             if(flags & TotpUsbTypeCodeWorkerEventType) {
                 totp_type_code_worker_type_code(context);
             }
@@ -74,7 +74,10 @@ static int32_t totp_type_code_worker_callback(void* context) {
     return 0;
 }
 
-TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(char* code_buf, size_t code_buf_length, FuriMutex* code_buf_update_sync) {
+TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
+    char* code_buf,
+    size_t code_buf_length,
+    FuriMutex* code_buf_update_sync) {
     TotpUsbTypeCodeWorkerContext* context = malloc(sizeof(TotpUsbTypeCodeWorkerContext));
     furi_check(context != NULL);
     context->string = code_buf;

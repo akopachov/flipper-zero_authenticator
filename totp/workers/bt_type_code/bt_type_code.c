@@ -18,8 +18,7 @@ static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context
         i++;
     } while(!furi_hal_bt_is_active() && i < 100 && !totp_type_code_worker_stop_requested());
 
-    if(furi_hal_bt_is_active() &&
-       furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
+    if(furi_hal_bt_is_active() && furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
         furi_delay_ms(500);
         i = 0;
         while(i < context->string_length && context->string[i] != 0) {
@@ -52,7 +51,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
         furi_check((flags & FuriFlagError) == 0); //-V562
         if(flags & TotpBtTypeCodeWorkerEventStop) break;
 
-        if (furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
+        if(furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
             if(flags & TotpBtTypeCodeWorkerEventType) {
                 totp_type_code_worker_type_code(context);
             }
@@ -68,7 +67,11 @@ static int32_t totp_type_code_worker_callback(void* context) {
     return 0;
 }
 
-void totp_bt_type_code_worker_start(TotpBtTypeCodeWorkerContext* context, char* code_buf, size_t code_buf_length, FuriMutex* code_buf_update_sync) {
+void totp_bt_type_code_worker_start(
+    TotpBtTypeCodeWorkerContext* context,
+    char* code_buf,
+    size_t code_buf_length,
+    FuriMutex* code_buf_update_sync) {
     furi_assert(context != NULL);
     context->string = code_buf;
     context->string_length = code_buf_length;
@@ -89,7 +92,9 @@ void totp_bt_type_code_worker_stop(TotpBtTypeCodeWorkerContext* context) {
     context->thread = NULL;
 }
 
-void totp_bt_type_code_worker_notify(TotpBtTypeCodeWorkerContext* context, TotpBtTypeCodeWorkerEvent event) {
+void totp_bt_type_code_worker_notify(
+    TotpBtTypeCodeWorkerContext* context,
+    TotpBtTypeCodeWorkerEvent event) {
     furi_assert(context != NULL);
     furi_thread_flags_set(furi_thread_get_id(context->thread), event);
 }
@@ -112,7 +117,7 @@ TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init() {
 void totp_bt_type_code_worker_free(TotpBtTypeCodeWorkerContext* context) {
     furi_assert(context != NULL);
 
-    if (context->thread != NULL) {
+    if(context->thread != NULL) {
         totp_bt_type_code_worker_stop(context);
     }
 

@@ -18,11 +18,17 @@
 char* YES_NO_LIST[] = {"NO", "YES"};
 char* ON_OFF_LIST[] = {"OFF", "ON"};
 
-typedef enum { HoursInput, MinutesInput, Sound, Vibro, BadUsb, 
-#ifdef TOTP_BADBT_TYPE_ENABLED 
-BadBt, 
+typedef enum {
+    HoursInput,
+    MinutesInput,
+    Sound,
+    Vibro,
+    BadUsb,
+#ifdef TOTP_BADBT_TYPE_ENABLED
+    BadBt,
 #endif
-ConfirmButton } Control;
+    ConfirmButton
+} Control;
 
 typedef struct {
     int8_t tz_offset_hours;
@@ -30,9 +36,9 @@ typedef struct {
     bool notification_sound;
     bool notification_vibro;
     bool badusb_enabled;
-    #ifdef TOTP_BADBT_TYPE_ENABLED 
+#ifdef TOTP_BADBT_TYPE_ENABLED
     bool badbt_enabled;
-    #endif
+#endif
     uint8_t y_offset;
     TotpNullable_uint16_t current_token_index;
     Control selected_control;
@@ -61,9 +67,9 @@ void totp_scene_app_settings_activate(
     scene_state->notification_sound = plugin_state->notification_method & NotificationMethodSound;
     scene_state->notification_vibro = plugin_state->notification_method & NotificationMethodVibro;
     scene_state->badusb_enabled = plugin_state->automation_method & AutomationMethodBadUsb;
-    #ifdef TOTP_BADBT_TYPE_ENABLED 
+#ifdef TOTP_BADBT_TYPE_ENABLED
     scene_state->badbt_enabled = plugin_state->automation_method & AutomationMethodBadBt;
-    #endif
+#endif
 }
 
 static void two_digit_to_str(int8_t num, char* str) {
@@ -140,17 +146,15 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
         scene_state->selected_control == Vibro);
 
     canvas_draw_icon(
-        canvas,
-        SCREEN_WIDTH_CENTER - 5,
-        123 - scene_state->y_offset,
-        &I_totp_arrow_bottom_10x5);
+        canvas, SCREEN_WIDTH_CENTER - 5, 123 - scene_state->y_offset, &I_totp_arrow_bottom_10x5);
 
     canvas_set_font(canvas, FontPrimary);
     canvas_draw_str_aligned(
         canvas, 0, 128 - scene_state->y_offset, AlignLeft, AlignTop, "Automation");
     canvas_set_font(canvas, FontSecondary);
 
-    canvas_draw_str_aligned(canvas, 0, 145 - scene_state->y_offset, AlignLeft, AlignTop, "BadUSB:");
+    canvas_draw_str_aligned(
+        canvas, 0, 145 - scene_state->y_offset, AlignLeft, AlignTop, "BadUSB:");
     ui_control_select_render(
         canvas,
         36,
@@ -159,7 +163,7 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
         ON_OFF_LIST[scene_state->badusb_enabled],
         scene_state->selected_control == BadUsb);
 
-    #ifdef TOTP_BADBT_TYPE_ENABLED 
+#ifdef TOTP_BADBT_TYPE_ENABLED
     canvas_draw_str_aligned(canvas, 0, 163 - scene_state->y_offset, AlignLeft, AlignTop, "BadBT:");
     ui_control_select_render(
         canvas,
@@ -168,16 +172,16 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
         SCREEN_WIDTH - 36,
         ON_OFF_LIST[scene_state->badbt_enabled],
         scene_state->selected_control == BadBt);
-    #endif
+#endif
 
     ui_control_button_render(
         canvas,
         SCREEN_WIDTH_CENTER - 24,
-        #ifdef TOTP_BADBT_TYPE_ENABLED
+#ifdef TOTP_BADBT_TYPE_ENABLED
         178 - scene_state->y_offset,
-        #else
+#else
         165 - scene_state->y_offset,
-        #endif
+#endif
         48,
         13,
         "Confirm",
@@ -204,7 +208,7 @@ bool totp_scene_app_settings_handle_event(
             HoursInput,
             ConfirmButton,
             RollOverflowBehaviorStop);
-        if (scene_state->selected_control > Vibro) {
+        if(scene_state->selected_control > Vibro) {
             scene_state->y_offset = 128;
         } else if(scene_state->selected_control > MinutesInput) {
             scene_state->y_offset = 64;
@@ -215,7 +219,7 @@ bool totp_scene_app_settings_handle_event(
     case InputKeyDown:
         totp_roll_value_uint8_t(
             &scene_state->selected_control, 1, HoursInput, ConfirmButton, RollOverflowBehaviorStop);
-        if (scene_state->selected_control > Vibro) {
+        if(scene_state->selected_control > Vibro) {
             scene_state->y_offset = 128;
         } else if(scene_state->selected_control > MinutesInput) {
             scene_state->y_offset = 64;
@@ -234,14 +238,14 @@ bool totp_scene_app_settings_handle_event(
             scene_state->notification_sound = !scene_state->notification_sound;
         } else if(scene_state->selected_control == Vibro) {
             scene_state->notification_vibro = !scene_state->notification_vibro;
-        } else if (scene_state->selected_control == BadUsb) {
+        } else if(scene_state->selected_control == BadUsb) {
             scene_state->badusb_enabled = !scene_state->badusb_enabled;
-        } 
-        #ifdef TOTP_BADBT_TYPE_ENABLED 
-        else if (scene_state->selected_control == BadBt) {
+        }
+#ifdef TOTP_BADBT_TYPE_ENABLED
+        else if(scene_state->selected_control == BadBt) {
             scene_state->badbt_enabled = !scene_state->badbt_enabled;
         }
-        #endif
+#endif
         break;
     case InputKeyLeft:
         if(scene_state->selected_control == HoursInput) {
@@ -254,14 +258,14 @@ bool totp_scene_app_settings_handle_event(
             scene_state->notification_sound = !scene_state->notification_sound;
         } else if(scene_state->selected_control == Vibro) {
             scene_state->notification_vibro = !scene_state->notification_vibro;
-        } else if (scene_state->selected_control == BadUsb) {
+        } else if(scene_state->selected_control == BadUsb) {
             scene_state->badusb_enabled = !scene_state->badusb_enabled;
-        } 
-        #ifdef TOTP_BADBT_TYPE_ENABLED 
-        else if (scene_state->selected_control == BadBt) {
+        }
+#ifdef TOTP_BADBT_TYPE_ENABLED
+        else if(scene_state->selected_control == BadBt) {
             scene_state->badbt_enabled = !scene_state->badbt_enabled;
         }
-        #endif
+#endif
         break;
     case InputKeyOk:
         if(scene_state->selected_control == ConfirmButton) {
@@ -274,16 +278,25 @@ bool totp_scene_app_settings_handle_event(
                 (scene_state->notification_vibro ? NotificationMethodVibro :
                                                    NotificationMethodNone);
 
-            plugin_state->automation_method = scene_state->badusb_enabled ? AutomationMethodBadUsb : AutomationMethodNone;
-            #ifdef TOTP_BADBT_TYPE_ENABLED 
-            plugin_state->automation_method |= scene_state->badbt_enabled ? AutomationMethodBadBt : AutomationMethodNone;
-            #endif
+            plugin_state->automation_method =
+                scene_state->badusb_enabled ? AutomationMethodBadUsb : AutomationMethodNone;
+#ifdef TOTP_BADBT_TYPE_ENABLED
+            plugin_state->automation_method |= scene_state->badbt_enabled ? AutomationMethodBadBt :
+                                                                            AutomationMethodNone;
+#endif
 
             if(totp_config_file_update_user_settings(plugin_state) !=
                TotpConfigFileUpdateSuccess) {
                 totp_dialogs_config_updating_error(plugin_state);
                 return false;
             }
+
+#ifdef TOTP_BADBT_TYPE_ENABLED
+            if(!scene_state->badbt_enabled && plugin_state->bt_type_code_worker_context != NULL) {
+                totp_bt_type_code_worker_free(plugin_state->bt_type_code_worker_context);
+                plugin_state->bt_type_code_worker_context = NULL;
+            }
+#endif
 
             if(!scene_state->current_token_index.is_null) {
                 TokenMenuSceneContext generate_scene_context = {

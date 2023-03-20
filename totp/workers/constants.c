@@ -11,5 +11,4 @@ const uint8_t hid_number_keys[10] = {
     HID_KEYBOARD_6,
     HID_KEYBOARD_7,
     HID_KEYBOARD_8,
-    HID_KEYBOARD_9
-};
+    HID_KEYBOARD_9};

@@ -103,10 +103,10 @@ typedef struct {
      */
     AutomationMethod automation_method;
 
-    #ifdef TOTP_BADBT_TYPE_ENABLED
+#ifdef TOTP_BADBT_TYPE_ENABLED
     /**
      * @brief Bad-Bluetooth worker context
      */
     TotpBtTypeCodeWorkerContext* bt_type_code_worker_context;
-    #endif
+#endif
 } PluginState;
