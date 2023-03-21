@@ -13,6 +13,7 @@ typedef struct {
     FuriThread* thread;
     FuriMutex* string_sync;
     Bt* bt;
+    bool is_advertising;
 } TotpBtTypeCodeWorkerContext;
 
 enum TotpBtTypeCodeWorkerEvents {

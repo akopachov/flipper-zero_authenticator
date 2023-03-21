@@ -351,7 +351,9 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
     }
 
 #if defined(TOTP_BADBT_TYPE_ENABLED) && defined(TOTP_BADBT_TYPE_ICON_ENABLED)
-    if(plugin_state->automation_method & AutomationMethodBadBt) {
+    if(plugin_state->automation_method & AutomationMethodBadBt &&
+        plugin_state->bt_type_code_worker_context != NULL &&
+        plugin_state->bt_type_code_worker_context->is_advertising) {
         canvas_draw_icon(
             canvas, SCREEN_WIDTH_CENTER - 5, SCREEN_HEIGHT_CENTER + 13, &I_hid_ble_10x7);
     }

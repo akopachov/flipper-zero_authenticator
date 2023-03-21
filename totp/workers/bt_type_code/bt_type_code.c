@@ -42,7 +42,11 @@ static int32_t totp_type_code_worker_callback(void* context) {
         return 251;
     }
 
+    TotpBtTypeCodeWorkerContext* bt_context = context;
+
     furi_hal_bt_start_advertising();
+    bt_context->is_advertising = true;
+    
     while(true) {
         uint32_t flags = furi_thread_flags_wait(
             TotpBtTypeCodeWorkerEventStop | TotpBtTypeCodeWorkerEventType,
@@ -53,7 +57,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
 
         if(furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
             if(flags & TotpBtTypeCodeWorkerEventType) {
-                totp_type_code_worker_type_code(context);
+                totp_type_code_worker_type_code(bt_context);
             }
 
             furi_mutex_release(context_mutex);
@@ -61,6 +65,8 @@ static int32_t totp_type_code_worker_callback(void* context) {
     }
 
     furi_hal_bt_stop_advertising();
+
+    bt_context->is_advertising = false;
 
     furi_mutex_free(context_mutex);
 
@@ -104,6 +110,7 @@ TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init() {
     furi_check(context != NULL);
 
     context->bt = furi_record_open(RECORD_BT);
+    context->is_advertising = false;
     bt_disconnect(context->bt);
     furi_delay_ms(200);
     bt_keys_storage_set_storage_path(context->bt, HID_BT_KEYS_STORAGE_PATH);
