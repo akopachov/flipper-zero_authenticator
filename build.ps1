@@ -40,21 +40,21 @@ function Features-Configure {
 
     foreach ($feature in $enable) {
         $featuresConfigContent = $featuresConfigContent -replace "(#undef)(\s+$feature(\s|$)+)", '#define$2'
-        [regex]$appManifestFeaturePattern="(#ifdef $feature)\r?\n((.+\r?\n)+)(#\s*endif)"
-        $appManifestContent = $appManifestFeaturePattern.Replace($appManifestContent, {
-            $args[0].Groups[1] + 
-            ($args[0].Groups[2] -replace '^(\s*)#(.+)$', '$1$2') + 
-            $args[0].Groups[4]
+        [regex]$appManifestFeaturePattern="(#ifdef $feature\r?\n)((.+\r?\n)+)(#\s*endif)"
+        $appManifestContent = $appManifestFeaturePattern.Replace($appManifestContent, { param($match)
+            return $match.Groups[1].Value + 
+            ($match.Groups[2].Value -replace '^(\s*)#(.+)$', '$1$2') + 
+            $match.Groups[4].Value
         })
     }
 
     foreach ($feature in $disable) {
         $featuresConfigContent = $featuresConfigContent -replace "(#define)(\s+$feature(\s|$)+)", '#undef$2'
-        [regex]$appManifestFeaturePattern="(#ifdef $feature)\r?\n((.+\r?\n)+)(#\s*endif)"
-        $appManifestContent = $appManifestFeaturePattern.Replace($appManifestContent, {
-            $args[0].Groups[1] + 
-            ($args[0].Groups[2] -replace '^(\s*)(.+)$', '$1#$2') + 
-            $args[0].Groups[4]
+        [regex]$appManifestFeaturePattern="(#ifdef $feature\r?\n)((.+\r?\n)+)(#\s*endif)"
+        $appManifestContent = $appManifestFeaturePattern.Replace($appManifestContent, { param($match)
+            return $match.Groups[1].Value + 
+            ($match.Groups[2].Value -replace '^(\s*)(.+)$', '#$1$2') + 
+            $match.Groups[4].Value
         })
     }
 
