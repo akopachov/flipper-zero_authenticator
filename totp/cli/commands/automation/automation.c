@@ -32,10 +32,14 @@ void totp_cli_command_automation_docopt_arguments() {
 }
 
 static void totp_cli_command_automation_print_method(AutomationMethod method, char* color) {
+#ifdef TOTP_BADBT_TYPE_ENABLED
     bool has_previous_method = false;
+#endif
     if(method & AutomationMethodBadUsb) {
         TOTP_CLI_PRINTF_COLORFUL(color, "\"" TOTP_CLI_COMMAND_AUTOMATION_METHOD_USB "\"");
+#ifdef TOTP_BADBT_TYPE_ENABLED
         has_previous_method = true;
+#endif
     }
 
 #ifdef TOTP_BADBT_TYPE_ENABLED

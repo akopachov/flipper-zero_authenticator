@@ -36,16 +36,30 @@ function Features-Configure {
     )
 
     $featuresConfigContent = Get-Content "totp/features_config.h" -Raw
+    $appManifestContent = Get-Content "totp/application.fam" -Raw
 
     foreach ($feature in $enable) {
         $featuresConfigContent = $featuresConfigContent -replace "(#undef)(\s+$feature(\s|$)+)", '#define$2'
+        [regex]$appManifestFeaturePattern="(#ifdef $feature)\r?\n((.+\r?\n)+)(#\s*endif)"
+        $appManifestContent = $appManifestFeaturePattern.Replace($appManifestContent, {
+            $args[0].Groups[1] + 
+            ($args[0].Groups[2] -replace '^(\s*)#(.+)$', '$1$2') + 
+            $args[0].Groups[4]
+        })
     }
 
     foreach ($feature in $disable) {
         $featuresConfigContent = $featuresConfigContent -replace "(#define)(\s+$feature(\s|$)+)", '#undef$2'
+        [regex]$appManifestFeaturePattern="(#ifdef $feature)\r?\n((.+\r?\n)+)(#\s*endif)"
+        $appManifestContent = $appManifestFeaturePattern.Replace($appManifestContent, {
+            $args[0].Groups[1] + 
+            ($args[0].Groups[2] -replace '^(\s*)(.+)$', '$1#$2') + 
+            $args[0].Groups[4]
+        })
     }
 
     Set-Content -Path "totp/features_config.h" -NoNewline -Value $featuresConfigContent
+    Set-Content -Path "totp/application.fam" -NoNewline -Value $appManifestContent
 }
 
 function Build-Run {
