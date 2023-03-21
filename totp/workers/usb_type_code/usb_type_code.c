@@ -76,7 +76,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
 
 TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
     char* code_buf,
-    size_t code_buf_length,
+    uint8_t code_buf_length,
     FuriMutex* code_buf_update_sync) {
     TotpUsbTypeCodeWorkerContext* context = malloc(sizeof(TotpUsbTypeCodeWorkerContext));
     furi_check(context != NULL);

@@ -372,8 +372,8 @@ bool totp_scene_generate_token_handle_event(
     }
 
     SceneState* scene_state;
-    if(event->input.type == InputTypeLong && event->input.key == InputKeyDown) {
-        if(plugin_state->automation_method & AutomationMethodBadUsb) {
+    if(event->input.type == InputTypeLong) {
+        if(event->input.key == InputKeyDown && plugin_state->automation_method & AutomationMethodBadUsb) {
             scene_state = (SceneState*)plugin_state->current_scene_state;
             totp_usb_type_code_worker_notify(
                 scene_state->usb_type_code_worker_context, TotpUsbTypeCodeWorkerEventType);
@@ -382,11 +382,8 @@ bool totp_scene_generate_token_handle_event(
                 get_notification_sequence_automation(plugin_state, scene_state));
             return true;
         }
-    }
-
 #ifdef TOTP_BADBT_TYPE_ENABLED
-    if(event->input.type == InputTypeLong && event->input.key == InputKeyUp) {
-        if(plugin_state->automation_method & AutomationMethodBadBt) {
+        else if(event->input.key == InputKeyUp && plugin_state->automation_method & AutomationMethodBadBt) {
             scene_state = (SceneState*)plugin_state->current_scene_state;
             totp_bt_type_code_worker_notify(
                 plugin_state->bt_type_code_worker_context, TotpBtTypeCodeWorkerEventType);
@@ -395,8 +392,8 @@ bool totp_scene_generate_token_handle_event(
                 get_notification_sequence_automation(plugin_state, scene_state));
             return true;
         }
-    }
 #endif
+    }
 
     if(event->input.type != InputTypePress && event->input.type != InputTypeRepeat) {
         return true;

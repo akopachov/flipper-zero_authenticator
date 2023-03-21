@@ -76,7 +76,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
 void totp_bt_type_code_worker_start(
     TotpBtTypeCodeWorkerContext* context,
     char* code_buf,
-    size_t code_buf_length,
+    uint8_t code_buf_length,
     FuriMutex* code_buf_update_sync) {
     furi_assert(context != NULL);
     context->string = code_buf;
