@@ -46,7 +46,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
 
     furi_hal_bt_start_advertising();
     bt_context->is_advertising = true;
-    
+
     while(true) {
         uint32_t flags = furi_thread_flags_wait(
             TotpBtTypeCodeWorkerEventStop | TotpBtTypeCodeWorkerEventType,
