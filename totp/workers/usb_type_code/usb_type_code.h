@@ -15,9 +15,9 @@ typedef struct {
 } TotpUsbTypeCodeWorkerContext;
 
 enum TotpUsbTypeCodeWorkerEvents {
-    TotpUsbTypeCodeWorkerEventReserved = (1 << 0),
-    TotpUsbTypeCodeWorkerEventStop = (1 << 1),
-    TotpUsbTypeCodeWorkerEventType = (1 << 2)
+    TotpUsbTypeCodeWorkerEventReserved = 0b0000,
+    TotpUsbTypeCodeWorkerEventStop = 0b0100,
+    TotpUsbTypeCodeWorkerEventType = 0b1000
 };
 
 TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(

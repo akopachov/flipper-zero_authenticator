@@ -13,6 +13,7 @@ TokenInfo* token_info_alloc() {
     tokenInfo->algo = SHA1;
     tokenInfo->digits = TOTP_6_DIGITS;
     tokenInfo->duration = TOTP_TOKEN_DURATION_DEFAULT;
+    tokenInfo->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
     return tokenInfo;
 }
 

@@ -5,8 +5,7 @@
 #include "../../types/common.h"
 #include "../../types/token_info.h"
 #include "../../features_config.h"
-#include "migrations/config_migration_v1_to_v2.h"
-#include "migrations/config_migration_v2_to_v3.h"
+#include "migrations/common_migration.h"
 
 #define CONFIG_FILE_DIRECTORY_PATH EXT_PATH("authenticator")
 #define CONFIG_FILE_PATH CONFIG_FILE_DIRECTORY_PATH "/totp.conf"
@@ -190,6 +189,13 @@ static TotpConfigFileOpenResult totp_open_config_file(Storage* storage, FlipperF
         flipper_format_write_comment(fff_data_file, temp_str);
         flipper_format_write_comment_cstr(fff_data_file, " ");
 
+        flipper_format_write_comment_cstr(
+            fff_data_file,
+            "# Token input automation features (0 - None, 1 - press \"Enter\" key at the end of automation)");
+        furi_string_printf(temp_str, "%s: 0", TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES);
+        flipper_format_write_comment(fff_data_file, temp_str);
+        flipper_format_write_comment_cstr(fff_data_file, " ");
+
         flipper_format_write_comment_cstr(fff_data_file, "=== TOKEN SAMPLE END ===");
         flipper_format_write_comment_cstr(fff_data_file, " ");
 
@@ -251,6 +257,13 @@ static TotpConfigFileUpdateResult
 
         tmp_uint32 = token_info->duration;
         if(!flipper_format_write_uint32(file, TOTP_CONFIG_KEY_TOKEN_DURATION, &tmp_uint32, 1)) {
+            update_result = TotpConfigFileUpdateError;
+            break;
+        }
+
+        tmp_uint32 = token_info->automation_features;
+        if(!flipper_format_write_uint32(
+               file, TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES, &tmp_uint32, 1)) {
             update_result = TotpConfigFileUpdateError;
             break;
         }
@@ -544,28 +557,19 @@ TotpConfigFileOpenResult totp_config_file_load_base(PluginState* const plugin_st
                     break;
                 }
 
-                if(file_version == 1) {
-                    if(totp_config_migrate_v1_to_v2(fff_data_file, fff_backup_data_file)) {
-                        FURI_LOG_I(LOGGING_TAG, "Applied migration from v1 to v2");
-                        file_version = 2;
-                    } else {
-                        FURI_LOG_W(
-                            LOGGING_TAG, "An error occurred during migration from v1 to v2");
-                        result = TotpConfigFileOpenError;
-                        break;
-                    }
-                }
-
-                if(file_version == 2) {
-                    if(totp_config_migrate_v2_to_v3(fff_data_file, fff_backup_data_file)) {
-                        FURI_LOG_I(LOGGING_TAG, "Applied migration from v2 to v3");
-                        file_version = 3;
-                    } else {
-                        FURI_LOG_W(
-                            LOGGING_TAG, "An error occurred during migration from v2 to v3");
-                        result = TotpConfigFileOpenError;
-                        break;
-                    }
+                if(totp_config_migrate_to_latest(fff_data_file, fff_backup_data_file)) {
+                    FURI_LOG_I(
+                        LOGGING_TAG,
+                        "Applied migration to version %" PRId16,
+                        CONFIG_FILE_ACTUAL_VERSION);
+                    file_version = CONFIG_FILE_ACTUAL_VERSION;
+                } else {
+                    FURI_LOG_W(
+                        LOGGING_TAG,
+                        "An error occurred during migration to version %" PRId16,
+                        CONFIG_FILE_ACTUAL_VERSION);
+                    result = TotpConfigFileOpenError;
+                    break;
                 }
 
                 flipper_format_file_close(fff_backup_data_file);
@@ -759,6 +763,11 @@ TokenLoadingResult totp_config_file_load_tokens(PluginState* const plugin_state)
                fff_data_file, TOTP_CONFIG_KEY_TOKEN_DURATION, &temp_data32, 1) ||
            !token_info_set_duration_from_int(tokenInfo, temp_data32)) {
             tokenInfo->duration = TOTP_TOKEN_DURATION_DEFAULT;
+        }
+
+        if(!flipper_format_read_uint32(
+               fff_data_file, TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES, &temp_data32, 1)) {
+            tokenInfo->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
         }
 
         FURI_LOG_D(LOGGING_TAG, "Found token \"%s\"", tokenInfo->name);

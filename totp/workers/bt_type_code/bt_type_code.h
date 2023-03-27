@@ -17,9 +17,9 @@ typedef struct {
 } TotpBtTypeCodeWorkerContext;
 
 enum TotpBtTypeCodeWorkerEvents {
-    TotpBtTypeCodeWorkerEventReserved = (1 << 0),
-    TotpBtTypeCodeWorkerEventStop = (1 << 1),
-    TotpBtTypeCodeWorkerEventType = (1 << 2)
+    TotpBtTypeCodeWorkerEventReserved = 0b0000,
+    TotpBtTypeCodeWorkerEventStop = 0b0100,
+    TotpBtTypeCodeWorkerEventType = 0b1000
 };
 
 TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init();

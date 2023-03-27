@@ -2,6 +2,7 @@
 #include <furi_hal_bt_hid.h>
 #include <storage/storage.h>
 #include "../../types/common.h"
+#include "../../types/token_info.h"
 #include "../../services/convert/convert.h"
 #include "../constants.h"
 
@@ -11,7 +12,15 @@ static inline bool totp_type_code_worker_stop_requested() {
     return furi_thread_flags_get() & TotpBtTypeCodeWorkerEventStop;
 }
 
-static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context) {
+static void totp_type_code_worker_press_key(uint8_t key) {
+    furi_hal_bt_hid_kb_press(key);
+    furi_delay_ms(30);
+    furi_hal_bt_hid_kb_release(key);
+}
+
+static void totp_type_code_worker_type_code(
+    TotpBtTypeCodeWorkerContext* context,
+    TokenAutomationFeature features) {
     uint8_t i = 0;
     do {
         furi_delay_ms(500);
@@ -25,10 +34,13 @@ static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context
             uint8_t digit = CONVERT_CHAR_TO_DIGIT(context->string[i]);
             if(digit > 9) break;
             uint8_t hid_kb_key = hid_number_keys[digit];
-            furi_hal_bt_hid_kb_press(hid_kb_key);
-            furi_delay_ms(30);
-            furi_hal_bt_hid_kb_release(hid_kb_key);
+            totp_type_code_worker_press_key(hid_kb_key);
             i++;
+        }
+
+        if(features & TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END) {
+            furi_delay_ms(30);
+            totp_type_code_worker_press_key(hid_enter_key);
         }
 
         furi_mutex_release(context->string_sync);
@@ -57,7 +69,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
 
         if(furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
             if(flags & TotpBtTypeCodeWorkerEventType) {
-                totp_type_code_worker_type_code(bt_context);
+                totp_type_code_worker_type_code(bt_context, flags ^ TotpBtTypeCodeWorkerEventType);
             }
 
             furi_mutex_release(context_mutex);

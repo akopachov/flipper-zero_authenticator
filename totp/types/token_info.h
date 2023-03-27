@@ -6,6 +6,7 @@
 
 typedef uint8_t TokenHashAlgo;
 typedef uint8_t TokenDigitsCount;
+typedef uint8_t TokenAutomationFeature;
 
 /**
  * @brief Hashing algorithm to be used to generate token
@@ -40,6 +41,21 @@ enum TokenDigitsCounts {
      * @brief 8 digits
      */
     TOTP_8_DIGITS = 8
+};
+
+/**
+ * @brief Token automation features.
+ */
+enum TokenAutomationFeatures {
+    /**
+     * @brief No features enabled
+     */
+    TOKEN_AUTOMATION_FEATURE_NONE = 0b00,
+
+    /**
+     * @brief Press "Enter" key at the end as a part of token input automation
+     */
+    TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END = 0b01
 };
 
 #define TOTP_TOKEN_DIGITS_MAX_COUNT 8
@@ -77,6 +93,11 @@ typedef struct {
      * @brief Desired TOTP token duration in seconds
      */
     uint8_t duration;
+
+    /**
+     * @brief Token input automation features
+     */
+    TokenAutomationFeature automation_features;
 } TokenInfo;
 
 /**
