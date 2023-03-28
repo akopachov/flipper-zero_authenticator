@@ -14,31 +14,6 @@
 #define CONFIG_FILE_ORIG_PATH CONFIG_FILE_PATH ".orig"
 #define CONFIG_FILE_PATH_PREVIOUS EXT_PATH("apps/Misc") "/totp.conf"
 
-static char* token_info_get_algo_as_cstr(const TokenInfo* token_info) {
-    switch(token_info->algo) {
-    case SHA1:
-        return TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME;
-    case SHA256:
-        return TOTP_CONFIG_TOKEN_ALGO_SHA256_NAME;
-    case SHA512:
-        return TOTP_CONFIG_TOKEN_ALGO_SHA512_NAME;
-    default:
-        break;
-    }
-
-    return NULL;
-}
-
-static void token_info_set_algo_from_str(TokenInfo* token_info, const FuriString* str) {
-    if(furi_string_cmpi_str(str, TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME) == 0) {
-        token_info->algo = SHA1;
-    } else if(furi_string_cmpi_str(str, TOTP_CONFIG_TOKEN_ALGO_SHA256_NAME) == 0) {
-        token_info->algo = SHA256;
-    } else if(furi_string_cmpi_str(str, TOTP_CONFIG_TOKEN_ALGO_SHA512_NAME) == 0) {
-        token_info->algo = SHA512;
-    }
-}
-
 /**
  * @brief Opens storage record
  * @return Storage record
@@ -165,13 +140,13 @@ static TotpConfigFileOpenResult totp_open_config_file(Storage* storage, FlipperF
         furi_string_printf(
             temp_str,
             " # Token hashing algorithm to use during code generation. Supported options are %s, %s and %s. If you are not use which one to use - use %s",
-            TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME,
-            TOTP_CONFIG_TOKEN_ALGO_SHA256_NAME,
-            TOTP_CONFIG_TOKEN_ALGO_SHA512_NAME,
-            TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME);
+            TOTP_TOKEN_ALGO_SHA1_NAME,
+            TOTP_TOKEN_ALGO_SHA256_NAME,
+            TOTP_TOKEN_ALGO_SHA512_NAME,
+            TOTP_TOKEN_ALGO_SHA1_NAME);
         flipper_format_write_comment(fff_data_file, temp_str);
         furi_string_printf(
-            temp_str, "%s: %s", TOTP_CONFIG_KEY_TOKEN_ALGO, TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME);
+            temp_str, "%s: %s", TOTP_CONFIG_KEY_TOKEN_ALGO, TOTP_TOKEN_ALGO_SHA1_NAME);
         flipper_format_write_comment(fff_data_file, temp_str);
         flipper_format_write_comment_cstr(fff_data_file, " ");
 
@@ -747,9 +722,8 @@ TokenLoadingResult totp_config_file_load_tokens(PluginState* const plugin_state)
             }
         }
 
-        if(flipper_format_read_string(fff_data_file, TOTP_CONFIG_KEY_TOKEN_ALGO, temp_str)) {
-            token_info_set_algo_from_str(tokenInfo, temp_str);
-        } else {
+        if(!flipper_format_read_string(fff_data_file, TOTP_CONFIG_KEY_TOKEN_ALGO, temp_str) ||
+           !token_info_set_algo_from_str(tokenInfo, temp_str)) {
             tokenInfo->algo = SHA1;
         }
 

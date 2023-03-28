@@ -49,12 +49,25 @@ bool totp_config_migrate_to_latest(
 
         flipper_format_rewind(fff_backup_data_file);
 
+        if(flipper_format_read_string(
+               fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_METHOD, temp_str)) {
+            flipper_format_write_string(
+                fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_METHOD, temp_str);
+        }
+
+        flipper_format_rewind(fff_backup_data_file);
+
+        FuriString* comment_str = furi_string_alloc();
+
         while(true) {
             if(!flipper_format_read_string(
                    fff_backup_data_file, TOTP_CONFIG_KEY_TOKEN_NAME, temp_str)) {
                 break;
             }
 
+            furi_string_printf(comment_str, "=== BEGIN \"%s\" ===", furi_string_get_cstr(temp_str));
+            flipper_format_write_comment(fff_data_file, comment_str);
+            furi_string_printf(comment_str, "=== END \"%s\" ===", furi_string_get_cstr(temp_str));
             flipper_format_write_string(fff_data_file, TOTP_CONFIG_KEY_TOKEN_NAME, temp_str);
 
             flipper_format_read_string(
@@ -71,7 +84,7 @@ bool totp_config_migrate_to_latest(
                 flipper_format_write_string(fff_data_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, temp_str);
             } else {
                 flipper_format_write_string_cstr(
-                    fff_data_file, TOTP_CONFIG_KEY_TOKEN_ALGO, TOTP_CONFIG_TOKEN_ALGO_SHA1_NAME);
+                    fff_data_file, TOTP_CONFIG_KEY_TOKEN_ALGO, TOTP_TOKEN_ALGO_SHA1_NAME);
                 const uint32_t default_digits = TOTP_6_DIGITS;
                 flipper_format_write_uint32(
                     fff_data_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &default_digits, 1);
@@ -101,7 +114,11 @@ bool totp_config_migrate_to_latest(
                     &default_automation_features,
                     1);
             }
+
+            flipper_format_write_comment(fff_data_file, comment_str);
         }
+
+        furi_string_free(comment_str);
 
         result = true;
     } while(false);
