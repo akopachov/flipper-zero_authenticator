@@ -7,8 +7,7 @@
 #include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
 #include "../../../ui/scene_director.h"
-
-#define TOTP_CLI_COMMAND_MOVE_ARG_INDEX "index"
+#include "../../common_command_arguments.h"
 
 #define TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX "index"
 #define TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX_PREFIX "-i"
@@ -21,7 +20,7 @@ void totp_cli_command_move_docopt_commands() {
 void totp_cli_command_move_docopt_usage() {
     TOTP_CLI_PRINTF(
         "  " TOTP_CLI_COMMAND_NAME
-        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_MOVE " | " TOTP_CLI_COMMAND_MOVE_ALT) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_MOVE_ARG_INDEX) 
+        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_MOVE " | " TOTP_CLI_COMMAND_MOVE_ALT) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_INDEX) 
         " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX))) "\r\n");
 }
 

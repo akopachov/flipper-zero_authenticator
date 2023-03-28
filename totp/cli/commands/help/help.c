@@ -51,7 +51,6 @@ void totp_cli_command_help_handle() {
     cli_nl();
     TOTP_CLI_PRINTF("Arguments:\r\n");
     totp_cli_command_add_docopt_arguments();
-    totp_cli_command_update_docopt_arguments();
     totp_cli_command_delete_docopt_arguments();
     totp_cli_command_timezone_docopt_arguments();
     totp_cli_command_notification_docopt_arguments();

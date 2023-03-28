@@ -7,9 +7,7 @@
 #include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
 #include "../../../ui/scene_director.h"
-
-#define TOTP_CLI_COMMAND_DELETE_ARG_INDEX "index"
-#define TOTP_CLI_COMMAND_DELETE_ARG_FORCE_SUFFIX "-f"
+#include "../../common_command_arguments.h"
 
 void totp_cli_command_delete_docopt_commands() {
     TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_DELETE ", " TOTP_CLI_COMMAND_DELETE_ALT
@@ -20,16 +18,16 @@ void totp_cli_command_delete_docopt_usage() {
     TOTP_CLI_PRINTF(
         "  " TOTP_CLI_COMMAND_NAME
         " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_DELETE " | " TOTP_CLI_COMMAND_DELETE_ALT) " " DOCOPT_ARGUMENT(
-            TOTP_CLI_COMMAND_DELETE_ARG_INDEX) " " DOCOPT_OPTIONAL(DOCOPT_SWITCH(TOTP_CLI_COMMAND_DELETE_ARG_FORCE_SUFFIX)) "\r\n");
+            TOTP_CLI_COMMAND_ARG_INDEX) " " DOCOPT_OPTIONAL(DOCOPT_SWITCH(TOTP_CLI_COMMAND_ARG_FORCE_SUFFIX)) "\r\n");
 }
 
 void totp_cli_command_delete_docopt_arguments() {
-    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_DELETE_ARG_INDEX "         Token index in the list\r\n");
+    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_ARG_INDEX "         Token index in the list\r\n");
 }
 
 void totp_cli_command_delete_docopt_options() {
     TOTP_CLI_PRINTF("  " DOCOPT_SWITCH(
-        TOTP_CLI_COMMAND_DELETE_ARG_FORCE_SUFFIX) "             Force command to do not ask user for interactive confirmation\r\n");
+        TOTP_CLI_COMMAND_ARG_FORCE_SUFFIX) "             Force command to do not ask user for interactive confirmation\r\n");
 }
 
 void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
@@ -43,7 +41,7 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     FuriString* temp_str = furi_string_alloc();
     bool confirm_needed = true;
     if(args_read_string_and_trim(args, temp_str)) {
-        if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_DELETE_ARG_FORCE_SUFFIX) == 0) {
+        if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_FORCE_SUFFIX) == 0) {
             confirm_needed = false;
         } else {
             TOTP_CLI_PRINTF("Unknown argument \"%s\"\r\n", furi_string_get_cstr(temp_str));

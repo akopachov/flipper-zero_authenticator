@@ -7,20 +7,9 @@
 #include "../../../services/convert/convert.h"
 #include "../../cli_helpers.h"
 #include "../../../ui/scene_director.h"
+#include "../../common_command_arguments.h"
 
-#define TOTP_CLI_COMMAND_UPDATE_ARG_INDEX "index"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_NAME "name"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_NAME_PREFIX "-n"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_ALGO "algo"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_ALGO_PREFIX "-a"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_DIGITS "digits"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_DIGITS_PREFIX "-d"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_UNSECURE_PREFIX "-u"
 #define TOTP_CLI_COMMAND_UPDATE_ARG_SECRET_PREFIX "-s"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_DURATION "duration"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_DURATION_PREFIX "-l"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_AUTOMATION_FEATURE_PREFIX "-b"
-#define TOTP_CLI_COMMAND_UPDATE_ARG_AUTOMATION_FEATURE "feature"
 
 void totp_cli_command_update_docopt_commands() {
     TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_UPDATE "           Update existing token\r\n");
@@ -29,23 +18,20 @@ void totp_cli_command_update_docopt_commands() {
 void totp_cli_command_update_docopt_usage() {
     TOTP_CLI_PRINTF(
         "  " TOTP_CLI_COMMAND_NAME
-        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_UPDATE) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_UPDATE_ARG_INDEX) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_UPDATE_ARG_ALGO_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_UPDATE_ARG_ALGO)))
-        " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_UPDATE_ARG_NAME_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_UPDATE_ARG_NAME)))
+        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_UPDATE) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_INDEX) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_ALGO_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_ALGO)))
+        " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_NAME_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_NAME)))
         " " DOCOPT_OPTIONAL(
             DOCOPT_OPTION(
-                TOTP_CLI_COMMAND_UPDATE_ARG_DIGITS_PREFIX,
+                TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX,
                 DOCOPT_ARGUMENT(
-                    TOTP_CLI_COMMAND_UPDATE_ARG_DIGITS))) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_UPDATE_ARG_DURATION_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_UPDATE_ARG_DURATION))) " " DOCOPT_OPTIONAL(DOCOPT_SWITCH(TOTP_CLI_COMMAND_UPDATE_ARG_UNSECURE_PREFIX)) 
-                    " " DOCOPT_MULTIPLE(DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_UPDATE_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_UPDATE_ARG_AUTOMATION_FEATURE)))) "\r\n");
-}
-
-void totp_cli_command_update_docopt_arguments() {
+                    TOTP_CLI_COMMAND_ARG_DIGITS))) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_DURATION_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_DURATION))) " " DOCOPT_OPTIONAL(DOCOPT_SWITCH(TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX)) 
+                    " " DOCOPT_MULTIPLE(DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE)))) "\r\n");
 }
 
 void totp_cli_command_update_docopt_options() {
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
-        TOTP_CLI_COMMAND_UPDATE_ARG_NAME_PREFIX,
-        DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_UPDATE_ARG_NAME)) "      Token name\r\n");
+        TOTP_CLI_COMMAND_ARG_NAME_PREFIX,
+        DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_NAME)) "      Token name\r\n");
 }
 
 void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
@@ -71,10 +57,10 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
     bool update_token_secret = false;
     while(args_read_string_and_trim(args, temp_str)) {
         bool parsed = false;
-        if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_UPDATE_ARG_NAME_PREFIX) == 0) {
+        if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_NAME_PREFIX) == 0) {
             if(!args_read_probably_quoted_string_and_trim(args, temp_str) || furi_string_empty(temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_NAME_PREFIX "\"\r\n");
+                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_NAME_PREFIX "\"\r\n");
             } else {
                 if (token_info->name != NULL) {
                     free(token_info->name);
@@ -86,61 +72,61 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
                 strlcpy(token_info->name, furi_string_get_cstr(temp_str), temp_cstr_len + 1);
                 parsed = true;
             }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_UPDATE_ARG_ALGO_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_ALGO_PREFIX) == 0) {
             if(!args_read_string_and_trim(args, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_ALGO_PREFIX "\"\r\n");
+                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_ALGO_PREFIX "\"\r\n");
             } else if(!token_info_set_algo_from_str(token_info, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_ALGO_PREFIX
+                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_ALGO_PREFIX
                     "\"\r\n",
                     furi_string_get_cstr(temp_str));
             } else {
                 parsed = true;
             }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_UPDATE_ARG_DIGITS_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX) == 0) {
             uint8_t digit_value;
             if(!args_read_uint8_and_trim(args, &digit_value)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_DIGITS_PREFIX
+                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX
                     "\"\r\n");
             } else if(!token_info_set_digits_from_int(token_info, digit_value)) {
                 TOTP_CLI_PRINTF_ERROR(
                     "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_DIGITS_PREFIX
+                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX
                     "\"\r\n",
                     digit_value);
             } else {
                 parsed = true;
             }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_UPDATE_ARG_DURATION_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_DURATION_PREFIX) == 0) {
             uint8_t duration_value;
             if(!args_read_uint8_and_trim(args, &duration_value)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_DURATION_PREFIX
+                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DURATION_PREFIX
                     "\"\r\n");
             } else if(!token_info_set_duration_from_int(token_info, duration_value)) {
                 TOTP_CLI_PRINTF_ERROR(
                     "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_DURATION_PREFIX
+                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DURATION_PREFIX
                     "\"\r\n",
                     duration_value);
             } else {
                 parsed = true;
             }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_UPDATE_ARG_UNSECURE_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX) == 0) {
             mask_user_input = false;
             parsed = true;
         } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_UPDATE_ARG_SECRET_PREFIX) == 0) {
             update_token_secret = true;
             parsed = true;
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_UPDATE_ARG_AUTOMATION_FEATURE_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX) == 0) {
             if(!args_read_string_and_trim(args, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_AUTOMATION_FEATURE_PREFIX "\"\r\n");
+                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX "\"\r\n");
             } else if(!token_info_set_automation_feature_from_str(token_info, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_UPDATE_ARG_AUTOMATION_FEATURE_PREFIX
+                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX
                     "\"\r\n",
                     furi_string_get_cstr(temp_str));
             } else {

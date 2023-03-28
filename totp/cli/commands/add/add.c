@@ -7,17 +7,7 @@
 #include "../../../services/convert/convert.h"
 #include "../../cli_helpers.h"
 #include "../../../ui/scene_director.h"
-
-#define TOTP_CLI_COMMAND_ADD_ARG_NAME "name"
-#define TOTP_CLI_COMMAND_ADD_ARG_ALGO "algo"
-#define TOTP_CLI_COMMAND_ADD_ARG_ALGO_PREFIX "-a"
-#define TOTP_CLI_COMMAND_ADD_ARG_DIGITS "digits"
-#define TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX "-d"
-#define TOTP_CLI_COMMAND_ADD_ARG_UNSECURE_PREFIX "-u"
-#define TOTP_CLI_COMMAND_ADD_ARG_DURATION "duration"
-#define TOTP_CLI_COMMAND_ADD_ARG_DURATION_PREFIX "-l"
-#define TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE_PREFIX "-b"
-#define TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE "feature"
+#include "../../common_command_arguments.h"
 
 void totp_cli_command_add_docopt_commands() {
     TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_ADD ", " TOTP_CLI_COMMAND_ADD_ALT
@@ -27,34 +17,34 @@ void totp_cli_command_add_docopt_commands() {
 void totp_cli_command_add_docopt_usage() {
     TOTP_CLI_PRINTF(
         "  " TOTP_CLI_COMMAND_NAME
-        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_ADD " | " TOTP_CLI_COMMAND_ADD_ALT " | " TOTP_CLI_COMMAND_ADD_ALT2) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ADD_ARG_NAME) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ADD_ARG_ALGO_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ADD_ARG_ALGO))) " " DOCOPT_OPTIONAL(
+        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_ADD " | " TOTP_CLI_COMMAND_ADD_ALT " | " TOTP_CLI_COMMAND_ADD_ALT2) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_NAME) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_ALGO_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_ALGO))) " " DOCOPT_OPTIONAL(
             DOCOPT_OPTION(
-                TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX,
+                TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX,
                 DOCOPT_ARGUMENT(
-                    TOTP_CLI_COMMAND_ADD_ARG_DIGITS))) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ADD_ARG_DURATION_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ADD_ARG_DURATION))) " " DOCOPT_OPTIONAL(DOCOPT_SWITCH(TOTP_CLI_COMMAND_ADD_ARG_UNSECURE_PREFIX)) 
-                    " " DOCOPT_MULTIPLE(DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE)))) "\r\n");
+                    TOTP_CLI_COMMAND_ARG_DIGITS))) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_DURATION_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_DURATION))) " " DOCOPT_OPTIONAL(DOCOPT_SWITCH(TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX)) 
+                    " " DOCOPT_MULTIPLE(DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE)))) "\r\n");
 }
 
 void totp_cli_command_add_docopt_arguments() {
-    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_ADD_ARG_NAME "          Token name\r\n");
+    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_ARG_NAME "          Token name\r\n");
 }
 
 void totp_cli_command_add_docopt_options() {
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
-        TOTP_CLI_COMMAND_ADD_ARG_ALGO_PREFIX,
-        DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ADD_ARG_ALGO)) "      Token hashing algorithm. Must be one of: " TOTP_TOKEN_ALGO_SHA1_NAME ", " TOTP_TOKEN_ALGO_SHA256_NAME ", " TOTP_TOKEN_ALGO_SHA512_NAME " " DOCOPT_DEFAULT(TOTP_TOKEN_ALGO_SHA1_NAME) "\r\n");
+        TOTP_CLI_COMMAND_ARG_ALGO_PREFIX,
+        DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_ALGO)) "      Token hashing algorithm. Must be one of: " TOTP_TOKEN_ALGO_SHA1_NAME ", " TOTP_TOKEN_ALGO_SHA256_NAME ", " TOTP_TOKEN_ALGO_SHA512_NAME " " DOCOPT_DEFAULT(TOTP_TOKEN_ALGO_SHA1_NAME) "\r\n");
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
-        TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX,
+        TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX,
         DOCOPT_ARGUMENT(
-            TOTP_CLI_COMMAND_ADD_ARG_DIGITS)) "    Number of digits to generate, one of: 6, 8 " DOCOPT_DEFAULT("6") "\r\n");
+            TOTP_CLI_COMMAND_ARG_DIGITS)) "    Number of digits to generate, one of: 6, 8 " DOCOPT_DEFAULT("6") "\r\n");
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
-        TOTP_CLI_COMMAND_ADD_ARG_DURATION_PREFIX,
+        TOTP_CLI_COMMAND_ARG_DURATION_PREFIX,
         DOCOPT_ARGUMENT(
-            TOTP_CLI_COMMAND_ADD_ARG_DURATION)) "  Token lifetime duration in seconds, between: 15 and 255 " DOCOPT_DEFAULT("30") "\r\n");
+            TOTP_CLI_COMMAND_ARG_DURATION)) "  Token lifetime duration in seconds, between: 15 and 255 " DOCOPT_DEFAULT("30") "\r\n");
     TOTP_CLI_PRINTF("  " DOCOPT_SWITCH(
-        TOTP_CLI_COMMAND_ADD_ARG_UNSECURE_PREFIX) "             Show console user input as-is without masking\r\n");
+        TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX) "             Show console user input as-is without masking\r\n");
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
-        TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE)) "   Token automation features to be enabled. Must be one of: " TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME ", " TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME " " DOCOPT_DEFAULT(TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME) "\r\n");
+        TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE)) "   Token automation features to be enabled. Must be one of: " TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME ", " TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME " " DOCOPT_DEFAULT(TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME) "\r\n");
     TOTP_CLI_PRINTF("                 # " TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME " - No features\r\n");
     TOTP_CLI_PRINTF("                 # " TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME " - Type <Enter> key at the end of token input automation\r\n");
 }
@@ -80,58 +70,58 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     bool mask_user_input = true;
     while(args_read_string_and_trim(args, temp_str)) {
         bool parsed = false;
-        if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ADD_ARG_ALGO_PREFIX) == 0) {
+        if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_ALGO_PREFIX) == 0) {
             if(!args_read_string_and_trim(args, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_ALGO_PREFIX "\"\r\n");
+                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_ALGO_PREFIX "\"\r\n");
             } else if(!token_info_set_algo_from_str(token_info, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_ALGO_PREFIX
+                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_ALGO_PREFIX
                     "\"\r\n",
                     furi_string_get_cstr(temp_str));
             } else {
                 parsed = true;
             }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX) == 0) {
             uint8_t digit_value;
             if(!args_read_uint8_and_trim(args, &digit_value)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX
+                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX
                     "\"\r\n");
             } else if(!token_info_set_digits_from_int(token_info, digit_value)) {
                 TOTP_CLI_PRINTF_ERROR(
                     "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DIGITS_PREFIX
+                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX
                     "\"\r\n",
                     digit_value);
             } else {
                 parsed = true;
             }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ADD_ARG_DURATION_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_DURATION_PREFIX) == 0) {
             uint8_t duration_value;
             if(!args_read_uint8_and_trim(args, &duration_value)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DURATION_PREFIX
+                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DURATION_PREFIX
                     "\"\r\n");
             } else if(!token_info_set_duration_from_int(token_info, duration_value)) {
                 TOTP_CLI_PRINTF_ERROR(
                     "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_DURATION_PREFIX
+                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DURATION_PREFIX
                     "\"\r\n",
                     duration_value);
             } else {
                 parsed = true;
             }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ADD_ARG_UNSECURE_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX) == 0) {
             mask_user_input = false;
             parsed = true;
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE_PREFIX) == 0) {
+        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX) == 0) {
             if(!args_read_string_and_trim(args, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE_PREFIX "\"\r\n");
+                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX "\"\r\n");
             } else if(!token_info_set_automation_feature_from_str(token_info, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ADD_ARG_AUTOMATION_FEATURE_PREFIX
+                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX
                     "\"\r\n",
                     furi_string_get_cstr(temp_str));
             } else {
