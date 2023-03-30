@@ -5,7 +5,7 @@ inline void totp_cli_printf_missed_argument_value(char* arg) {
     TOTP_CLI_PRINTF_ERROR("Missed or incorrect value for argument \"%s\"\r\n", arg);
 }
 
-inline void totp_cli_printf_unknown_argument(FuriString* arg) {
+inline void totp_cli_printf_unknown_argument(const FuriString* arg) {
     TOTP_CLI_PRINTF("Unknown argument \"%s\"\r\n", furi_string_get_cstr(arg));
 }
 
@@ -30,7 +30,7 @@ bool totp_cli_try_read_algo(TokenInfo* token_info, FuriString* arg, FuriString* 
 
 bool totp_cli_try_read_digits(
     TokenInfo* token_info,
-    FuriString* arg,
+    const FuriString* arg,
     FuriString* args,
     bool* parsed) {
     if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX) == 0) {
@@ -55,7 +55,7 @@ bool totp_cli_try_read_digits(
 
 bool totp_cli_try_read_duration(
     TokenInfo* token_info,
-    FuriString* arg,
+    const FuriString* arg,
     FuriString* args,
     bool* parsed) {
     if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_ARG_DURATION_PREFIX) == 0) {
@@ -101,7 +101,7 @@ bool totp_cli_try_read_automation_features(
     return false;
 }
 
-bool totp_cli_try_read_unsecure_flag(FuriString* arg, bool* parsed, bool* unsecure_flag) {
+bool totp_cli_try_read_unsecure_flag(const FuriString* arg, bool* parsed, bool* unsecure_flag) {
     if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX) == 0) {
         *unsecure_flag = false;
         *parsed = true;

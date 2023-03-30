@@ -173,11 +173,11 @@ char* token_info_get_algo_as_cstr(const TokenInfo* token_info);
  * @param str desired token automation feature
  * @return \c true if token automation feature has been set; \c false otherwise
  */
-bool token_info_set_automation_feature_from_str(TokenInfo* token_info, FuriString* str);
+bool token_info_set_automation_feature_from_str(TokenInfo* token_info, const FuriString* str);
 
 /**
  * @brief Clones \c TokenInfo instance
  * @param src instance to clone
  * @return cloned instance
  */
-TokenInfo* token_info_clone(TokenInfo* src);
+TokenInfo* token_info_clone(const TokenInfo* src);

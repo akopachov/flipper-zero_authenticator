@@ -7,7 +7,7 @@
 #include "../../cli_helpers.h"
 #include "../../common_command_arguments.h"
 
-static void print_automation_features(TokenInfo* token_info) {
+static void print_automation_features(const TokenInfo* token_info) {
     if(token_info->automation_features == TOKEN_AUTOMATION_FEATURE_NONE) {
         TOTP_CLI_PRINTF("| %-20s | %-28.28s |\r\n", "Automation features", "None");
         return;

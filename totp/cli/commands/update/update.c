@@ -54,7 +54,7 @@ static bool
     return false;
 }
 
-static bool totp_cli_try_read_change_secret_flag(FuriString* arg, bool* parsed, bool* flag) {
+static bool totp_cli_try_read_change_secret_flag(const FuriString* arg, bool* parsed, bool* flag) {
     if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_UPDATE_ARG_SECRET_PREFIX) == 0) {
         *flag = true;
         *parsed = true;

@@ -16,17 +16,17 @@
 #define TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE "feature"
 #define TOTP_CLI_COMMAND_ARG_INDEX "index"
 
-void totp_cli_printf_unknown_argument(FuriString* arg);
+void totp_cli_printf_unknown_argument(const FuriString* arg);
 void totp_cli_printf_missed_argument_value(char* arg);
 bool totp_cli_try_read_algo(TokenInfo* token_info, FuriString* arg, FuriString* args, bool* parsed);
 bool totp_cli_try_read_digits(
     TokenInfo* token_info,
-    FuriString* arg,
+    const FuriString* arg,
     FuriString* args,
     bool* parsed);
 bool totp_cli_try_read_duration(
     TokenInfo* token_info,
-    FuriString* arg,
+    const FuriString* arg,
     FuriString* args,
     bool* parsed);
 bool totp_cli_try_read_automation_features(
@@ -34,4 +34,4 @@ bool totp_cli_try_read_automation_features(
     FuriString* arg,
     FuriString* args,
     bool* parsed);
-bool totp_cli_try_read_unsecure_flag(FuriString* arg, bool* parsed, bool* unsecure_flag);
+bool totp_cli_try_read_unsecure_flag(const FuriString* arg, bool* parsed, bool* unsecure_flag);
