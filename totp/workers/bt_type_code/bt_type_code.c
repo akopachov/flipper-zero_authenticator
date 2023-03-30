@@ -19,8 +19,8 @@ static void totp_type_code_worker_press_key(uint8_t key) {
 }
 
 static void totp_type_code_worker_type_code(
-    TotpBtTypeCodeWorkerContext* context,
-    TokenAutomationFeature features) {
+    TotpBtTypeCodeWorkerContext* context) {
+    TokenAutomationFeature features = context->flags;
     uint8_t i = 0;
     do {
         furi_delay_ms(500);
@@ -69,7 +69,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
 
         if(furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
             if(flags & TotpBtTypeCodeWorkerEventType) {
-                totp_type_code_worker_type_code(bt_context, flags ^ TotpBtTypeCodeWorkerEventType);
+                totp_type_code_worker_type_code(bt_context);
             }
 
             furi_mutex_release(context_mutex);
@@ -112,8 +112,10 @@ void totp_bt_type_code_worker_stop(TotpBtTypeCodeWorkerContext* context) {
 
 void totp_bt_type_code_worker_notify(
     TotpBtTypeCodeWorkerContext* context,
-    TotpBtTypeCodeWorkerEvent event) {
+    TotpBtTypeCodeWorkerEvent event,
+    uint8_t flags) {
     furi_assert(context != NULL);
+    context->flags = flags;
     furi_thread_flags_set(furi_thread_get_id(context->thread), event);
 }
 
@@ -141,6 +143,7 @@ void totp_bt_type_code_worker_free(TotpBtTypeCodeWorkerContext* context) {
     }
 
     bt_disconnect(context->bt);
+    furi_delay_ms(200);
     bt_keys_storage_set_default_path(context->bt);
 
     if(!bt_set_profile(context->bt, BtProfileSerial)) {

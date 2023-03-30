@@ -10,6 +10,7 @@ typedef uint8_t TotpBtTypeCodeWorkerEvent;
 typedef struct {
     char* string;
     uint8_t string_length;
+    uint8_t flags;
     FuriThread* thread;
     FuriMutex* string_sync;
     Bt* bt;
@@ -32,4 +33,5 @@ void totp_bt_type_code_worker_start(
 void totp_bt_type_code_worker_stop(TotpBtTypeCodeWorkerContext* context);
 void totp_bt_type_code_worker_notify(
     TotpBtTypeCodeWorkerContext* context,
-    TotpBtTypeCodeWorkerEvent event);
+    TotpBtTypeCodeWorkerEvent event,
+    uint8_t flags);

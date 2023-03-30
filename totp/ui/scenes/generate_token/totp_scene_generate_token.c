@@ -398,7 +398,8 @@ bool totp_scene_generate_token_handle_event(
             scene_state = (SceneState*)plugin_state->current_scene_state;
             totp_usb_type_code_worker_notify(
                 scene_state->usb_type_code_worker_context,
-                TotpUsbTypeCodeWorkerEventType | scene_state->current_token->automation_features);
+                TotpUsbTypeCodeWorkerEventType, 
+                scene_state->current_token->automation_features);
             notification_message(
                 plugin_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));
@@ -411,7 +412,8 @@ bool totp_scene_generate_token_handle_event(
             scene_state = (SceneState*)plugin_state->current_scene_state;
             totp_bt_type_code_worker_notify(
                 plugin_state->bt_type_code_worker_context,
-                TotpBtTypeCodeWorkerEventType | scene_state->current_token->automation_features);
+                TotpBtTypeCodeWorkerEventType,
+                scene_state->current_token->automation_features);
             notification_message(
                 plugin_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));

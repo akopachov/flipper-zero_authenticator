@@ -10,6 +10,7 @@
 #include "../notification/notification.h"
 #include "../reset/reset.h"
 #include "../automation/automation.h"
+#include "../details/details.h"
 
 void totp_cli_command_help_docopt_commands() {
     TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_HELP ", " TOTP_CLI_COMMAND_HELP_ALT
@@ -26,6 +27,7 @@ void totp_cli_command_help_handle() {
     TOTP_CLI_PRINTF("Usage:\r\n");
     totp_cli_command_help_docopt_usage();
     totp_cli_command_list_docopt_usage();
+    totp_cli_command_details_docopt_usage();
     totp_cli_command_add_docopt_usage();
     totp_cli_command_update_docopt_usage();
     totp_cli_command_delete_docopt_usage();
@@ -39,6 +41,7 @@ void totp_cli_command_help_handle() {
     TOTP_CLI_PRINTF("Commands:\r\n");
     totp_cli_command_help_docopt_commands();
     totp_cli_command_list_docopt_commands();
+    totp_cli_command_details_docopt_commands();
     totp_cli_command_add_docopt_commands();
     totp_cli_command_update_docopt_commands();
     totp_cli_command_delete_docopt_commands();

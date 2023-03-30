@@ -21,8 +21,8 @@ static void totp_type_code_worker_press_key(uint8_t key) {
 }
 
 static void totp_type_code_worker_type_code(
-    TotpUsbTypeCodeWorkerContext* context,
-    TokenAutomationFeature features) {
+    TotpUsbTypeCodeWorkerContext* context) {
+    TokenAutomationFeature features = context->flags;
     context->usb_mode_prev = furi_hal_usb_get_config();
     furi_hal_usb_unlock();
     furi_check(furi_hal_usb_set_config(&usb_hid, NULL) == true);
@@ -74,7 +74,7 @@ static int32_t totp_type_code_worker_callback(void* context) {
 
         if(furi_mutex_acquire(context_mutex, FuriWaitForever) == FuriStatusOk) {
             if(flags & TotpUsbTypeCodeWorkerEventType) {
-                totp_type_code_worker_type_code(context, flags ^ TotpUsbTypeCodeWorkerEventType);
+                totp_type_code_worker_type_code(context);
             }
 
             furi_mutex_release(context_mutex);
@@ -116,7 +116,9 @@ void totp_usb_type_code_worker_stop(TotpUsbTypeCodeWorkerContext* context) {
 
 void totp_usb_type_code_worker_notify(
     TotpUsbTypeCodeWorkerContext* context,
-    TotpUsbTypeCodeWorkerEvent event) {
+    TotpUsbTypeCodeWorkerEvent event,
+    uint8_t flags) {
     furi_assert(context != NULL);
+    context->flags = flags;
     furi_thread_flags_set(furi_thread_get_id(context->thread), event);
 }

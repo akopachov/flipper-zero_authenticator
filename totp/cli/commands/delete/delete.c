@@ -31,6 +31,10 @@ void totp_cli_command_delete_docopt_options() {
 }
 
 void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
+    if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
+        return;
+    }
+    
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
        token_number > plugin_state->tokens_count) {
@@ -51,10 +55,6 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
         }
     }
     furi_string_free(temp_str);
-
-    if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
-        return;
-    }
 
     ListNode* list_node = list_element_at(plugin_state->tokens_list, token_number - 1);
 

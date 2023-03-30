@@ -31,17 +31,12 @@ void totp_cli_command_move_docopt_options() {
 }
 
 void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
-    int token_index;
-    if(!args_read_int_and_trim(args, &token_index)) {
-        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
-        return;
-    }
-
     if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
         return;
     }
-
-    if(token_index < 1 || token_index > plugin_state->tokens_count) {
+    
+    int token_index;
+    if(!args_read_int_and_trim(args, &token_index) || token_index < 1 || token_index > plugin_state->tokens_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }

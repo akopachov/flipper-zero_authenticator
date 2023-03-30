@@ -739,8 +739,10 @@ TokenLoadingResult totp_config_file_load_tokens(PluginState* const plugin_state)
             tokenInfo->duration = TOTP_TOKEN_DURATION_DEFAULT;
         }
 
-        if(!flipper_format_read_uint32(
+        if(flipper_format_read_uint32(
                fff_data_file, TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES, &temp_data32, 1)) {
+            tokenInfo->automation_features = temp_data32;
+        } else {
             tokenInfo->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
         }
 

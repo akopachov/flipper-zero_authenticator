@@ -9,15 +9,16 @@ typedef uint8_t TotpUsbTypeCodeWorkerEvent;
 typedef struct {
     char* string;
     uint8_t string_length;
+    uint8_t flags;
     FuriThread* thread;
     FuriMutex* string_sync;
     FuriHalUsbInterface* usb_mode_prev;
 } TotpUsbTypeCodeWorkerContext;
 
 enum TotpUsbTypeCodeWorkerEvents {
-    TotpUsbTypeCodeWorkerEventReserved = 0b0000,
-    TotpUsbTypeCodeWorkerEventStop = 0b0100,
-    TotpUsbTypeCodeWorkerEventType = 0b1000
+    TotpUsbTypeCodeWorkerEventReserved = 0b00,
+    TotpUsbTypeCodeWorkerEventStop = 0b01,
+    TotpUsbTypeCodeWorkerEventType = 0b10
 };
 
 TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
@@ -27,4 +28,5 @@ TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
 void totp_usb_type_code_worker_stop(TotpUsbTypeCodeWorkerContext* context);
 void totp_usb_type_code_worker_notify(
     TotpUsbTypeCodeWorkerContext* context,
-    TotpUsbTypeCodeWorkerEvent event);
+    TotpUsbTypeCodeWorkerEvent event,
+    uint8_t flags);
