@@ -31,6 +31,39 @@ void totp_cli_command_update_docopt_options() {
         DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_NAME)) "      Token name\r\n");
 }
 
+static bool
+    totp_cli_try_read_name(TokenInfo* token_info, FuriString* arg, FuriString* args, bool* parsed) {
+    if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_ARG_NAME_PREFIX) == 0) {
+        if(!args_read_probably_quoted_string_and_trim(args, arg) || furi_string_empty(arg)) {
+            totp_cli_printf_missed_argument_value(TOTP_CLI_COMMAND_ARG_NAME_PREFIX);
+        } else {
+            if(token_info->name != NULL) {
+                free(token_info->name);
+            }
+
+            size_t temp_cstr_len = furi_string_size(arg);
+            token_info->name = malloc(temp_cstr_len + 1);
+            furi_check(token_info->name != NULL);
+            strlcpy(token_info->name, furi_string_get_cstr(arg), temp_cstr_len + 1);
+            *parsed = true;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+static bool totp_cli_try_read_change_secret_flag(FuriString* arg, bool* parsed, bool* flag) {
+    if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_UPDATE_ARG_SECRET_PREFIX) == 0) {
+        *flag = true;
+        *parsed = true;
+        return true;
+    }
+
+    return false;
+}
+
 void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
     FuriString* temp_str = furi_string_alloc();
 
@@ -54,85 +87,14 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
     bool update_token_secret = false;
     while(args_read_string_and_trim(args, temp_str)) {
         bool parsed = false;
-        if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_NAME_PREFIX) == 0) {
-            if(!args_read_probably_quoted_string_and_trim(args, temp_str) ||
-               furi_string_empty(temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_NAME_PREFIX "\"\r\n");
-            } else {
-                if(token_info->name != NULL) {
-                    free(token_info->name);
-                }
-
-                size_t temp_cstr_len = furi_string_size(temp_str);
-                token_info->name = malloc(temp_cstr_len + 1);
-                furi_check(token_info->name != NULL);
-                strlcpy(token_info->name, furi_string_get_cstr(temp_str), temp_cstr_len + 1);
-                parsed = true;
-            }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_ALGO_PREFIX) == 0) {
-            if(!args_read_string_and_trim(args, temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_ALGO_PREFIX "\"\r\n");
-            } else if(!token_info_set_algo_from_str(token_info, temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_ALGO_PREFIX
-                    "\"\r\n",
-                    furi_string_get_cstr(temp_str));
-            } else {
-                parsed = true;
-            }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX) == 0) {
-            uint8_t digit_value;
-            if(!args_read_uint8_and_trim(args, &digit_value)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX
-                    "\"\r\n");
-            } else if(!token_info_set_digits_from_int(token_info, digit_value)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX
-                    "\"\r\n",
-                    digit_value);
-            } else {
-                parsed = true;
-            }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_DURATION_PREFIX) == 0) {
-            uint8_t duration_value;
-            if(!args_read_uint8_and_trim(args, &duration_value)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DURATION_PREFIX
-                    "\"\r\n");
-            } else if(!token_info_set_duration_from_int(token_info, duration_value)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DURATION_PREFIX
-                    "\"\r\n",
-                    duration_value);
-            } else {
-                parsed = true;
-            }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX) == 0) {
-            mask_user_input = false;
-            parsed = true;
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_UPDATE_ARG_SECRET_PREFIX) == 0) {
-            update_token_secret = true;
-            parsed = true;
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX) == 0) {
-            if(!args_read_string_and_trim(args, temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX
-                    "\"\r\n");
-            } else if(!token_info_set_automation_feature_from_str(token_info, temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX
-                    "\"\r\n",
-                    furi_string_get_cstr(temp_str));
-            } else {
-                parsed = true;
-            }
-        } else {
-            TOTP_CLI_PRINTF_ERROR("Unknown argument \"%s\"\r\n", furi_string_get_cstr(temp_str));
+        if(!totp_cli_try_read_name(token_info, temp_str, args, &parsed) &&
+           !totp_cli_try_read_algo(token_info, temp_str, args, &parsed) &&
+           !totp_cli_try_read_digits(token_info, temp_str, args, &parsed) &&
+           !totp_cli_try_read_duration(token_info, temp_str, args, &parsed) &&
+           !totp_cli_try_read_unsecure_flag(temp_str, &parsed, &mask_user_input) &&
+           !totp_cli_try_read_change_secret_flag(temp_str, &parsed, &update_token_secret) &&
+           !totp_cli_try_read_automation_features(token_info, temp_str, args, &parsed)) {
+            totp_cli_printf_unknown_argument(temp_str);
         }
 
         if(!parsed) {

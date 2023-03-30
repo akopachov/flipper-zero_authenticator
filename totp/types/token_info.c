@@ -1,4 +1,3 @@
-#include <furi/furi.h>
 #include <furi_hal.h>
 #include "token_info.h"
 #include "stdlib.h"

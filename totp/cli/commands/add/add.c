@@ -80,66 +80,12 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     bool mask_user_input = true;
     while(args_read_string_and_trim(args, temp_str)) {
         bool parsed = false;
-        if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_ALGO_PREFIX) == 0) {
-            if(!args_read_string_and_trim(args, temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_ALGO_PREFIX "\"\r\n");
-            } else if(!token_info_set_algo_from_str(token_info, temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_ALGO_PREFIX
-                    "\"\r\n",
-                    furi_string_get_cstr(temp_str));
-            } else {
-                parsed = true;
-            }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX) == 0) {
-            uint8_t digit_value;
-            if(!args_read_uint8_and_trim(args, &digit_value)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX
-                    "\"\r\n");
-            } else if(!token_info_set_digits_from_int(token_info, digit_value)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX
-                    "\"\r\n",
-                    digit_value);
-            } else {
-                parsed = true;
-            }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_DURATION_PREFIX) == 0) {
-            uint8_t duration_value;
-            if(!args_read_uint8_and_trim(args, &duration_value)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed or incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DURATION_PREFIX
-                    "\"\r\n");
-            } else if(!token_info_set_duration_from_int(token_info, duration_value)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_DURATION_PREFIX
-                    "\"\r\n",
-                    duration_value);
-            } else {
-                parsed = true;
-            }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX) == 0) {
-            mask_user_input = false;
-            parsed = true;
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX) == 0) {
-            if(!args_read_string_and_trim(args, temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX
-                    "\"\r\n");
-            } else if(!token_info_set_automation_feature_from_str(token_info, temp_str)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX
-                    "\"\r\n",
-                    furi_string_get_cstr(temp_str));
-            } else {
-                parsed = true;
-            }
-        } else {
-            TOTP_CLI_PRINTF_ERROR("Unknown argument \"%s\"\r\n", furi_string_get_cstr(temp_str));
+        if(!totp_cli_try_read_algo(token_info, temp_str, args, &parsed) &&
+           !totp_cli_try_read_digits(token_info, temp_str, args, &parsed) &&
+           !totp_cli_try_read_duration(token_info, temp_str, args, &parsed) &&
+           !totp_cli_try_read_unsecure_flag(temp_str, &parsed, &mask_user_input) &&
+           !totp_cli_try_read_automation_features(token_info, temp_str, args, &parsed)) {
+            totp_cli_printf_unknown_argument(temp_str);
         }
 
         if(!parsed) {

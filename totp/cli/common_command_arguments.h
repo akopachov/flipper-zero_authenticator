@@ -1,4 +1,7 @@
 #pragma once
+#include <stdlib.h>
+#include "../types/token_info.h"
+#include "cli_helpers.h"
 
 #define TOTP_CLI_COMMAND_ARG_NAME "name"
 #define TOTP_CLI_COMMAND_ARG_NAME_PREFIX "-n"
@@ -12,4 +15,23 @@
 #define TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX "-b"
 #define TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE "feature"
 #define TOTP_CLI_COMMAND_ARG_INDEX "index"
-#define TOTP_CLI_COMMAND_ARG_FORCE_SUFFIX "-f"
+
+void totp_cli_printf_unknown_argument(FuriString* arg);
+void totp_cli_printf_missed_argument_value(char* arg);
+bool totp_cli_try_read_algo(TokenInfo* token_info, FuriString* arg, FuriString* args, bool* parsed);
+bool totp_cli_try_read_digits(
+    TokenInfo* token_info,
+    FuriString* arg,
+    FuriString* args,
+    bool* parsed);
+bool totp_cli_try_read_duration(
+    TokenInfo* token_info,
+    FuriString* arg,
+    FuriString* args,
+    bool* parsed);
+bool totp_cli_try_read_automation_features(
+    TokenInfo* token_info,
+    FuriString* arg,
+    FuriString* args,
+    bool* parsed);
+bool totp_cli_try_read_unsecure_flag(FuriString* arg, bool* parsed, bool* unsecure_flag);

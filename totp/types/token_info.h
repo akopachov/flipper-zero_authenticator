@@ -1,6 +1,8 @@
 #pragma once
 
 #include <inttypes.h>
+#include <stdbool.h>
+#include <furi/furi.h>
 
 #define TOTP_TOKEN_DURATION_DEFAULT 30
 
