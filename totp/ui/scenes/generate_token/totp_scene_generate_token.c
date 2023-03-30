@@ -398,7 +398,7 @@ bool totp_scene_generate_token_handle_event(
             scene_state = (SceneState*)plugin_state->current_scene_state;
             totp_usb_type_code_worker_notify(
                 scene_state->usb_type_code_worker_context,
-                TotpUsbTypeCodeWorkerEventType, 
+                TotpUsbTypeCodeWorkerEventType,
                 scene_state->current_token->automation_features);
             notification_message(
                 plugin_state->notification_app,

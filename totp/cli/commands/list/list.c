@@ -26,8 +26,7 @@ void totp_cli_command_list_handle(PluginState* plugin_state, Cli* cli) {
     }
 
     TOTP_CLI_PRINTF("+-----+---------------------------+--------+----+-----+\r\n");
-    TOTP_CLI_PRINTF(
-        "| %-3s | %-25s | %-6s | %-s | %-s |\r\n", "#", "Name", "Algo", "Ln", "Dur");
+    TOTP_CLI_PRINTF("| %-3s | %-25s | %-6s | %-s | %-s |\r\n", "#", "Name", "Algo", "Ln", "Dur");
     TOTP_CLI_PRINTF("+-----+---------------------------+--------+----+-----+\r\n");
     uint16_t index = 1;
     TOTP_LIST_FOREACH(plugin_state->tokens_list, node, {

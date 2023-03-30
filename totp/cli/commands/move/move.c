@@ -20,8 +20,10 @@ void totp_cli_command_move_docopt_commands() {
 void totp_cli_command_move_docopt_usage() {
     TOTP_CLI_PRINTF(
         "  " TOTP_CLI_COMMAND_NAME
-        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_MOVE " | " TOTP_CLI_COMMAND_MOVE_ALT) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_INDEX) 
-        " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX))) "\r\n");
+        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_MOVE " | " TOTP_CLI_COMMAND_MOVE_ALT) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_INDEX) " " DOCOPT_OPTIONAL(
+            DOCOPT_OPTION(
+                TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX_PREFIX,
+                DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_MOVE_ARG_NEW_INDEX))) "\r\n");
 }
 
 void totp_cli_command_move_docopt_options() {
@@ -34,9 +36,10 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
     if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
         return;
     }
-    
+
     int token_index;
-    if(!args_read_int_and_trim(args, &token_index) || token_index < 1 || token_index > plugin_state->tokens_count) {
+    if(!args_read_int_and_trim(args, &token_index) || token_index < 1 ||
+       token_index > plugin_state->tokens_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }

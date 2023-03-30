@@ -8,13 +8,14 @@
 #include "../../common_command_arguments.h"
 
 static void print_automation_features(TokenInfo* token_info) {
-    if (token_info->automation_features == TOKEN_AUTOMATION_FEATURE_NONE) {
+    if(token_info->automation_features == TOKEN_AUTOMATION_FEATURE_NONE) {
         TOTP_CLI_PRINTF("| %-20s | %-28.28s |\r\n", "Automation features", "None");
         return;
     }
 
-    if (token_info->automation_features & TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END) {
-        TOTP_CLI_PRINTF("| %-20s | %-28.28s |\r\n", "Automation features", "Type <Enter> key at the end");
+    if(token_info->automation_features & TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END) {
+        TOTP_CLI_PRINTF(
+            "| %-20s | %-28.28s |\r\n", "Automation features", "Type <Enter> key at the end");
     }
 }
 
@@ -25,7 +26,8 @@ void totp_cli_command_details_docopt_commands() {
 
 void totp_cli_command_details_docopt_usage() {
     TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_NAME " " DOCOPT_REQUIRED(
-        TOTP_CLI_COMMAND_DETAILS " | " TOTP_CLI_COMMAND_DETAILS_ALT) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_INDEX) "\r\n");
+        TOTP_CLI_COMMAND_DETAILS
+        " | " TOTP_CLI_COMMAND_DETAILS_ALT) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_INDEX) "\r\n");
 }
 
 void totp_cli_command_details_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
@@ -34,9 +36,8 @@ void totp_cli_command_details_handle(PluginState* plugin_state, FuriString* args
     }
 
     int token_number;
-    if(!args_read_int_and_trim(args, &token_number) || 
-        token_number <= 0 ||
-        token_number > plugin_state->tokens_count) {
+    if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
+       token_number > plugin_state->tokens_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
@@ -50,9 +51,11 @@ void totp_cli_command_details_handle(PluginState* plugin_state, FuriString* args
     TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
     TOTP_CLI_PRINTF("| %-20s | %-28d |\r\n", "Index", token_number);
     TOTP_CLI_PRINTF("| %-20s | %-28.28s |\r\n", "Name", token_info->name);
-    TOTP_CLI_PRINTF("| %-20s | %-28s |\r\n", "Hashing algorithm", token_info_get_algo_as_cstr(token_info));
+    TOTP_CLI_PRINTF(
+        "| %-20s | %-28s |\r\n", "Hashing algorithm", token_info_get_algo_as_cstr(token_info));
     TOTP_CLI_PRINTF("| %-20s | %-28" PRIu8 " |\r\n", "Number of digits", token_info->digits);
-    TOTP_CLI_PRINTF("| %-20s | %" PRIu8 " sec.%-21s |\r\n", "Token lifetime", token_info->duration, " ");
+    TOTP_CLI_PRINTF(
+        "| %-20s | %" PRIu8 " sec.%-21s |\r\n", "Token lifetime", token_info->duration, " ");
     print_automation_features(token_info);
     TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
 }

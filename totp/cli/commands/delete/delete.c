@@ -34,7 +34,7 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
         return;
     }
-    
+
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
        token_number > plugin_state->tokens_count) {

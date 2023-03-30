@@ -109,12 +109,12 @@ char* token_info_get_algo_as_cstr(const TokenInfo* token_info) {
 }
 
 bool token_info_set_automation_feature_from_str(TokenInfo* token_info, FuriString* str) {
-    if (furi_string_cmpi_str(str, TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME) == 0) {
+    if(furi_string_cmpi_str(str, TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME) == 0) {
         token_info->automation_features |= TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END;
         return true;
     }
-    
-    if (furi_string_cmpi_str(str, TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME) == 0) {
+
+    if(furi_string_cmpi_str(str, TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME) == 0) {
         token_info->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
         return true;
     }

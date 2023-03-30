@@ -20,8 +20,7 @@ static void totp_type_code_worker_press_key(uint8_t key) {
     furi_hal_hid_kb_release(key);
 }
 
-static void totp_type_code_worker_type_code(
-    TotpUsbTypeCodeWorkerContext* context) {
+static void totp_type_code_worker_type_code(TotpUsbTypeCodeWorkerContext* context) {
     TokenAutomationFeature features = context->flags;
     context->usb_mode_prev = furi_hal_usb_get_config();
     furi_hal_usb_unlock();

@@ -17,12 +17,11 @@ void totp_cli_command_add_docopt_commands() {
 void totp_cli_command_add_docopt_usage() {
     TOTP_CLI_PRINTF(
         "  " TOTP_CLI_COMMAND_NAME
-        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_ADD " | " TOTP_CLI_COMMAND_ADD_ALT " | " TOTP_CLI_COMMAND_ADD_ALT2) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_NAME) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_ALGO_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_ALGO))) " " DOCOPT_OPTIONAL(
+        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_ADD " | " TOTP_CLI_COMMAND_ADD_ALT " | " TOTP_CLI_COMMAND_ADD_ALT2) " " DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_NAME) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_ALGO_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_ALGO))) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_DIGITS))) " " DOCOPT_OPTIONAL(
             DOCOPT_OPTION(
-                TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX,
+                TOTP_CLI_COMMAND_ARG_DURATION_PREFIX,
                 DOCOPT_ARGUMENT(
-                    TOTP_CLI_COMMAND_ARG_DIGITS))) " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_DURATION_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_DURATION))) " " DOCOPT_OPTIONAL(DOCOPT_SWITCH(TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX)) 
-                    " " DOCOPT_MULTIPLE(DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE)))) "\r\n");
+                    TOTP_CLI_COMMAND_ARG_DURATION))) " " DOCOPT_OPTIONAL(DOCOPT_SWITCH(TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX)) " " DOCOPT_MULTIPLE(DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE)))) "\r\n");
 }
 
 void totp_cli_command_add_docopt_arguments() {
@@ -32,7 +31,11 @@ void totp_cli_command_add_docopt_arguments() {
 void totp_cli_command_add_docopt_options() {
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
         TOTP_CLI_COMMAND_ARG_ALGO_PREFIX,
-        DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_ALGO)) "      Token hashing algorithm. Must be one of: " TOTP_TOKEN_ALGO_SHA1_NAME ", " TOTP_TOKEN_ALGO_SHA256_NAME ", " TOTP_TOKEN_ALGO_SHA512_NAME " " DOCOPT_DEFAULT(TOTP_TOKEN_ALGO_SHA1_NAME) "\r\n");
+        DOCOPT_ARGUMENT(
+            TOTP_CLI_COMMAND_ARG_ALGO)) "      Token hashing algorithm. Must be one of: " TOTP_TOKEN_ALGO_SHA1_NAME
+                                        ", " TOTP_TOKEN_ALGO_SHA256_NAME
+                                        ", " TOTP_TOKEN_ALGO_SHA512_NAME
+                                        " " DOCOPT_DEFAULT(TOTP_TOKEN_ALGO_SHA1_NAME) "\r\n");
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
         TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX,
         DOCOPT_ARGUMENT(
@@ -44,9 +47,16 @@ void totp_cli_command_add_docopt_options() {
     TOTP_CLI_PRINTF("  " DOCOPT_SWITCH(
         TOTP_CLI_COMMAND_ARG_UNSECURE_PREFIX) "             Show console user input as-is without masking\r\n");
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
-        TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE)) "   Token automation features to be enabled. Must be one of: " TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME ", " TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME " " DOCOPT_DEFAULT(TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME) "\r\n");
-    TOTP_CLI_PRINTF("                 # " TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME " - No features\r\n");
-    TOTP_CLI_PRINTF("                 # " TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME " - Type <Enter> key at the end of token input automation\r\n");
+        TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX,
+        DOCOPT_ARGUMENT(
+            TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE)) "   Token automation features to be enabled. Must be one of: " TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME
+                                                      ", " TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME
+                                                      " " DOCOPT_DEFAULT(
+                                                          TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME) "\r\n");
+    TOTP_CLI_PRINTF("                 # " TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME
+                    " - No features\r\n");
+    TOTP_CLI_PRINTF("                 # " TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME
+                    " - Type <Enter> key at the end of token input automation\r\n");
 }
 
 void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
@@ -118,7 +128,8 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX) == 0) {
             if(!args_read_string_and_trim(args, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
-                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX "\"\r\n");
+                    "Missed value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX
+                    "\"\r\n");
             } else if(!token_info_set_automation_feature_from_str(token_info, temp_str)) {
                 TOTP_CLI_PRINTF_ERROR(
                     "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_AUTOMATION_FEATURE_PREFIX

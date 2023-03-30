@@ -65,7 +65,8 @@ bool totp_config_migrate_to_latest(
                 break;
             }
 
-            furi_string_printf(comment_str, "=== BEGIN \"%s\" ===", furi_string_get_cstr(temp_str));
+            furi_string_printf(
+                comment_str, "=== BEGIN \"%s\" ===", furi_string_get_cstr(temp_str));
             flipper_format_write_comment(fff_data_file, comment_str);
             furi_string_printf(comment_str, "=== END \"%s\" ===", furi_string_get_cstr(temp_str));
             flipper_format_write_string(fff_data_file, TOTP_CONFIG_KEY_TOKEN_NAME, temp_str);

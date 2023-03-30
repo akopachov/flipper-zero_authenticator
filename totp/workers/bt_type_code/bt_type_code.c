@@ -18,8 +18,7 @@ static void totp_type_code_worker_press_key(uint8_t key) {
     furi_hal_bt_hid_kb_release(key);
 }
 
-static void totp_type_code_worker_type_code(
-    TotpBtTypeCodeWorkerContext* context) {
+static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context) {
     TokenAutomationFeature features = context->flags;
     uint8_t i = 0;
     do {
@@ -80,9 +79,9 @@ static int32_t totp_type_code_worker_callback(void* context) {
 
 static void connection_status_changed_callback(BtStatus status, void* context) {
     TotpBtTypeCodeWorkerContext* bt_context = context;
-    if (status == BtStatusConnected) {
+    if(status == BtStatusConnected) {
         bt_context->is_connected = true;
-    } else if (status < BtStatusConnected) {
+    } else if(status < BtStatusConnected) {
         bt_context->is_connected = false;
     }
 }
