@@ -18,13 +18,17 @@ static void print_automation_features(const TokenInfo* token_info) {
     bool header_printed = false;
     if(token_info->automation_features & TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END) {
         TOTP_CLI_PRINTF(
-            "| %-20s | %-28.28s |\r\n", AUTOMATION_FEATURES_PROPERTY_HEADER, "Type <Enter> key at the end");
+            "| %-20s | %-28.28s |\r\n",
+            AUTOMATION_FEATURES_PROPERTY_HEADER,
+            "Type <Enter> key at the end");
         header_printed = true;
     }
 
     if(token_info->automation_features & TOKEN_AUTOMATION_FEATURE_TAB_AT_THE_END) {
         TOTP_CLI_PRINTF(
-            "| %-20s | %-28.28s |\r\n", header_printed ? "" : AUTOMATION_FEATURES_PROPERTY_HEADER, "Type <Tab> key at the end");
+            "| %-20s | %-28.28s |\r\n",
+            header_printed ? "" : AUTOMATION_FEATURES_PROPERTY_HEADER,
+            "Type <Tab> key at the end");
         header_printed = true;
     }
 }
