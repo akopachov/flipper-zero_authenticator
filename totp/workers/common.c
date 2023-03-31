@@ -17,7 +17,7 @@ static const uint8_t hid_number_keys[10] = {
 
 void totp_type_code_worker_execute_automation(
     TOTP_AUTOMATION_PRESS_KEY key_press_fn,
-    char* string,
+    const char* string,
     uint8_t string_length,
     TokenAutomationFeature features) {
     furi_delay_ms(500);
