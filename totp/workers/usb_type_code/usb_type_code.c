@@ -48,6 +48,11 @@ static void totp_type_code_worker_type_code(TotpUsbTypeCodeWorkerContext* contex
             totp_type_code_worker_press_key(hid_enter_key);
         }
 
+        if(features & TOKEN_AUTOMATION_FEATURE_TAB_AT_THE_END) {
+            furi_delay_ms(30);
+            totp_type_code_worker_press_key(hid_tab_key);
+        }
+
         furi_mutex_release(context->string_sync);
 
         furi_delay_ms(100);

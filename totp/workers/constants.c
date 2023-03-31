@@ -14,3 +14,4 @@ const uint8_t hid_number_keys[10] = {
     HID_KEYBOARD_9};
 
 const uint8_t hid_enter_key = HID_KEYBOARD_RETURN;
+const uint8_t hid_tab_key = HID_KEYBOARD_TAB;
