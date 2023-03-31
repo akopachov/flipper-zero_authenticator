@@ -1,5 +1,6 @@
 #include "bt_type_code.h"
 #include <furi_hal_bt_hid.h>
+#include <bt/bt_service/bt_i.h>
 #include <storage/storage.h>
 #include "../../types/common.h"
 #include "../../types/token_info.h"
@@ -10,6 +11,26 @@
 static inline bool totp_type_code_worker_stop_requested() {
     return furi_thread_flags_get() & TotpBtTypeCodeWorkerEventStop;
 }
+
+#ifdef TOTP_XTREME_FIRMWARE
+static void totp_type_code_worker_bt_set_app_mac(uint8_t* mac) {
+    uint8_t max_i;
+    size_t uid_size = furi_hal_version_uid_size();
+    if(uid_size < 6) {
+        max_i = uid_size;
+    } else {
+        max_i = 6;
+    }
+
+    const uint8_t* uid = furi_hal_version_uid();
+    memcpy(mac, uid, max_i);
+    for(uint8_t i = max_i; i < 6; i++) {
+        mac[i] = 0;
+    }
+
+    mac[0] = 0b10;
+}
+#endif
 
 static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context) {
     uint8_t i = 0;
@@ -114,6 +135,17 @@ TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init() {
     furi_hal_bt_reinit();
     furi_delay_ms(200);
     bt_keys_storage_set_storage_path(context->bt, HID_BT_KEYS_STORAGE_PATH);
+
+    #ifdef TOTP_XTREME_FIRMWARE
+    totp_type_code_worker_bt_set_app_mac(&context->bt_mac[0]);
+    memcpy(&context->previous_bt_name[0], furi_hal_bt_get_profile_adv_name(FuriHalBtProfileHidKeyboard), TOTP_BT_WORKER_BT_ADV_NAME_MAX_LEN);
+    memcpy(&context->previous_bt_mac[0], furi_hal_bt_get_profile_mac_addr(FuriHalBtProfileHidKeyboard), TOTP_BT_WORKER_BT_MAC_ADDRESS_LEN);
+    char new_name[TOTP_BT_WORKER_BT_ADV_NAME_MAX_LEN];
+    snprintf(new_name, sizeof(new_name), "%s TOTP Auth", furi_hal_version_get_name_ptr());
+    furi_hal_bt_set_profile_adv_name(FuriHalBtProfileHidKeyboard, new_name);
+    furi_hal_bt_set_profile_mac_addr(FuriHalBtProfileHidKeyboard, context->bt_mac);
+    #endif
+
     if(!bt_set_profile(context->bt, BtProfileHidKeyboard)) {
         FURI_LOG_E(LOGGING_TAG, "Failed to switch BT to keyboard HID profile");
     }
@@ -141,6 +173,11 @@ void totp_bt_type_code_worker_free(TotpBtTypeCodeWorkerContext* context) {
     bt_disconnect(context->bt);
     furi_delay_ms(200);
     bt_keys_storage_set_default_path(context->bt);
+
+    #ifdef TOTP_XTREME_FIRMWARE
+    furi_hal_bt_set_profile_adv_name(FuriHalBtProfileHidKeyboard, context->previous_bt_name);
+    furi_hal_bt_set_profile_mac_addr(FuriHalBtProfileHidKeyboard, context->previous_bt_mac);
+    #endif
 
     if(!bt_set_profile(context->bt, BtProfileSerial)) {
         FURI_LOG_E(LOGGING_TAG, "Failed to switch BT to Serial profile");
