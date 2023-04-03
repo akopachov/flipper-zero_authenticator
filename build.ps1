@@ -92,7 +92,7 @@ function Build-Run {
             Remove-Item "$build_path\*" -Recurse -Force
         }
 
-        Features-Configure -set TOTP_TARGET_FIRMWARE=$build_command.FW_CDEF
+        Features-Configure -set "TOTP_TARGET_FIRMWARE=$($build_command.FW_CDEF)"
 
         ./fbt $build_command.FbtSwitch COMPACT=1 DEBUG=0 VERBOSE=0 fap_totp
 
@@ -116,6 +116,6 @@ Write-Information 'Building without BadBT'
 Features-Configure -disable TOTP_BADBT_TYPE_ENABLED,TOTP_AUTOMATION_ICONS_ENABLED
 Build-Run -FeaturesSuffix '_no-badbt'
 
-Features-Configure -enable TOTP_BADBT_TYPE_ENABLED,TOTP_AUTOMATION_ICONS_ENABLED
+Features-Configure -enable TOTP_BADBT_TYPE_ENABLED,TOTP_AUTOMATION_ICONS_ENABLED -set TOTP_TARGET_FIRMWARE=TOTP_FIRMWARE_XTREME
 
 Pop-Location
