@@ -67,10 +67,7 @@ uint64_t totp_at(
     uint64_t for_time_adjusted =
         timezone_offset_apply(for_time, timezone_offset_from_hours(timezone));
     return otp_generate(
-        algo,
-        plain_secret,
-        plain_secret_length,
-        totp_timecode(interval, for_time_adjusted));
+        algo, plain_secret, plain_secret_length, totp_timecode(interval, for_time_adjusted));
 }
 
 static int totp_algo_sha1(
