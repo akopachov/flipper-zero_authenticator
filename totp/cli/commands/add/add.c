@@ -35,11 +35,12 @@ void totp_cli_command_add_docopt_options() {
             TOTP_CLI_COMMAND_ARG_ALGO)) "      Token hashing algorithm. Must be one of: " TOTP_TOKEN_ALGO_SHA1_NAME
                                         ", " TOTP_TOKEN_ALGO_SHA256_NAME
                                         ", " TOTP_TOKEN_ALGO_SHA512_NAME
+                                        ", " TOTP_TOKEN_ALGO_STEAM_NAME
                                         " " DOCOPT_DEFAULT(TOTP_TOKEN_ALGO_SHA1_NAME) "\r\n");
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
         TOTP_CLI_COMMAND_ARG_DIGITS_PREFIX,
         DOCOPT_ARGUMENT(
-            TOTP_CLI_COMMAND_ARG_DIGITS)) "    Number of digits to generate, one of: 6, 8 " DOCOPT_DEFAULT("6") "\r\n");
+            TOTP_CLI_COMMAND_ARG_DIGITS)) "    Number of digits to generate, one of: 5, 6, 8 " DOCOPT_DEFAULT("6") "\r\n");
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(
         TOTP_CLI_COMMAND_ARG_DURATION_PREFIX,
         DOCOPT_ARGUMENT(

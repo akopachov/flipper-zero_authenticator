@@ -20,6 +20,7 @@
 #include "../../../workers/bt_type_code/bt_type_code.h"
 #endif
 
+static const char* STEAM_ALGO_ALPHABET = "23456789BCDFGHJKMNPQRTVWXY";
 static const uint8_t PROGRESS_BAR_MARGIN = 3;
 static const uint8_t PROGRESS_BAR_HEIGHT = 4;
 
@@ -121,13 +122,20 @@ static const NotificationSequence*
     return (NotificationSequence*)scene_state->notification_sequence_badusb;
 }
 
-static void int_token_to_str(uint32_t i_token_code, char* str, TokenDigitsCount len) {
+static void int_token_to_str(uint64_t i_token_code, char* str, TokenDigitsCount len, TokenHashAlgo algo) {
     if(i_token_code == OTP_ERROR) {
         memset(&str[0], '-', len);
     } else {
-        for(int i = len - 1; i >= 0; i--) {
-            str[i] = CONVERT_DIGIT_TO_CHAR(i_token_code % 10);
-            i_token_code = i_token_code / 10;
+        if (algo == STEAM) {
+            for(uint8_t i = 0; i < len; i++) {
+                str[i] = STEAM_ALGO_ALPHABET[i_token_code % 26];
+                i_token_code = i_token_code / 26;
+            }
+        } else {
+            for(int8_t i = len - 1; i >= 0; i--) {
+                str[i] = CONVERT_DIGIT_TO_CHAR(i_token_code % 10);
+                i_token_code = i_token_code / 10;
+            }
         }
     }
 
@@ -142,6 +150,8 @@ static TOTP_ALGO get_totp_algo_impl(TokenHashAlgo algo) {
         return TOTP_ALGO_SHA256;
     case SHA512:
         return TOTP_ALGO_SHA512;
+    case STEAM:
+        return TOTP_ALGO_SHA1;
     default:
         break;
     }
@@ -274,19 +284,19 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
             int_token_to_str(
                 totp_at(
                     get_totp_algo_impl(tokenInfo->algo),
-                    tokenInfo->digits,
                     key,
                     key_length,
                     curr_ts,
                     plugin_state->timezone_offset,
                     tokenInfo->duration),
                 scene_state->last_code,
-                tokenInfo->digits);
+                tokenInfo->digits,
+                tokenInfo->algo);
             memset_s(key, key_length, 0, key_length);
             free(key);
         } else {
             furi_mutex_acquire(scene_state->last_code_update_sync, FuriWaitForever);
-            int_token_to_str(0, scene_state->last_code, tokenInfo->digits);
+            int_token_to_str(0, scene_state->last_code, tokenInfo->digits, tokenInfo->algo);
         }
 
         furi_mutex_release(scene_state->last_code_update_sync);
@@ -322,7 +332,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
         canvas_set_color(canvas, ColorBlack);
     }
 
-    canvas_set_font(canvas, FontBigNumbers);
+    //canvas_set_font(canvas, FontBigNumbers);
     canvas_draw_str_aligned(
         canvas,
         SCREEN_WIDTH_CENTER,

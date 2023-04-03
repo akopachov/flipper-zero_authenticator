@@ -139,10 +139,11 @@ static TotpConfigFileOpenResult totp_open_config_file(Storage* storage, FlipperF
 
         furi_string_printf(
             temp_str,
-            " # Token hashing algorithm to use during code generation. Supported options are %s, %s and %s. If you are not use which one to use - use %s",
+            " # Token hashing algorithm to use during code generation. Supported options are %s, %s, %s, and %s. If you are not use which one to use - use %s",
             TOTP_TOKEN_ALGO_SHA1_NAME,
             TOTP_TOKEN_ALGO_SHA256_NAME,
             TOTP_TOKEN_ALGO_SHA512_NAME,
+            TOTP_TOKEN_ALGO_STEAM_NAME,
             TOTP_TOKEN_ALGO_SHA1_NAME);
         flipper_format_write_comment(fff_data_file, temp_str);
         furi_string_printf(
@@ -152,7 +153,7 @@ static TotpConfigFileOpenResult totp_open_config_file(Storage* storage, FlipperF
 
         flipper_format_write_comment_cstr(
             fff_data_file,
-            "# How many digits there should be in generated code. Available options are 6 and 8. Majority websites requires 6 digits code, however some rare websites wants to get 8 digits code. If you are not sure which one to use - use 6");
+            "# How many digits there should be in generated code. Available options are 5, 6 and 8. Majority websites requires 6 digits code, however some rare websites wants to get 8 digits code. If you are not sure which one to use - use 6");
         furi_string_printf(temp_str, "%s: 6", TOTP_CONFIG_KEY_TOKEN_DIGITS);
         flipper_format_write_comment(fff_data_file, temp_str);
         flipper_format_write_comment_cstr(fff_data_file, " ");

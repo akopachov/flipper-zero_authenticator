@@ -51,6 +51,9 @@ bool token_info_set_secret(
 
 bool token_info_set_digits_from_int(TokenInfo* token_info, uint8_t digits) {
     switch(digits) {
+    case 5:
+        token_info->digits = TOTP_5_DIGITS;
+        return true;
     case 6:
         token_info->digits = TOTP_6_DIGITS;
         return true;
@@ -89,6 +92,11 @@ bool token_info_set_algo_from_str(TokenInfo* token_info, const FuriString* str) 
         return true;
     }
 
+    if(furi_string_cmpi_str(str, TOTP_TOKEN_ALGO_STEAM_NAME) == 0) {
+        token_info->algo = STEAM;
+        return true;
+    }
+
     return false;
 }
 
@@ -100,6 +108,8 @@ char* token_info_get_algo_as_cstr(const TokenInfo* token_info) {
         return TOTP_TOKEN_ALGO_SHA256_NAME;
     case SHA512:
         return TOTP_TOKEN_ALGO_SHA512_NAME;
+    case STEAM:
+        return TOTP_TOKEN_ALGO_STEAM_NAME;
     default:
         break;
     }

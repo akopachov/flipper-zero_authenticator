@@ -7,6 +7,7 @@
 #define TOTP_TOKEN_DURATION_DEFAULT 30
 
 #define TOTP_TOKEN_ALGO_SHA1_NAME "sha1"
+#define TOTP_TOKEN_ALGO_STEAM_NAME "steam"
 #define TOTP_TOKEN_ALGO_SHA256_NAME "sha256"
 #define TOTP_TOKEN_ALGO_SHA512_NAME "sha512"
 #define TOTP_TOKEN_MAX_LENGTH 255
@@ -37,13 +38,23 @@ enum TokenHashAlgos {
     /**
      * @brief SHA512 hashing algorithm
      */
-    SHA512
+    SHA512,
+
+    /**
+     * @brief Algorithm used by Steam (Valve)
+     */
+    STEAM
 };
 
 /**
  * @brief Token digits count to be generated.
  */
 enum TokenDigitsCounts {
+    /**
+     * @brief 6 digits
+     */
+    TOTP_5_DIGITS = 5,
+
     /**
      * @brief 6 digits
      */
