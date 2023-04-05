@@ -172,7 +172,7 @@ static void update_totp_params(PluginState* const plugin_state) {
     }
 }
 
-static void draw_totp_code(Canvas* const canvas, SceneState* const scene_state) {
+static void draw_totp_code(Canvas* const canvas, const SceneState* const scene_state) {
     uint8_t code_length = scene_state->current_token->digits;
     uint8_t char_width = modeNine_15ptFontInfo.charInfo[0].width;
     uint8_t total_length = code_length * (char_width + modeNine_15ptFontInfo.spacePixels);
