@@ -1,12 +1,11 @@
-#include <furi_hal.h>
 #include "token_info.h"
-#include "stdlib.h"
-#include "common.h"
+#include <furi_hal.h>
 #include <base32.h>
 #include <base64.h>
-#include "../services/crypto/crypto.h"
 #include <memset_s.h>
 #include <strnlen.h>
+#include "common.h"
+#include "../services/crypto/crypto.h"
 
 TokenInfo* token_info_alloc() {
     TokenInfo* tokenInfo = malloc(sizeof(TokenInfo));
