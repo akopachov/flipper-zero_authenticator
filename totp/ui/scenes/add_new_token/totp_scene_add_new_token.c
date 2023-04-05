@@ -4,11 +4,11 @@
 #include "../../scene_director.h"
 #include "totp_input_text.h"
 #include "../../../types/token_info.h"
-#include "../../../lib/list/list.h"
+#include <linked_list.h>
 #include "../../../services/config/config.h"
 #include "../../ui_controls.h"
 #include "../../common_dialogs.h"
-#include "../../../lib/roll_value/roll_value.h"
+#include <roll_value.h>
 #include "../../../types/nullable.h"
 #include "../generate_token/totp_scene_generate_token.h"
 
@@ -270,6 +270,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
                 tokenInfo,
                 scene_state->token_secret,
                 scene_state->token_secret_length,
+                PLAIN_TOKEN_ENCODING_BASE32,
                 &plugin_state->iv[0]);
 
             if(token_secret_set) {

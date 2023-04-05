@@ -11,7 +11,7 @@
 #include "../hmac/byteswap.h"
 #include "../../lib/timezone_utils/timezone_utils.h"
 
-#define HMAC_MAX_SIZE 64
+#define HMAC_MAX_RESULT_SIZE HMAC_SHA512_RESULT_SIZE
 
 /**
  * @brief Generates the timeblock for a time in seconds.
@@ -39,7 +39,7 @@ uint64_t otp_generate(
     const uint8_t* plain_secret,
     size_t plain_secret_length,
     uint64_t input) {
-    uint8_t hmac[HMAC_MAX_SIZE] = {0};
+    uint8_t hmac[HMAC_MAX_RESULT_SIZE] = {0};
 
     uint64_t input_swapped = swap_uint64(input);
 

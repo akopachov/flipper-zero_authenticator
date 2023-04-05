@@ -147,13 +147,12 @@ static void
 static TOTP_ALGO get_totp_algo_impl(TokenHashAlgo algo) {
     switch(algo) {
     case SHA1:
+    case STEAM:
         return TOTP_ALGO_SHA1;
     case SHA256:
         return TOTP_ALGO_SHA256;
     case SHA512:
         return TOTP_ALGO_SHA512;
-    case STEAM:
-        return TOTP_ALGO_SHA1;
     default:
         break;
     }

@@ -12,6 +12,9 @@
 #define TOTP_TOKEN_ALGO_SHA512_NAME "sha512"
 #define TOTP_TOKEN_MAX_LENGTH 255
 
+#define PLAIN_TOKEN_ENCODING_BASE32_NAME "base32"
+#define PLAIN_TOKEN_ENCODING_BASE64_NAME "base64"
+
 #define TOTP_TOKEN_AUTOMATION_FEATURE_NONE_NAME "none"
 #define TOTP_TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME "enter"
 #define TOTP_TOKEN_AUTOMATION_FEATURE_TAB_AT_THE_END_NAME "tab"
@@ -20,6 +23,7 @@
 typedef uint8_t TokenHashAlgo;
 typedef uint8_t TokenDigitsCount;
 typedef uint8_t TokenAutomationFeature;
+typedef uint8_t PlainTokenSecretEncoding;
 
 /**
  * @brief Hashing algorithm to be used to generate token
@@ -91,6 +95,11 @@ enum TokenAutomationFeatures {
     TOKEN_AUTOMATION_FEATURE_TYPE_SLOWER = 0b100
 };
 
+enum PlainTokenSecretEncodings {
+    PLAIN_TOKEN_ENCODING_BASE32 = 0,
+    PLAIN_TOKEN_ENCODING_BASE64 = 1
+};
+
 #define TOTP_TOKEN_DIGITS_MAX_COUNT 8
 
 /**
@@ -155,8 +164,9 @@ void token_info_free(TokenInfo* token_info);
  */
 bool token_info_set_secret(
     TokenInfo* token_info,
-    const char* base32_token_secret,
+    const char* plain_token_secret,
     size_t token_secret_length,
+    PlainTokenSecretEncoding plain_token_secret_encoding,
     const uint8_t* iv);
 
 /**

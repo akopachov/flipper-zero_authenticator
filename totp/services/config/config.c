@@ -1,7 +1,7 @@
 #include "config.h"
 #include <stdlib.h>
 #include <string.h>
-#include "../list/list.h"
+#include <linked_list.h>
 #include "../../types/common.h"
 #include "../../types/token_info.h"
 #include "../../features_config.h"
@@ -687,6 +687,7 @@ TokenLoadingResult totp_config_file_load_tokens(PluginState* const plugin_state)
                        tokenInfo,
                        furi_string_get_cstr(temp_str),
                        furi_string_size(temp_str),
+                       PLAIN_TOKEN_ENCODING_BASE32,
                        &plugin_state->iv[0])) {
                     FURI_LOG_W(LOGGING_TAG, "Token \"%s\" has plain secret", tokenInfo->name);
                 } else {
