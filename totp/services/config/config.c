@@ -51,13 +51,13 @@ static char* totp_config_file_backup_i(Storage* storage) {
     memcpy(backup_path, CONFIG_FILE_BACKUP_BASE_PATH, sizeof(CONFIG_FILE_BACKUP_BASE_PATH));
     uint16_t i = 1;
     bool backup_file_exists;
-    while ((backup_file_exists = storage_common_exists(storage, backup_path)) && i <= 9999) {
+    while((backup_file_exists = storage_common_exists(storage, backup_path)) && i <= 9999) {
         snprintf(backup_path, backup_path_size, CONFIG_FILE_BACKUP_BASE_PATH ".%" PRIu16, i);
         i++;
     }
-    
-    if (backup_file_exists || 
-        !storage_common_copy(storage, CONFIG_FILE_PATH, backup_path) == FSE_OK) {
+
+    if(backup_file_exists ||
+       !storage_common_copy(storage, CONFIG_FILE_PATH, backup_path) == FSE_OK) {
         FURI_LOG_E(LOGGING_TAG, "Unable to take a backup");
         free(backup_path);
         return NULL;
@@ -557,8 +557,7 @@ TotpConfigFileOpenResult totp_config_file_load_base(PluginState* const plugin_st
                 }
 
                 FlipperFormat* fff_backup_data_file = flipper_format_file_alloc(storage);
-                if(!flipper_format_file_open_existing(
-                       fff_backup_data_file, backup_path)) {
+                if(!flipper_format_file_open_existing(fff_backup_data_file, backup_path)) {
                     flipper_format_file_close(fff_backup_data_file);
                     flipper_format_free(fff_backup_data_file);
                     result = TotpConfigFileOpenError;
