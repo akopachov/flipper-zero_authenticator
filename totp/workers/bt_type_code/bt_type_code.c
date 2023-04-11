@@ -4,7 +4,7 @@
 #include <storage/storage.h>
 #include "../../types/common.h"
 #include "../../types/token_info.h"
-#include "../common.h"
+#include "../type-code-common.h"
 
 #define HID_BT_KEYS_STORAGE_PATH EXT_PATH("authenticator/.bt_hid.keys")
 
@@ -16,15 +16,15 @@ static inline bool totp_type_code_worker_stop_requested() {
 static void totp_type_code_worker_bt_set_app_mac(uint8_t* mac) {
     uint8_t max_i;
     size_t uid_size = furi_hal_version_uid_size();
-    if(uid_size < 6) {
+    if(uid_size < TOTP_BT_WORKER_BT_MAC_ADDRESS_LEN) {
         max_i = uid_size;
     } else {
-        max_i = 6;
+        max_i = TOTP_BT_WORKER_BT_MAC_ADDRESS_LEN;
     }
 
     const uint8_t* uid = furi_hal_version_uid();
     memcpy(mac, uid, max_i);
-    for(uint8_t i = max_i; i < 6; i++) {
+    for(uint8_t i = max_i; i < TOTP_BT_WORKER_BT_MAC_ADDRESS_LEN; i++) {
         mac[i] = 0;
     }
 
@@ -137,7 +137,6 @@ TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init() {
     bt_keys_storage_set_storage_path(context->bt, HID_BT_KEYS_STORAGE_PATH);
 
 #if TOTP_TARGET_FIRMWARE == TOTP_FIRMWARE_XTREME
-    totp_type_code_worker_bt_set_app_mac(&context->bt_mac[0]);
     memcpy(
         &context->previous_bt_name[0],
         furi_hal_bt_get_profile_adv_name(FuriHalBtProfileHidKeyboard),
@@ -148,8 +147,10 @@ TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init() {
         TOTP_BT_WORKER_BT_MAC_ADDRESS_LEN);
     char new_name[TOTP_BT_WORKER_BT_ADV_NAME_MAX_LEN];
     snprintf(new_name, sizeof(new_name), "%s TOTP Auth", furi_hal_version_get_name_ptr());
+    uint8_t new_bt_mac[TOTP_BT_WORKER_BT_MAC_ADDRESS_LEN];
+    totp_type_code_worker_bt_set_app_mac(new_bt_mac);
     furi_hal_bt_set_profile_adv_name(FuriHalBtProfileHidKeyboard, new_name);
-    furi_hal_bt_set_profile_mac_addr(FuriHalBtProfileHidKeyboard, context->bt_mac);
+    furi_hal_bt_set_profile_mac_addr(FuriHalBtProfileHidKeyboard, new_bt_mac);
 #endif
 
     if(!bt_set_profile(context->bt, BtProfileHidKeyboard)) {
