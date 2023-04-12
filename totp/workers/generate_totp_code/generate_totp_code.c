@@ -79,7 +79,7 @@ static int32_t totp_generate_worker_callback(void* context) {
             FuriFlagWaitAny,
             ONE_SEC_MS);
         
-        if (flags == FuriFlagErrorTimeout) { // If timeout, consider as no error, as we expect this and can handle gracefully
+        if (flags == (uint32_t)FuriFlagErrorTimeout) { // If timeout, consider as no error, as we expect this and can handle gracefully
             flags = 0;
         }
 
