@@ -1,4 +1,5 @@
 #include "usb_type_code.h"
+#include <furi_hal_usb_hid.h>
 #include "../../services/convert/convert.h"
 #include "../../types/token_info.h"
 #include "../type-code-common.h"
@@ -43,9 +44,6 @@ static void totp_type_code_worker_type_code(TotpUsbTypeCodeWorkerContext* contex
 static int32_t totp_type_code_worker_callback(void* context) {
     furi_check(context);
     FuriMutex* context_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
-    if(context_mutex == NULL) {
-        return 251;
-    }
 
     while(true) {
         uint32_t flags = furi_thread_flags_wait(

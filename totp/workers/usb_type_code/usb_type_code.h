@@ -1,8 +1,11 @@
 #pragma once
 
 #include <stdlib.h>
-#include <furi/furi.h>
-#include <furi_hal.h>
+#include <furi/core/thread.h>
+#include <furi/core/mutex.h>
+#include <furi/core/kernel.h>
+#include <furi/core/check.h>
+#include <furi_hal_usb.h>
 
 typedef uint8_t TotpUsbTypeCodeWorkerEvent;
 

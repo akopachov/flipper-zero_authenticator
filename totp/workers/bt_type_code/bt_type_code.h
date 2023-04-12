@@ -1,8 +1,10 @@
 #pragma once
 
 #include <stdlib.h>
-#include <furi/furi.h>
-#include <furi_hal.h>
+#include <furi/core/thread.h>
+#include <furi/core/mutex.h>
+#include <furi/core/string.h>
+#include <furi/core/kernel.h>
 #include <bt/bt_service/bt.h>
 #include "../../features_config.h"
 
@@ -29,9 +31,9 @@ typedef struct {
 } TotpBtTypeCodeWorkerContext;
 
 enum TotpBtTypeCodeWorkerEvents {
-    TotpBtTypeCodeWorkerEventReserved = 0b0000,
-    TotpBtTypeCodeWorkerEventStop = 0b0100,
-    TotpBtTypeCodeWorkerEventType = 0b1000
+    TotpBtTypeCodeWorkerEventReserved = 0b00,
+    TotpBtTypeCodeWorkerEventStop = 0b01,
+    TotpBtTypeCodeWorkerEventType = 0b10
 };
 
 TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init();

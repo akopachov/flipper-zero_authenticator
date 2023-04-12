@@ -1,6 +1,6 @@
 #include "type-code-common.h"
-#include <furi/furi.h>
-#include <furi_hal.h>
+#include <furi_hal_usb_hid.h>
+#include <furi/core/kernel.h>
 #include "../../services/convert/convert.h"
 
 static const uint8_t hid_number_keys[] = {

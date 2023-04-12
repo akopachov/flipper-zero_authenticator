@@ -1,5 +1,6 @@
 #include "bt_type_code.h"
 #include <furi_hal_bt_hid.h>
+#include <furi_hal_version.h>
 #include <bt/bt_service/bt_i.h>
 #include <storage/storage.h>
 #include "../../types/common.h"
@@ -53,9 +54,6 @@ static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context
 static int32_t totp_type_code_worker_callback(void* context) {
     furi_check(context);
     FuriMutex* context_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
-    if(context_mutex == NULL) {
-        return 251;
-    }
 
     TotpBtTypeCodeWorkerContext* bt_context = context;
 
