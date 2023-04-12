@@ -26,14 +26,14 @@ static void totp_type_code_worker_type_code(TotpUsbTypeCodeWorkerContext* contex
     } while(!furi_hal_hid_is_connected() && i < 100 && !totp_type_code_worker_stop_requested());
 
     if(furi_hal_hid_is_connected() &&
-       furi_mutex_acquire(context->string_sync, 500) == FuriStatusOk) {
+       furi_mutex_acquire(context->code_buffer_sync, 500) == FuriStatusOk) {
         totp_type_code_worker_execute_automation(
             &furi_hal_hid_kb_press,
             &furi_hal_hid_kb_release,
-            context->string,
-            context->string_length,
+            context->code_buffer,
+            context->code_buffer_size,
             context->flags);
-        furi_mutex_release(context->string_sync);
+        furi_mutex_release(context->code_buffer_sync);
 
         furi_delay_ms(100);
     }
@@ -68,14 +68,14 @@ static int32_t totp_type_code_worker_callback(void* context) {
 }
 
 TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
-    char* code_buf,
-    uint8_t code_buf_length,
-    FuriMutex* code_buf_update_sync) {
+    char* code_buffer,
+    uint8_t code_buffer_size,
+    FuriMutex* code_buffer_sync) {
     TotpUsbTypeCodeWorkerContext* context = malloc(sizeof(TotpUsbTypeCodeWorkerContext));
     furi_check(context != NULL);
-    context->string = code_buf;
-    context->string_length = code_buf_length;
-    context->string_sync = code_buf_update_sync;
+    context->code_buffer = code_buffer;
+    context->code_buffer_size = code_buffer_size;
+    context->code_buffer_sync = code_buffer_sync;
     context->thread = furi_thread_alloc();
     context->usb_mode_prev = NULL;
     furi_thread_set_name(context->thread, "TOTPUsbHidWorker");

@@ -124,8 +124,10 @@ static void update_totp_params(PluginState* const plugin_state) {
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
 
     if(scene_state->current_token_index < plugin_state->tokens_count) {
-        scene_state->current_token = list_element_at(plugin_state->tokens_list, scene_state->current_token_index)->data;
-        totp_generate_code_worker_notify(scene_state->generate_code_worker_context, TotpGenerateCodeWorkerEventForceUpdate);
+        scene_state->current_token =
+            list_element_at(plugin_state->tokens_list, scene_state->current_token_index)->data;
+        totp_generate_code_worker_notify(
+            scene_state->generate_code_worker_context, TotpGenerateCodeWorkerEventForceUpdate);
     }
 }
 
@@ -152,7 +154,7 @@ static void draw_totp_code(Canvas* const canvas, const SceneState* const scene_s
 }
 
 static void on_new_token_code_generated(bool time_left, void* context) {
-    if (time_left) {
+    if(time_left) {
         PluginState* plugin_state = context;
         notification_message(
             plugin_state->notification_app,
@@ -162,9 +164,11 @@ static void on_new_token_code_generated(bool time_left, void* context) {
 
 static void on_code_lifetime_updated_generated(float code_lifetime_percent, void* context) {
     SceneState* scene_state = context;
-    scene_state->progress_bar_width = (uint8_t)((float)(SCREEN_WIDTH - (PROGRESS_BAR_MARGIN << 1)) * code_lifetime_percent);
+    scene_state->progress_bar_width =
+        (uint8_t)((float)(SCREEN_WIDTH - (PROGRESS_BAR_MARGIN << 1)) * code_lifetime_percent);
     scene_state->progress_bar_x =
-        ((SCREEN_WIDTH - (PROGRESS_BAR_MARGIN << 1) - scene_state->progress_bar_width) >> 1) + PROGRESS_BAR_MARGIN;
+        ((SCREEN_WIDTH - (PROGRESS_BAR_MARGIN << 1) - scene_state->progress_bar_width) >> 1) +
+        PROGRESS_BAR_MARGIN;
 }
 
 void totp_scene_generate_token_activate(
@@ -231,14 +235,17 @@ void totp_scene_generate_token_activate(
 #endif
 
     scene_state->generate_code_worker_context = totp_generate_code_worker_start(
-        scene_state->last_code, 
-        TOTP_TOKEN_DIGITS_MAX_COUNT + 1,
+        scene_state->last_code,
         &scene_state->current_token,
         scene_state->last_code_update_sync,
         plugin_state->timezone_offset,
-        plugin_state->iv,
-        &on_new_token_code_generated,
-        plugin_state,
+        plugin_state->iv);
+
+    totp_generate_code_worker_set_code_generated_handler(
+        scene_state->generate_code_worker_context, &on_new_token_code_generated, plugin_state);
+
+    totp_generate_code_worker_set_lifetime_changed_handler(
+        scene_state->generate_code_worker_context,
         &on_code_lifetime_updated_generated,
         scene_state);
 
@@ -264,7 +271,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
         return;
     }
 
-    SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
+    const SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
 
     canvas_set_font(canvas, FontPrimary);
     uint16_t token_name_width = canvas_string_width(canvas, scene_state->current_token->name);
