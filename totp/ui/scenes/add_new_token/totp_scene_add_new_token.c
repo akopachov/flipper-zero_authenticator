@@ -4,12 +4,10 @@
 #include "../../scene_director.h"
 #include "totp_input_text.h"
 #include "../../../types/token_info.h"
-#include <linked_list.h>
 #include "../../../services/config/config.h"
 #include "../../ui_controls.h"
 #include "../../common_dialogs.h"
 #include <roll_value.h>
-#include "../../../types/nullable.h"
 #include "../generate_token/totp_scene_generate_token.h"
 
 char* TOKEN_ALGO_LIST[] = {"SHA1", "SHA256", "SHA512", "Steam"};
@@ -36,7 +34,6 @@ typedef struct {
     InputTextSceneContext* token_secret_input_context;
     InputTextSceneState* input_state;
     uint32_t input_started_at;
-    TotpNullable_uint16_t current_token_index;
     int16_t screen_y_offset;
     TokenHashAlgo algo;
     uint8_t digits_count_index;
@@ -67,8 +64,7 @@ static void update_duration_text(SceneState* scene_state) {
 }
 
 void totp_scene_add_new_token_activate(
-    PluginState* plugin_state,
-    const TokenAddEditSceneContext* context) {
+    PluginState* plugin_state) {
     SceneState* scene_state = malloc(sizeof(SceneState));
     furi_check(scene_state != NULL);
     plugin_state->current_scene_state = scene_state;
@@ -97,12 +93,6 @@ void totp_scene_add_new_token_activate(
     scene_state->duration = TOTP_TOKEN_DURATION_DEFAULT;
     scene_state->duration_text = furi_string_alloc();
     update_duration_text(scene_state);
-
-    if(context == NULL) {
-        TOTP_NULLABLE_NULL(scene_state->current_token_index);
-    } else {
-        TOTP_NULLABLE_VALUE(scene_state->current_token_index, context->current_token_index);
-    }
 }
 
 void totp_scene_add_new_token_render(Canvas* const canvas, PluginState* plugin_state) {
@@ -260,7 +250,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
         case TokenDurationSelect:
             break;
         case ConfirmButton: {
-            TokenInfo* tokenInfo = token_info_alloc();
+            TokenInfo* tokenInfo = plugin_state->config_file_context->token_info_iterator_context->current_token;
             bool token_secret_set = token_info_set_secret(
                 tokenInfo,
                 scene_state->token_secret,
@@ -269,29 +259,25 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
                 &plugin_state->iv[0]);
 
             if(token_secret_set) {
-                tokenInfo->name = malloc(scene_state->token_name_length + 1);
-                furi_check(tokenInfo->name != NULL);
-                strlcpy(
-                    tokenInfo->name, scene_state->token_name, scene_state->token_name_length + 1);
+                furi_string_set_strn(tokenInfo->name_n, scene_state->token_name, scene_state->token_name_length + 1);
                 tokenInfo->algo = scene_state->algo;
                 tokenInfo->digits = TOKEN_DIGITS_VALUE_LIST[scene_state->digits_count_index];
                 tokenInfo->duration = scene_state->duration;
 
-                TOTP_LIST_INIT_OR_ADD(plugin_state->tokens_list, tokenInfo, furi_check);
-                plugin_state->tokens_count++;
+                size_t previous_token_index = plugin_state->config_file_context->token_info_iterator_context->current_index;
+                plugin_state->config_file_context->token_info_iterator_context->current_index = plugin_state->config_file_context->token_info_iterator_context->total_count;
 
-                if(totp_config_file_save_new_token(tokenInfo) != TotpConfigFileUpdateSuccess) {
-                    token_info_free(tokenInfo);
+                if(!totp_token_info_iterator_save_current_token_info_changes(plugin_state->config_file_context->token_info_iterator_context)) {
+                    plugin_state->config_file_context->token_info_iterator_context->current_index = previous_token_index;
+                    totp_token_info_iterator_load_current_token_info(plugin_state->config_file_context->token_info_iterator_context);
                     totp_dialogs_config_updating_error(plugin_state);
                     return false;
                 }
 
-                GenerateTokenSceneContext generate_scene_context = {
-                    .current_token_index = plugin_state->tokens_count - 1};
                 totp_scene_director_activate_scene(
-                    plugin_state, TotpSceneGenerateToken, &generate_scene_context);
+                    plugin_state, TotpSceneGenerateToken);
             } else {
-                token_info_free(tokenInfo);
+                totp_token_info_iterator_load_current_token_info(plugin_state->config_file_context->token_info_iterator_context);
                 DialogMessage* message = dialog_message_alloc();
                 dialog_message_set_buttons(message, "Back", NULL, NULL);
                 dialog_message_set_text(
@@ -313,14 +299,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
         }
         break;
     case InputKeyBack:
-        if(!scene_state->current_token_index.is_null) {
-            GenerateTokenSceneContext generate_scene_context = {
-                .current_token_index = scene_state->current_token_index.value};
-            totp_scene_director_activate_scene(
-                plugin_state, TotpSceneGenerateToken, &generate_scene_context);
-        } else {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
-        }
+        totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         break;
     default:
         break;

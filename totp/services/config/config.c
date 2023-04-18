@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <flipper_format/flipper_format.h>
-#include <linked_list.h>
 #include "../../types/common.h"
 #include "../../types/token_info.h"
 #include "../../features_config.h"
@@ -228,10 +227,10 @@ char* totp_config_file_backup() {
     return result;
 }
 
-TotpConfigFileUpdateResult totp_config_file_update_timezone_offset(const PluginState* plugin_state) {
+bool totp_config_file_update_timezone_offset(const PluginState* plugin_state) {
     FlipperFormat* file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(file);
-    bool update_result;
+    bool update_result = true;
 
     do {
         if(!flipper_format_insert_or_update_float(
@@ -250,7 +249,7 @@ bool
     totp_config_file_update_notification_method(const PluginState* plugin_state) {
     FlipperFormat* file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(file);
-    bool update_result;
+    bool update_result = true;
 
     do {
         uint32_t tmp_uint32 = plugin_state->notification_method;
@@ -270,7 +269,7 @@ bool
     totp_config_file_update_automation_method(const PluginState* plugin_state) {
     FlipperFormat* file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(file);
-    bool update_result;
+    bool update_result = true;
 
     do {
         uint32_t tmp_uint32 = plugin_state->automation_method;
@@ -289,7 +288,7 @@ bool
 bool totp_config_file_update_user_settings(const PluginState* plugin_state) {
     FlipperFormat* file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(file);
-    bool update_result;
+    bool update_result = true;
     do {
         if(!flipper_format_insert_or_update_float(
                 file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1)) {
@@ -326,7 +325,7 @@ bool totp_config_file_load(PluginState* const plugin_state) {
 
     flipper_format_rewind(fff_data_file);
 
-    bool result;
+    bool result = true;
 
     plugin_state->timezone_offset = 0;
 
@@ -336,6 +335,7 @@ bool totp_config_file_load(PluginState* const plugin_state) {
         uint32_t file_version;
         if(!flipper_format_read_header(fff_data_file, temp_str, &file_version)) {
             FURI_LOG_E(LOGGING_TAG, "Missing or incorrect header");
+            FURI_LOG_D(LOGGING_TAG, "Line 339");
             result = false;
             break;
         }
@@ -466,8 +466,10 @@ bool totp_config_file_load(PluginState* const plugin_state) {
 
         plugin_state->automation_method = tmp_uint32;
 
+        plugin_state->config_file_context = malloc(sizeof(ConfigFileContext));
+        furi_check(plugin_state->config_file_context != NULL);
         plugin_state->config_file_context->config_file = fff_data_file;
-        plugin_state->token_info_iterator_context = totp_token_info_iterator_alloc(plugin_state->config_file_context->config_file, plugin_state->iv);
+        plugin_state->config_file_context->token_info_iterator_context = totp_token_info_iterator_alloc(plugin_state->config_file_context->config_file, plugin_state->iv);
     } while(false);
 
     furi_string_free(temp_str);
@@ -478,7 +480,7 @@ bool
     totp_config_file_update_crypto_signatures(const PluginState* plugin_state) {
     FlipperFormat* config_file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(config_file);
-    bool update_result;
+    bool update_result = true;
     do {
         if(!flipper_format_insert_or_update_hex(
                 config_file, TOTP_CONFIG_KEY_BASE_IV, plugin_state->base_iv, TOTP_IV_SIZE)) {

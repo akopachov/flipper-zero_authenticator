@@ -4,7 +4,6 @@
 #include <gui/gui.h>
 #include <dialogs/dialogs.h>
 #include "../features_config.h"
-#include <linked_list.h>
 #include "../ui/totp_scenes_enum.h"
 #include "../services/config/config_file_context.h"
 #include "notification_method.h"

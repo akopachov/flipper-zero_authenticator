@@ -2,30 +2,84 @@
 
 #include <flipper_format/flipper_format_i.h>
 #include <flipper_format/flipper_format_stream.h>
-#include <flipper_format/flipper_format_stream_i.h>
 #include "../../types/common.h"
 
+static bool flipper_format_seek_to_siblinig_token_start(Stream* stream, StreamDirection direction) {
+    char buffer[sizeof(TOTP_CONFIG_KEY_TOKEN_NAME) + 1];
+    bool found = false;
+    while (!found) {
+        if (!stream_seek_to_char(stream, '\n', direction)) {
+            break;
+        }
+
+        if (!stream_read(stream, (uint8_t *)&buffer[0], sizeof(buffer))) {
+            break;
+        }
+
+        stream_seek(stream, -sizeof(buffer), StreamOffsetFromCurrent);
+
+        if (strncmp(buffer, ("\n" TOTP_CONFIG_KEY_TOKEN_NAME ":"), sizeof(buffer)) == 0) {
+            found = true;
+        }
+    }
+
+    return found;
+}
+
 static bool seek_to_token(size_t token_index, TokenInfoIteratorContext* context) {
+    furi_check(context != NULL && context->config_file != NULL);
     if (token_index >= context->total_count) {
         return false;
     }
 
     Stream* stream = flipper_format_get_raw_stream(context->config_file);
-    long i = -1;
-    do {
-        if(!flipper_format_stream_seek_to_key(stream, TOTP_CONFIG_KEY_TOKEN_NAME, false)) {
-            break;
-        }
-
-        i++;
-    } while (i < token_index);
-
-    if (i < token_index) {
-        return false;
+    long token_index_diff;
+    StreamDirection direction;
+    bool edge_case;
+    if (token_index == 0) {
+        context->last_seek_offset = 0;
+        context->last_seek_index = 0;
+        token_index_diff = 0;
+        direction = StreamDirectionForward;
+        edge_case = true;
+    } else if (token_index >= context->total_count - 1) {
+        context->last_seek_offset = stream_size(stream);
+        context->last_seek_index = context->total_count - 1;
+        token_index_diff = 0;
+        direction = StreamDirectionBackward;
+        edge_case = true;
+    } else {
+        token_index_diff = (long)token_index - (long)context->last_seek_index;
+        direction = token_index_diff >= 0 ? StreamDirectionForward : StreamDirectionBackward;
+        edge_case = false;
     }
 
-    if (!stream_seek(stream, -(sizeof(TOTP_CONFIG_KEY_TOKEN_NAME) + 1), StreamOffsetFromCurrent)) {
-        return false;
+    FURI_LOG_D(LOGGING_TAG, "SEEKINIG TO: %u", context->last_seek_offset);
+    stream_seek(stream, context->last_seek_offset, StreamOffsetFromStart);
+
+    if (token_index_diff != 0 || edge_case) {    
+        long i = 0;
+        long i_inc = token_index_diff >= 0 ? 1 : -1;
+        FURI_LOG_D(LOGGING_TAG, "Need to move by %ld tokens", token_index_diff);
+        do {
+            if(!flipper_format_seek_to_siblinig_token_start(stream, direction)) {
+                break;
+            }
+
+            i += i_inc;
+        } while ((i_inc > 0 && i < token_index_diff) || (i_inc < 0 && i > token_index_diff));
+
+        if ((i_inc > 0 && i < token_index_diff) || (i_inc < 0 && i > token_index_diff)) {
+            context->last_seek_offset = 0;
+            FURI_LOG_D(LOGGING_TAG, "Was not able to move");
+            return false;
+        }
+
+        context->last_seek_offset = stream_tell(stream);
+        context->last_seek_index = token_index;
+        
+
+        FURI_LOG_D(LOGGING_TAG, "Moved to %u", context->last_seek_offset);
     }
 
     return true;
@@ -33,9 +87,10 @@ static bool seek_to_token(size_t token_index, TokenInfoIteratorContext* context)
 
 TokenInfoIteratorContext* totp_token_info_iterator_alloc(FlipperFormat* config_file, uint8_t* iv) {
     Stream* stream = flipper_format_get_raw_stream(config_file);
+    stream_rewind(stream);
     size_t tokens_count = 0;
     while(true) {
-        if(!flipper_format_stream_seek_to_key(stream, TOTP_CONFIG_KEY_TOKEN_NAME, false)) {
+        if(!flipper_format_seek_to_siblinig_token_start(stream, StreamDirectionForward)) {
             break;
         }
 
@@ -47,6 +102,7 @@ TokenInfoIteratorContext* totp_token_info_iterator_alloc(FlipperFormat* config_f
 
     context->total_count = tokens_count;
     context->current_token = token_info_alloc();
+    context->config_file = config_file;
     context->iv = iv;
     return context;
 }
@@ -58,7 +114,7 @@ void totp_token_info_iterator_free(TokenInfoIteratorContext* context) {
 }
 
 bool totp_token_info_iterator_remove_current_token_info(TokenInfoIteratorContext* context) {
-    if (!seek_to_token(context->current_token, context)) {
+    if (!seek_to_token(context->current_index, context)) {
         return false;
     }
 
@@ -81,7 +137,7 @@ bool totp_token_info_iterator_remove_current_token_info(TokenInfoIteratorContext
 
 bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIteratorContext* context) {
     if (context->current_index < context->total_count) {
-        if (!seek_to_token(context->current_token, context)) {
+        if (!seek_to_token(context->current_index, context)) {
             return false;
         }
     } else {
@@ -123,7 +179,7 @@ bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIteratorC
         return false;
     }
 
-    if (context->current_index < context->total_count) {
+    if (context->current_index >= context->total_count) {
         context->total_count++;
     }
 
@@ -131,6 +187,7 @@ bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIteratorC
 }
 
 bool totp_token_info_iterator_load_current_token_info(TokenInfoIteratorContext* context) {
+    furi_check(context != NULL);
     if (!seek_to_token(context->current_index, context)) {
         return false;
     }
@@ -155,12 +212,12 @@ bool totp_token_info_iterator_load_current_token_info(TokenInfoIteratorContext* 
                     furi_string_size(temp_str),
                     PLAIN_TOKEN_ENCODING_BASE32,
                     context->iv)) {
-                FURI_LOG_W(LOGGING_TAG, "Token \"%s\" has plain secret", tokenInfo->name);
+                FURI_LOG_W(LOGGING_TAG, "Token \"%s\" has plain secret", furi_string_get_cstr(tokenInfo->name_n));
                 token_update_needed = true;
             } else {
                 tokenInfo->token = NULL;
                 tokenInfo->token_length = 0;
-                FURI_LOG_W(LOGGING_TAG, "Token \"%s\" has invalid secret", tokenInfo->name);
+                FURI_LOG_W(LOGGING_TAG, "Token \"%s\" has invalid secret", furi_string_get_cstr(tokenInfo->name_n));
             }
         } else {
             tokenInfo->token = NULL;
@@ -188,7 +245,7 @@ bool totp_token_info_iterator_load_current_token_info(TokenInfoIteratorContext* 
     }
 
     uint32_t temp_data32;
-    if(flipper_format_read_uint32(context->config_file, TOTP_CONFIG_KEY_TOKEN_ALGO, temp_data32) &&
+    if(flipper_format_read_uint32(context->config_file, TOTP_CONFIG_KEY_TOKEN_ALGO, &temp_data32, 1) &&
         temp_data32 <= STEAM) {
         tokenInfo->algo = (TokenHashAlgo)temp_data32;
     } else {
@@ -215,7 +272,7 @@ bool totp_token_info_iterator_load_current_token_info(TokenInfoIteratorContext* 
     }
 
     if (token_update_needed) {
-        if (!totp_token_info_iterator_save_current_token_changes(context)) {
+        if (!totp_token_info_iterator_save_current_token_info_changes(context)) {
             return false;
         }
     }

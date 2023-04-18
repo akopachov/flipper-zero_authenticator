@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <lib/toolbox/args.h>
-#include <linked_list.h>
 #include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
 #include "../../../ui/scene_director.h"
@@ -39,7 +38,7 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
 
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
-       token_number > plugin_state->tokens_count) {
+       (size_t)token_number > plugin_state->config_file_context->token_info_iterator_context->total_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
@@ -59,9 +58,11 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     furi_string_free(temp_str);
 
     TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
+    size_t original_token_index = iterator_context->current_index;
     iterator_context->current_index = token_number - 1;
+    totp_token_info_iterator_load_current_token_info(iterator_context);
     TokenInfo* token_info = iterator_context->current_token;
-    char* token_info_name = furi_string_get_cstr(token_info->name_n);
+    const char* token_info_name = furi_string_get_cstr(token_info->name_n);
 
     bool confirmed = !confirm_needed;
     if(confirm_needed) {
@@ -87,23 +88,26 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
 
         bool activate_generate_token_scene = false;
         if(plugin_state->current_scene != TotpSceneAuthentication) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneNone, NULL);
+            totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
             activate_generate_token_scene = true;
         }
 
         if(totp_token_info_iterator_remove_current_token_info(iterator_context)) {
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully deleted\r\n", token_info_name);
+            iterator_context->current_index = 0;
         } else {
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+            iterator_context->current_index = original_token_index;
         }
-
-        totp_token_info_iterator_load_current_token_info(iterator_context);
 
         if(activate_generate_token_scene) {
             totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         }
     } else {
         TOTP_CLI_PRINTF_INFO("User has not confirmed\r\n");
+        iterator_context->current_index = original_token_index;
     }
+
+    totp_token_info_iterator_load_current_token_info(iterator_context);
 }

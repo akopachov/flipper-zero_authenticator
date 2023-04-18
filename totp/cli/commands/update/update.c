@@ -1,7 +1,6 @@
 #include "update.h"
 #include <stdlib.h>
 #include <lib/toolbox/args.h>
-#include <linked_list.h>
 #include "../../../types/token_info.h"
 #include "../../../services/config/config.h"
 #include "../../../services/convert/convert.h"
@@ -70,7 +69,7 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
 
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
-       token_number > iterator_context->total_count) {
+       (size_t)token_number > iterator_context->total_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
@@ -101,6 +100,7 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
         if(!parsed) {
             TOTP_CLI_PRINT_INVALID_ARGUMENTS();
             furi_string_free(temp_str);
+            iterator_context->current_index = previous_index;
             totp_token_info_iterator_load_current_token_info(iterator_context);
             return;
         }

@@ -110,8 +110,7 @@ bool totp_crypto_seed_iv(PluginState* plugin_state, const uint8_t* pin, uint8_t 
 
         plugin_state->pin_set = pin != NULL && pin_length > 0;
 
-        result = totp_config_file_update_crypto_signatures(plugin_state) ==
-                 TotpConfigFileUpdateSuccess;
+        result = totp_config_file_update_crypto_signatures(plugin_state);
     }
 
     return result;

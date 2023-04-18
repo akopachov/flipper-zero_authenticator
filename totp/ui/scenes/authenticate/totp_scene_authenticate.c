@@ -119,7 +119,7 @@ bool totp_scene_authenticate_handle_event(
 
         if(totp_crypto_verify_key(plugin_state)) {
             FURI_LOG_D(LOGGING_TAG, "PIN is valid");
-            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         } else {
             FURI_LOG_D(LOGGING_TAG, "PIN is NOT valid");
             memset(&scene_state->code_input[0], 0, MAX_CODE_LENGTH);

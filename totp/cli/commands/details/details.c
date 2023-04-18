@@ -1,7 +1,6 @@
 #include "details.h"
 #include <stdlib.h>
 #include <lib/toolbox/args.h>
-#include <linked_list.h>
 #include "../../../types/token_info.h"
 #include "../../../services/config/constants.h"
 #include "../../cli_helpers.h"
@@ -53,26 +52,35 @@ void totp_cli_command_details_handle(PluginState* plugin_state, FuriString* args
     }
 
     int token_number;
+    TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
-       token_number > plugin_state->tokens_count) {
+       (size_t)token_number > iterator_context->total_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
 
-    ListNode* list_node = list_element_at(plugin_state->tokens_list, token_number - 1);
 
-    TokenInfo* token_info = list_node->data;
+    size_t original_token_index = iterator_context->current_index;
+    iterator_context->current_index = token_number - 1;
+    if (totp_token_info_iterator_load_current_token_info(iterator_context)) {
+        TokenInfo* token_info = iterator_context->current_token;
 
-    TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
-    TOTP_CLI_PRINTF("| %-20s | %-28s |\r\n", "Property", "Value");
-    TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
-    TOTP_CLI_PRINTF("| %-20s | %-28d |\r\n", "Index", token_number);
-    TOTP_CLI_PRINTF("| %-20s | %-28.28s |\r\n", "Name", token_info->name);
-    TOTP_CLI_PRINTF(
-        "| %-20s | %-28s |\r\n", "Hashing algorithm", token_info_get_algo_as_cstr(token_info));
-    TOTP_CLI_PRINTF("| %-20s | %-28" PRIu8 " |\r\n", "Number of digits", token_info->digits);
-    TOTP_CLI_PRINTF(
-        "| %-20s | %" PRIu8 " sec.%-21s |\r\n", "Token lifetime", token_info->duration, " ");
-    print_automation_features(token_info);
-    TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
+        TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
+        TOTP_CLI_PRINTF("| %-20s | %-28s |\r\n", "Property", "Value");
+        TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
+        TOTP_CLI_PRINTF("| %-20s | %-28d |\r\n", "Index", token_number);
+        TOTP_CLI_PRINTF("| %-20s | %-28.28s |\r\n", "Name", furi_string_get_cstr(token_info->name_n));
+        TOTP_CLI_PRINTF(
+            "| %-20s | %-28s |\r\n", "Hashing algorithm", token_info_get_algo_as_cstr(token_info));
+        TOTP_CLI_PRINTF("| %-20s | %-28" PRIu8 " |\r\n", "Number of digits", token_info->digits);
+        TOTP_CLI_PRINTF(
+            "| %-20s | %" PRIu8 " sec.%-21s |\r\n", "Token lifetime", token_info->duration, " ");
+        print_automation_features(token_info);
+        TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
+    } else {
+        TOTP_CLI_PRINT_ERROR_LOADING_TOKEN_INFO();
+    }
+
+    iterator_context->current_index = original_token_index;
+    totp_token_info_iterator_load_current_token_info(iterator_context);
 }

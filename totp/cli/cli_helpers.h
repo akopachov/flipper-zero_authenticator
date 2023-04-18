@@ -55,6 +55,9 @@
 #define TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE() \
     TOTP_CLI_PRINTF_ERROR("An error has occurred during updating config file\r\n")
 
+#define TOTP_CLI_PRINT_ERROR_LOADING_TOKEN_INFO() \
+    TOTP_CLI_PRINTF_ERROR("An error has occurred during loading token information\r\n")
+
 /**
  * @brief Checks whether user is authenticated and entered correct PIN.
  *        If user is not authenticated it prompts user to enter correct PIN to authenticate.

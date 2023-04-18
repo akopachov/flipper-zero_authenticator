@@ -7,6 +7,8 @@
 typedef struct {
     size_t total_count;
     size_t current_index;
+    size_t last_seek_offset;
+    size_t last_seek_index;
     TokenInfo* current_token;
     FlipperFormat* config_file;
     uint8_t* iv;

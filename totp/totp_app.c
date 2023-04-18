@@ -51,23 +51,23 @@ static bool totp_activate_initial_scene(PluginState* const plugin_state) {
             dialog_message_show(plugin_state->dialogs_app, message);
         dialog_message_free(message);
         if(dialog_result == DialogMessageButtonRight) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication, NULL);
+            totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication);
         } else {
             if(!totp_crypto_seed_iv(plugin_state, NULL, 0)) {
                 totp_dialogs_config_loading_error(plugin_state);
                 return false;
             }
-            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         }
     } else if(plugin_state->pin_set) {
-        totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication, NULL);
+        totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication);
     } else {
         if(!totp_crypto_seed_iv(plugin_state, NULL, 0)) {
             totp_dialogs_config_loading_error(plugin_state);
             return false;
         }
         if(totp_crypto_verify_key(plugin_state)) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         } else {
             FURI_LOG_E(
                 LOGGING_TAG,
@@ -186,7 +186,7 @@ int32_t totp_app() {
             } else if(
                 plugin_state->pin_set && plugin_state->current_scene != TotpSceneAuthentication &&
                 furi_get_tick() - last_user_interaction_time > IDLE_TIMEOUT) {
-                totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication, NULL);
+                totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication);
             }
 
             view_port_update(view_port);

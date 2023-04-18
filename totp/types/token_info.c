@@ -18,7 +18,6 @@ TokenInfo* token_info_alloc() {
 
 void token_info_free(TokenInfo* token_info) {
     if(token_info == NULL) return;
-    free(token_info->name);
     free(token_info->token);
     furi_string_free(token_info->name_n);
     free(token_info);
@@ -170,10 +169,7 @@ TokenInfo* token_info_clone(const TokenInfo* src) {
     furi_check(clone->token != NULL);
     memcpy(clone->token, src->token, src->token_length);
 
-    int name_length = strnlen(src->name, TOTP_TOKEN_MAX_LENGTH);
-    clone->name = malloc(name_length + 1);
-    furi_check(clone->name != NULL);
-    strlcpy(clone->name, src->name, name_length + 1);
+    furi_string_set(clone->name_n, src->name_n);
 
     return clone;
 }

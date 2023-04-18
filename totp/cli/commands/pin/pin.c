@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <lib/toolbox/args.h>
-#include <linked_list.h>
 #include "../../../types/token_info.h"
 #include "../../../types/user_pin_codes.h"
 #include "../../../services/config/config.h"
@@ -157,33 +156,40 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
             memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
 
-            // TODO: Implement other way
-            // TOTP_LIST_FOREACH(plugin_state->tokens_list, node, {
-            //     TokenInfo* token_info = node->data;
-            //     size_t plain_token_length;
-            //     uint8_t* plain_token = totp_crypto_decrypt(
-            //         token_info->token, token_info->token_length, &old_iv[0], &plain_token_length);
-            //     free(token_info->token);
-            //     token_info->token = totp_crypto_encrypt(
-            //         plain_token,
-            //         plain_token_length,
-            //         &plugin_state->iv[0],
-            //         &token_info->token_length);
-            //     memset_s(plain_token, plain_token_length, 0, plain_token_length);
-            //     free(plain_token);
-            // });
+            bool update_successful = true;
+            TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
+            for (size_t i = 0; i < iterator_context->total_count && update_successful; i++) {
+                iterator_context->current_index = i;
+                if (totp_token_info_iterator_load_current_token_info(iterator_context)) {
+                    TokenInfo* token_info = iterator_context->current_token;
+                    size_t plain_token_length;
+                    uint8_t* plain_token = totp_crypto_decrypt(
+                        token_info->token, token_info->token_length, &old_iv[0], &plain_token_length);
+                    free(token_info->token);
+                    token_info->token = totp_crypto_encrypt(
+                        plain_token,
+                        plain_token_length,
+                        &plugin_state->iv[0],
+                        &token_info->token_length);
+                    memset_s(plain_token, plain_token_length, 0, plain_token_length);
+                    free(plain_token);
+                    update_successful = totp_token_info_iterator_save_current_token_info_changes(iterator_context);
+                } else {
+                    update_successful = false;
+                }
+            }
 
-            // TOTP_CLI_DELETE_LAST_LINE();
+            TOTP_CLI_DELETE_LAST_LINE();
 
-            // if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
-            //     if(do_change) {
-            //         TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully changed\r\n");
-            //     } else if(do_remove) {
-            //         TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully removed\r\n");
-            //     }
-            // } else {
-            //     TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
-            // }
+            if(update_successful && totp_config_file_update_crypto_signatures(plugin_state)) {
+                if(do_change) {
+                    TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully changed\r\n");
+                } else if(do_remove) {
+                    TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully removed\r\n");
+                }
+            } else {
+                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+            }
 
         } while(false);
 

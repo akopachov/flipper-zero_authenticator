@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <lib/toolbox/args.h>
-#include <linked_list.h>
 #include "../../../types/token_info.h"
 #include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
@@ -35,7 +34,7 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
 
     int token_index;
     if(!args_read_int_and_trim(args, &token_index) || token_index < 1 ||
-       token_index > plugin_state->tokens_count) {
+       (size_t)token_index > plugin_state->config_file_context->token_info_iterator_context->total_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
@@ -43,7 +42,7 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
     int new_token_index = 0;
 
     if(!args_read_int_and_trim(args, &new_token_index) || new_token_index < 1 ||
-       new_token_index > plugin_state->tokens_count) {
+       (size_t)new_token_index > plugin_state->config_file_context->token_info_iterator_context->total_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
