@@ -135,7 +135,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
             }
 
             if(plugin_state->current_scene == TotpSceneGenerateToken) {
-                totp_scene_director_activate_scene(plugin_state, TotpSceneNone, NULL);
+                totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
                 load_generate_token_scene = true;
             }
 
@@ -157,37 +157,38 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
             memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
 
-            TOTP_LIST_FOREACH(plugin_state->tokens_list, node, {
-                TokenInfo* token_info = node->data;
-                size_t plain_token_length;
-                uint8_t* plain_token = totp_crypto_decrypt(
-                    token_info->token, token_info->token_length, &old_iv[0], &plain_token_length);
-                free(token_info->token);
-                token_info->token = totp_crypto_encrypt(
-                    plain_token,
-                    plain_token_length,
-                    &plugin_state->iv[0],
-                    &token_info->token_length);
-                memset_s(plain_token, plain_token_length, 0, plain_token_length);
-                free(plain_token);
-            });
+            // TODO: Implement other way
+            // TOTP_LIST_FOREACH(plugin_state->tokens_list, node, {
+            //     TokenInfo* token_info = node->data;
+            //     size_t plain_token_length;
+            //     uint8_t* plain_token = totp_crypto_decrypt(
+            //         token_info->token, token_info->token_length, &old_iv[0], &plain_token_length);
+            //     free(token_info->token);
+            //     token_info->token = totp_crypto_encrypt(
+            //         plain_token,
+            //         plain_token_length,
+            //         &plugin_state->iv[0],
+            //         &token_info->token_length);
+            //     memset_s(plain_token, plain_token_length, 0, plain_token_length);
+            //     free(plain_token);
+            // });
 
-            TOTP_CLI_DELETE_LAST_LINE();
+            // TOTP_CLI_DELETE_LAST_LINE();
 
-            if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
-                if(do_change) {
-                    TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully changed\r\n");
-                } else if(do_remove) {
-                    TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully removed\r\n");
-                }
-            } else {
-                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
-            }
+            // if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
+            //     if(do_change) {
+            //         TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully changed\r\n");
+            //     } else if(do_remove) {
+            //         TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully removed\r\n");
+            //     }
+            // } else {
+            //     TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+            // }
 
         } while(false);
 
         if(load_generate_token_scene) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         }
     }
 

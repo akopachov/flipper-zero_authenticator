@@ -75,21 +75,23 @@ void totp_cli_command_add_docopt_options() {
 }
 
 void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
-    FuriString* temp_str = furi_string_alloc();
-    TokenInfo* token_info = token_info_alloc();
+    TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
+    TokenInfo* token_info = iterator_context->current_token;
+
+    bool load_generate_token_scene = false;
+    if(plugin_state->current_scene == TotpSceneGenerateToken) {
+        totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
+        load_generate_token_scene = true;
+    }
 
     // Reading token name
-    if(!args_read_probably_quoted_string_and_trim(args, temp_str)) {
+    if(!args_read_probably_quoted_string_and_trim(args, token_info->name_n)) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
-        furi_string_free(temp_str);
-        token_info_free(token_info);
+        totp_token_info_iterator_load_current_token_info(iterator_context);
         return;
     }
 
-    size_t temp_cstr_len = furi_string_size(temp_str);
-    token_info->name = malloc(temp_cstr_len + 1);
-    furi_check(token_info->name != NULL);
-    strlcpy(token_info->name, furi_string_get_cstr(temp_str), temp_cstr_len + 1);
+    FuriString* temp_str = furi_string_alloc();
 
     // Read optional arguments
     bool mask_user_input = true;
@@ -109,7 +111,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         if(!parsed) {
             TOTP_CLI_PRINT_INVALID_ARGUMENTS();
             furi_string_free(temp_str);
-            token_info_free(token_info);
+            totp_token_info_iterator_load_current_token_info(iterator_context);
             return;
         }
     }
@@ -122,17 +124,11 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         TOTP_CLI_DELETE_LAST_LINE();
         TOTP_CLI_PRINTF_INFO("Cancelled by user\r\n");
         furi_string_secure_free(temp_str);
-        token_info_free(token_info);
+        totp_token_info_iterator_load_current_token_info(iterator_context);
         return;
     }
 
     TOTP_CLI_DELETE_LAST_LINE();
-
-    bool load_generate_token_scene = false;
-    if(plugin_state->current_scene == TotpSceneGenerateToken) {
-        totp_scene_director_activate_scene(plugin_state, TotpSceneNone, NULL);
-        load_generate_token_scene = true;
-    }
 
     bool secret_set = token_info_set_secret(
         token_info,
@@ -144,21 +140,22 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     furi_string_secure_free(temp_str);
 
     if(secret_set) {
-        TOTP_LIST_INIT_OR_ADD(plugin_state->tokens_list, token_info, furi_check);
-        plugin_state->tokens_count++;
-
-        if(totp_config_file_save_new_token(token_info) == TotpConfigFileUpdateSuccess) {
+        size_t previous_index = iterator_context->current_index;
+        iterator_context->current_index = iterator_context->total_count;
+        if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
             TOTP_CLI_PRINTF_SUCCESS(
-                "Token \"%s\" has been successfully added\r\n", token_info->name);
+                "Token \"%s\" has been successfully added\r\n", furi_string_get_cstr(token_info->name_n));
         } else {
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+            iterator_context->current_index = previous_index;
+            totp_token_info_iterator_load_current_token_info(iterator_context);
         }
     } else {
-        token_info_free(token_info);
         TOTP_CLI_PRINTF_ERROR("Token secret seems to be invalid and can not be parsed\r\n");
+        totp_token_info_iterator_load_current_token_info(iterator_context);
     }
 
     if(load_generate_token_scene) {
-        totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+        totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
     }
 }

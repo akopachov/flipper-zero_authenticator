@@ -31,9 +31,7 @@ typedef struct {
 } UiPrecalculatedDimensions;
 
 typedef struct {
-    uint16_t current_token_index;
     char last_code[TOTP_TOKEN_DIGITS_MAX_COUNT + 1];
-    TokenInfo* current_token;
     TotpUsbTypeCodeWorkerContext* usb_type_code_worker_context;
     NotificationMessage const** notification_sequence_new_token;
     NotificationMessage const** notification_sequence_automation;
@@ -192,43 +190,9 @@ static void on_code_lifetime_updated_generated(float code_lifetime_percent, void
         PROGRESS_BAR_MARGIN;
 }
 
-void totp_scene_generate_token_activate(
-    PluginState* plugin_state,
-    const GenerateTokenSceneContext* context) {
-    if(!plugin_state->token_list_loaded) {
-        TokenLoadingResult token_load_result = totp_config_file_load_tokens(plugin_state);
-        if(token_load_result != TokenLoadingResultSuccess) {
-            DialogMessage* message = dialog_message_alloc();
-            dialog_message_set_buttons(message, NULL, "Okay", NULL);
-            if(token_load_result == TokenLoadingResultWarning) {
-                dialog_message_set_text(
-                    message,
-                    "Unable to load some tokens\nPlease review conf file",
-                    SCREEN_WIDTH_CENTER,
-                    SCREEN_HEIGHT_CENTER,
-                    AlignCenter,
-                    AlignCenter);
-            } else if(token_load_result == TokenLoadingResultError) {
-                dialog_message_set_text(
-                    message,
-                    "Unable to load tokens\nPlease review conf file",
-                    SCREEN_WIDTH_CENTER,
-                    SCREEN_HEIGHT_CENTER,
-                    AlignCenter,
-                    AlignCenter);
-            }
-
-            dialog_message_show(plugin_state->dialogs_app, message);
-            dialog_message_free(message);
-        }
-    }
+void totp_scene_generate_token_activate(PluginState* plugin_state) {
     SceneState* scene_state = malloc(sizeof(SceneState));
     furi_check(scene_state != NULL);
-    if(context == NULL || context->current_token_index > plugin_state->tokens_count) {
-        scene_state->current_token_index = 0;
-    } else {
-        scene_state->current_token_index = context->current_token_index;
-    }
 
     plugin_state->current_scene_state = scene_state;
     FURI_LOG_D(LOGGING_TAG, "Timezone set to: %f", (double)plugin_state->timezone_offset);
@@ -274,7 +238,7 @@ void totp_scene_generate_token_activate(
 }
 
 void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_state) {
-    if(plugin_state->tokens_count == 0) {
+    if(plugin_state->config_file_context->token_info_iterator_context->total_count == 0) {
         canvas_draw_str_aligned(
             canvas,
             SCREEN_WIDTH_CENTER,
@@ -327,7 +291,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
         scene_state->ui_precalculated_dimensions.progress_bar_width,
         PROGRESS_BAR_HEIGHT);
 
-    if(plugin_state->tokens_count > 1) {
+    if(plugin_state->config_file_context->token_info_iterator_context->total_count > 1) {
         canvas_draw_icon(canvas, 0, SCREEN_HEIGHT_CENTER - 24, &I_totp_arrow_left_8x9);
         canvas_draw_icon(
             canvas, SCREEN_WIDTH - 9, SCREEN_HEIGHT_CENTER - 24, &I_totp_arrow_right_8x9);
@@ -417,29 +381,26 @@ bool totp_scene_generate_token_handle_event(
         break;
     case InputKeyRight:
         totp_roll_value_uint16_t(
-            &scene_state->current_token_index,
+            &plugin_state->config_file_context->token_info_iterator_context->current_index,
             1,
             0,
-            plugin_state->tokens_count - 1,
+            plugin_state->config_file_context->token_info_iterator_context->total_count - 1,
             RollOverflowBehaviorRoll);
+        totp_token_info_iterator_load_current_token_info(plugin_state->config_file_context->token_info_iterator_context);
         update_totp_params(plugin_state);
         break;
     case InputKeyLeft:
         totp_roll_value_uint16_t(
-            &scene_state->current_token_index,
+            &plugin_state->config_file_context->token_info_iterator_context->current_index,
             -1,
             0,
-            plugin_state->tokens_count - 1,
+            plugin_state->config_file_context->token_info_iterator_context->total_count - 1,
             RollOverflowBehaviorRoll);
+        totp_token_info_iterator_load_current_token_info(plugin_state->config_file_context->token_info_iterator_context);
         update_totp_params(plugin_state);
         break;
     case InputKeyOk:
-        if(plugin_state->tokens_count == 0) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu, NULL);
-        } else {
-            TokenMenuSceneContext ctx = {.current_token_index = scene_state->current_token_index};
-            totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu, &ctx);
-        }
+        totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu);
         break;
     case InputKeyBack:
         break;

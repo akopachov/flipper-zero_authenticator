@@ -50,25 +50,27 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
 
     bool activate_generate_token_scene = false;
     if(plugin_state->current_scene != TotpSceneAuthentication) {
-        totp_scene_director_activate_scene(plugin_state, TotpSceneNone, NULL);
+        totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
         activate_generate_token_scene = true;
     }
 
-    TokenInfo* token_info = NULL;
-    plugin_state->tokens_list =
-        list_remove_at(plugin_state->tokens_list, token_index - 1, (void**)&token_info);
-    furi_check(token_info != NULL);
-    plugin_state->tokens_list =
-        list_insert_at(plugin_state->tokens_list, new_token_index - 1, token_info);
+    // TODO: implement other way
 
-    if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
-        TOTP_CLI_PRINTF_SUCCESS(
-            "Token \"%s\" has been successfully updated\r\n", token_info->name);
-    } else {
-        TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
-    }
+    // TokenInfo* token_info = NULL;
+    // plugin_state->tokens_list =
+    //     list_remove_at(plugin_state->tokens_list, token_index - 1, (void**)&token_info);
+    // furi_check(token_info != NULL);
+    // plugin_state->tokens_list =
+    //     list_insert_at(plugin_state->tokens_list, new_token_index - 1, token_info);
+
+    // if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
+    //     TOTP_CLI_PRINTF_SUCCESS(
+    //         "Token \"%s\" has been successfully updated\r\n", token_info->name);
+    // } else {
+    //     TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+    // }
 
     if(activate_generate_token_scene) {
-        totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+        totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
     }
 }

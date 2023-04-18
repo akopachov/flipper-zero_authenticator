@@ -8,24 +8,23 @@
 
 void totp_scene_director_activate_scene(
     PluginState* const plugin_state,
-    Scene scene,
-    const void* context) {
+    Scene scene) {
     totp_scene_director_deactivate_active_scene(plugin_state);
     switch(scene) {
     case TotpSceneGenerateToken:
-        totp_scene_generate_token_activate(plugin_state, context);
+        totp_scene_generate_token_activate(plugin_state);
         break;
     case TotpSceneAuthentication:
         totp_scene_authenticate_activate(plugin_state);
         break;
     case TotpSceneAddNewToken:
-        totp_scene_add_new_token_activate(plugin_state, context);
+        totp_scene_add_new_token_activate(plugin_state);
         break;
     case TotpSceneTokenMenu:
-        totp_scene_token_menu_activate(plugin_state, context);
+        totp_scene_token_menu_activate(plugin_state);
         break;
     case TotpSceneAppSettings:
-        totp_scene_app_settings_activate(plugin_state, context);
+        totp_scene_app_settings_activate(plugin_state);
         break;
     case TotpSceneNone:
         break;

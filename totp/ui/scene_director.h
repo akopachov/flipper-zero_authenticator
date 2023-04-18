@@ -13,8 +13,7 @@
  */
 void totp_scene_director_activate_scene(
     PluginState* const plugin_state,
-    Scene scene,
-    const void* context);
+    Scene scene);
 
 /**
  * @brief Deactivate current scene

@@ -96,7 +96,7 @@ static bool totp_plugin_state_init(PluginState* const plugin_state) {
     plugin_state->dialogs_app = furi_record_open(RECORD_DIALOGS);
     memset(&plugin_state->iv[0], 0, TOTP_IV_SIZE);
 
-    if(totp_config_file_load_base(plugin_state) != TotpConfigFileOpenSuccess) {
+    if(!totp_config_file_load(plugin_state)) {
         totp_dialogs_config_loading_error(plugin_state);
         return false;
     }
@@ -119,15 +119,7 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
     furi_record_close(RECORD_NOTIFICATION);
     furi_record_close(RECORD_DIALOGS);
 
-    ListNode* node = plugin_state->tokens_list;
-    ListNode* tmp;
-    while(node != NULL) {
-        tmp = node->next;
-        TokenInfo* tokenInfo = node->data;
-        token_info_free(tokenInfo);
-        free(node);
-        node = tmp;
-    }
+    totp_config_file_close(plugin_state);
 
     if(plugin_state->crypto_verify_data != NULL) {
         free(plugin_state->crypto_verify_data);

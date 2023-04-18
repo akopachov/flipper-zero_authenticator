@@ -37,17 +37,9 @@ void totp_cli_command_update_docopt_options() {
 static bool
     totp_cli_try_read_name(TokenInfo* token_info, FuriString* arg, FuriString* args, bool* parsed) {
     if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_ARG_NAME_PREFIX) == 0) {
-        if(!args_read_probably_quoted_string_and_trim(args, arg) || furi_string_empty(arg)) {
+        if(!args_read_probably_quoted_string_and_trim(args, token_info->name_n) || furi_string_empty(token_info->name_n)) {
             totp_cli_printf_missed_argument_value(TOTP_CLI_COMMAND_ARG_NAME_PREFIX);
         } else {
-            if(token_info->name != NULL) {
-                free(token_info->name);
-            }
-
-            size_t temp_cstr_len = furi_string_size(arg);
-            token_info->name = malloc(temp_cstr_len + 1);
-            furi_check(token_info->name != NULL);
-            strlcpy(token_info->name, furi_string_get_cstr(arg), temp_cstr_len + 1);
             *parsed = true;
         }
 
@@ -74,16 +66,19 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
         return;
     }
 
+    TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
+
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
-       token_number > plugin_state->tokens_count) {
+       token_number > iterator_context->total_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
 
-    ListNode* list_item = list_element_at(plugin_state->tokens_list, token_number - 1);
-    TokenInfo* existing_token_info = list_item->data;
-    TokenInfo* token_info = token_info_clone(existing_token_info);
+    size_t previous_index = iterator_context->current_index;
+    iterator_context->current_index = token_number - 1;
+    totp_token_info_iterator_load_current_token_info(iterator_context);
+    TokenInfo* token_info = iterator_context->current_token;
 
     // Read optional arguments
     bool mask_user_input = true;
@@ -106,7 +101,7 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
         if(!parsed) {
             TOTP_CLI_PRINT_INVALID_ARGUMENTS();
             furi_string_free(temp_str);
-            token_info_free(token_info);
+            totp_token_info_iterator_load_current_token_info(iterator_context);
             return;
         }
     }
@@ -125,15 +120,12 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
 
     bool load_generate_token_scene = false;
     if(plugin_state->current_scene == TotpSceneGenerateToken) {
-        totp_scene_director_activate_scene(plugin_state, TotpSceneNone, NULL);
+        totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
         load_generate_token_scene = true;
     }
 
     bool token_secret_set = false;
     if(update_token_secret && token_secret_read) {
-        if(token_info->token != NULL) {
-            free(token_info->token);
-        }
         token_secret_set = token_info_set_secret(
             token_info,
             furi_string_get_cstr(temp_str),
@@ -148,22 +140,18 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
     furi_string_secure_free(temp_str);
 
     if(!update_token_secret || (token_secret_read && token_secret_set)) {
-        list_item->data = token_info;
-
-        if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
+        if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
             TOTP_CLI_PRINTF_SUCCESS(
-                "Token \"%s\" has been successfully updated\r\n", token_info->name);
-            token_info_free(existing_token_info);
+                "Token \"%s\" has been successfully updated\r\n", furi_string_get_cstr(token_info->name_n));
         } else {
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
-            list_item->data = existing_token_info;
-            token_info_free(token_info);
         }
-    } else {
-        token_info_free(token_info);
     }
 
+    iterator_context->current_index = previous_index;
+    totp_token_info_iterator_load_current_token_info(iterator_context);
+
     if(load_generate_token_scene) {
-        totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+        totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
     }
 }

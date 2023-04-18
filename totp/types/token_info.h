@@ -130,7 +130,7 @@ typedef struct {
     /**
      * @brief User-friendly token name 
      */
-    char* name;
+    FuriString* name_n;
 
     /**
      * @brief Hashing algorithm

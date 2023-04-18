@@ -58,16 +58,17 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     }
     furi_string_free(temp_str);
 
-    ListNode* list_node = list_element_at(plugin_state->tokens_list, token_number - 1);
-
-    TokenInfo* token_info = list_node->data;
+    TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
+    iterator_context->current_index = token_number - 1;
+    TokenInfo* token_info = iterator_context->current_token;
+    char* token_info_name = furi_string_get_cstr(token_info->name_n);
 
     bool confirmed = !confirm_needed;
     if(confirm_needed) {
         TOTP_CLI_PRINTF_WARNING("WARNING!\r\n");
         TOTP_CLI_PRINTF_WARNING(
             "TOKEN \"%s\" WILL BE PERMANENTLY DELETED WITHOUT ABILITY TO RECOVER IT.\r\n",
-            token_info->name);
+            token_info_name);
         TOTP_CLI_PRINTF_WARNING("Confirm? [y/n]\r\n");
         fflush(stdout);
         char user_pick;
@@ -90,20 +91,17 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
             activate_generate_token_scene = true;
         }
 
-        plugin_state->tokens_list = list_remove(plugin_state->tokens_list, list_node);
-        plugin_state->tokens_count--;
-
-        if(totp_full_save_config_file(plugin_state) == TotpConfigFileUpdateSuccess) {
+        if(totp_token_info_iterator_remove_current_token_info(iterator_context)) {
             TOTP_CLI_PRINTF_SUCCESS(
-                "Token \"%s\" has been successfully deleted\r\n", token_info->name);
+                "Token \"%s\" has been successfully deleted\r\n", token_info_name);
         } else {
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
         }
 
-        token_info_free(token_info);
+        totp_token_info_iterator_load_current_token_info(iterator_context);
 
         if(activate_generate_token_scene) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken, NULL);
+            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         }
     } else {
         TOTP_CLI_PRINTF_INFO("User has not confirmed\r\n");

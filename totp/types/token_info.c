@@ -12,6 +12,7 @@ TokenInfo* token_info_alloc() {
     tokenInfo->digits = TOTP_6_DIGITS;
     tokenInfo->duration = TOTP_TOKEN_DURATION_DEFAULT;
     tokenInfo->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
+    tokenInfo->name_n = furi_string_alloc();
     return tokenInfo;
 }
 
@@ -19,6 +20,7 @@ void token_info_free(TokenInfo* token_info) {
     if(token_info == NULL) return;
     free(token_info->name);
     free(token_info->token);
+    furi_string_free(token_info->name_n);
     free(token_info);
 }
 
@@ -52,6 +54,10 @@ bool token_info_set_secret(
 
     bool result;
     if(plain_secret_length > 0) {
+        if (token_info->token != NULL) {
+            free(token_info->token);
+        }
+        
         token_info->token =
             totp_crypto_encrypt(plain_secret, plain_secret_length, iv, &token_info->token_length);
         result = true;
