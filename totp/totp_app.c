@@ -184,7 +184,9 @@ int32_t totp_app() {
                     processing = totp_scene_director_handle_event(&event, plugin_state);
                 }
             } else if(
-                plugin_state->pin_set && plugin_state->current_scene != TotpSceneAuthentication &&
+                plugin_state->pin_set && 
+                plugin_state->current_scene != TotpSceneAuthentication &&
+                plugin_state->current_scene != TotpSceneStandby &&
                 furi_get_tick() - last_user_interaction_time > IDLE_TIMEOUT) {
                 totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication);
             }

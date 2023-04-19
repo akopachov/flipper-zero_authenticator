@@ -33,19 +33,14 @@ void totp_cli_command_timezone_handle(PluginState* plugin_state, FuriString* arg
         char* strtof_endptr;
         float tz = strtof(furi_string_get_cstr(temp_str), &strtof_endptr);
         if(*strtof_endptr == 0 && tz >= -12.75f && tz <= 12.75f) {
+            TOTP_CLI_LOCK_UI(plugin_state);
             plugin_state->timezone_offset = tz;
             if(totp_config_file_update_timezone_offset(plugin_state)) {
                 TOTP_CLI_PRINTF_SUCCESS("Timezone is set to %f\r\n", (double)tz);
             } else {
                 TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
             }
-            if(plugin_state->current_scene == TotpSceneGenerateToken) {
-                totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
-                totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
-            } else if(plugin_state->current_scene == TotpSceneAppSettings) {
-                totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
-                totp_scene_director_activate_scene(plugin_state, TotpSceneAppSettings);
-            }
+            TOTP_CLI_UNLOCK_UI(plugin_state);
         } else {
             TOTP_CLI_PRINTF_ERROR("Invalid timezone offset\r\n");
         }

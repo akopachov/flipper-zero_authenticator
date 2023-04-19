@@ -226,3 +226,10 @@ bool token_info_set_automation_feature_from_str(TokenInfo* token_info, const Fur
  * @return cloned instance
  */
 TokenInfo* token_info_clone(const TokenInfo* src);
+
+/**
+ * @brief Copies all the values from \c src to \c dst
+ * @param dst destination token info
+ * @param src source token info
+ */
+void token_info_assign_from(TokenInfo* dst, const TokenInfo* src);

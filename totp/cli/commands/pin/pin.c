@@ -103,15 +103,14 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
     }
 
     if((do_change || do_remove) && totp_cli_ensure_authenticated(plugin_state, cli)) {
-        bool load_generate_token_scene = false;
+        TOTP_CLI_LOCK_UI(plugin_state);
         do {
             uint8_t old_iv[TOTP_IV_SIZE];
             memcpy(&old_iv[0], &plugin_state->iv[0], TOTP_IV_SIZE);
             uint8_t new_pin[TOTP_IV_SIZE];
             uint8_t new_pin_length = 0;
             if(do_change) {
-                if(!totp_cli_read_pin(cli, &new_pin[0], &new_pin_length) ||
-                   !totp_cli_ensure_authenticated(plugin_state, cli)) {
+                if(!totp_cli_read_pin(cli, &new_pin[0], &new_pin_length)) {
                     memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
                     break;
                 }
@@ -131,11 +130,6 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                 TOTP_CLI_PRINTF_ERROR(
                     "An error has occurred during taking backup of config file\r\n");
                 break;
-            }
-
-            if(plugin_state->current_scene == TotpSceneGenerateToken) {
-                totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
-                load_generate_token_scene = true;
             }
 
             TOTP_CLI_PRINTF("Encrypting, please wait...\r\n");
@@ -193,9 +187,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
         } while(false);
 
-        if(load_generate_token_scene) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
-        }
+        TOTP_CLI_UNLOCK_UI(plugin_state);
     }
 
     furi_string_free(temp_str);

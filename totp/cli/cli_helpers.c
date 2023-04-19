@@ -17,6 +17,7 @@ bool totp_cli_ensure_authenticated(const PluginState* plugin_state, Cli* cli) {
 
         if(plugin_state->current_scene == TotpSceneAuthentication || //-V560
            plugin_state->current_scene == TotpSceneNone) { //-V560
+            TOTP_CLI_PRINTF_INFO("Cancelled by user\r\n");
             return false;
         }
     }

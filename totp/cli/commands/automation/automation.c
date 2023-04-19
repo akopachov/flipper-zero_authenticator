@@ -93,12 +93,7 @@ void totp_cli_command_automation_handle(PluginState* plugin_state, FuriString* a
         }
 
         if(new_method_provided) {
-            Scene previous_scene = TotpSceneNone;
-            if(plugin_state->current_scene == TotpSceneGenerateToken ||
-               plugin_state->current_scene == TotpSceneAppSettings) {
-                previous_scene = plugin_state->current_scene;
-                totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
-            }
+            TOTP_CLI_LOCK_UI(plugin_state);
 
             plugin_state->automation_method = new_method;
             if(totp_config_file_update_automation_method(plugin_state)) {
@@ -117,9 +112,7 @@ void totp_cli_command_automation_handle(PluginState* plugin_state, FuriString* a
             }
 #endif
 
-            if(previous_scene != TotpSceneNone) {
-                totp_scene_director_activate_scene(plugin_state, previous_scene);
-            }
+            TOTP_CLI_UNLOCK_UI(plugin_state);
         } else {
             TOTP_CLI_PRINTF_INFO("Current automation method is ");
             totp_cli_command_automation_print_method(

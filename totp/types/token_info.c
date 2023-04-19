@@ -169,7 +169,25 @@ TokenInfo* token_info_clone(const TokenInfo* src) {
     furi_check(clone->token != NULL);
     memcpy(clone->token, src->token, src->token_length);
 
+    clone->name_n = furi_string_alloc();
     furi_string_set(clone->name_n, src->name_n);
 
     return clone;
+}
+
+void token_info_assign_from(TokenInfo* dst, const TokenInfo* src) {
+    dst->algo = src->algo;
+    dst->automation_features = src->automation_features;
+    dst->digits = src->digits;
+    dst->duration = src->duration;
+    
+    furi_string_set(dst->name_n, src->name_n);
+    if (dst->token != NULL) {
+        free(dst->token);
+    }
+
+    dst->token = malloc(src->token_length);
+    furi_check(dst->token != NULL);
+    memcpy(dst->token, src->token, src->token_length);
+    dst->token_length = src->token_length;
 }

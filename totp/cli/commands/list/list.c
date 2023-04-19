@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "../../../types/token_info.h"
 #include "../../../services/config/constants.h"
+#include "../../../ui/scene_director.h"
 #include "../../cli_helpers.h"
 
 void totp_cli_command_list_docopt_commands() {
@@ -25,6 +26,8 @@ void totp_cli_command_list_handle(PluginState* plugin_state, Cli* cli) {
         return;
     }
 
+    TOTP_CLI_LOCK_UI(plugin_state);
+
     size_t original_index = iterator_context->current_index;
 
     TOTP_CLI_PRINTF("+-----+---------------------------+--------+----+-----+\r\n");
@@ -47,4 +50,6 @@ void totp_cli_command_list_handle(PluginState* plugin_state, Cli* cli) {
 
     iterator_context->current_index = original_index;
     totp_token_info_iterator_load_current_token_info(iterator_context);
+
+    TOTP_CLI_UNLOCK_UI(plugin_state);
 }

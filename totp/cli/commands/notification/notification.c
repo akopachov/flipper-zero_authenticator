@@ -78,12 +78,7 @@ void totp_cli_command_notification_handle(PluginState* plugin_state, FuriString*
         }
 
         if(new_method_provided) {
-            Scene previous_scene = TotpSceneNone;
-            if(plugin_state->current_scene == TotpSceneGenerateToken ||
-               plugin_state->current_scene == TotpSceneAppSettings) {
-                previous_scene = plugin_state->current_scene;
-                totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
-            }
+            TOTP_CLI_LOCK_UI(plugin_state);
 
             plugin_state->notification_method = new_method;
             if(totp_config_file_update_notification_method(plugin_state)) {
@@ -94,9 +89,7 @@ void totp_cli_command_notification_handle(PluginState* plugin_state, FuriString*
                 TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
             }
 
-            if(previous_scene != TotpSceneNone) {
-                totp_scene_director_activate_scene(plugin_state, previous_scene);
-            }
+            TOTP_CLI_UNLOCK_UI(plugin_state);
         } else {
             TOTP_CLI_PRINTF_INFO("Current notification method is ");
             totp_cli_command_notification_print_method(

@@ -3,6 +3,7 @@
 #include <lib/toolbox/args.h>
 #include "../../../types/token_info.h"
 #include "../../../services/config/constants.h"
+#include "../../../ui/scene_director.h"
 #include "../../cli_helpers.h"
 #include "../../common_command_arguments.h"
 
@@ -59,6 +60,7 @@ void totp_cli_command_details_handle(PluginState* plugin_state, FuriString* args
         return;
     }
 
+    TOTP_CLI_LOCK_UI(plugin_state);
 
     size_t original_token_index = iterator_context->current_index;
     iterator_context->current_index = token_number - 1;
@@ -83,4 +85,6 @@ void totp_cli_command_details_handle(PluginState* plugin_state, FuriString* args
 
     iterator_context->current_index = original_token_index;
     totp_token_info_iterator_load_current_token_info(iterator_context);
+
+    TOTP_CLI_UNLOCK_UI(plugin_state);
 }

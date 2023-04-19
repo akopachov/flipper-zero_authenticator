@@ -57,6 +57,8 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     }
     furi_string_free(temp_str);
 
+    TOTP_CLI_LOCK_UI(plugin_state);
+
     TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
     size_t original_token_index = iterator_context->current_index;
     iterator_context->current_index = token_number - 1;
@@ -82,16 +84,6 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     }
 
     if(confirmed) {
-        if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
-            return;
-        }
-
-        bool activate_generate_token_scene = false;
-        if(plugin_state->current_scene != TotpSceneAuthentication) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneNone);
-            activate_generate_token_scene = true;
-        }
-
         if(totp_token_info_iterator_remove_current_token_info(iterator_context)) {
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully deleted\r\n", token_info_name);
@@ -100,14 +92,11 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
             iterator_context->current_index = original_token_index;
         }
-
-        if(activate_generate_token_scene) {
-            totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
-        }
     } else {
         TOTP_CLI_PRINTF_INFO("User has not confirmed\r\n");
         iterator_context->current_index = original_token_index;
     }
 
     totp_token_info_iterator_load_current_token_info(iterator_context);
+    TOTP_CLI_UNLOCK_UI(plugin_state);
 }
