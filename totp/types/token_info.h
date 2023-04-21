@@ -228,8 +228,7 @@ bool token_info_set_automation_feature_from_str(TokenInfo* token_info, const Fur
 TokenInfo* token_info_clone(const TokenInfo* src);
 
 /**
- * @brief Copies all the values from \c src to \c dst
- * @param dst destination token info
- * @param src source token info
+ * @brief Sets default values to all the properties of \c token_info
+ * @param token_info instance to set defaults to
  */
-void token_info_assign_from(TokenInfo* dst, const TokenInfo* src);
+void token_info_set_defaults(TokenInfo* token_info);

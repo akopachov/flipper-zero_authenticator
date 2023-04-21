@@ -8,11 +8,8 @@
 TokenInfo* token_info_alloc() {
     TokenInfo* tokenInfo = malloc(sizeof(TokenInfo));
     furi_check(tokenInfo != NULL);
-    tokenInfo->algo = SHA1;
-    tokenInfo->digits = TOTP_6_DIGITS;
-    tokenInfo->duration = TOTP_TOKEN_DURATION_DEFAULT;
-    tokenInfo->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
     tokenInfo->name_n = furi_string_alloc();
+    token_info_set_defaults(tokenInfo);
     return tokenInfo;
 }
 
@@ -175,19 +172,11 @@ TokenInfo* token_info_clone(const TokenInfo* src) {
     return clone;
 }
 
-void token_info_assign_from(TokenInfo* dst, const TokenInfo* src) {
-    dst->algo = src->algo;
-    dst->automation_features = src->automation_features;
-    dst->digits = src->digits;
-    dst->duration = src->duration;
-    
-    furi_string_set(dst->name_n, src->name_n);
-    if (dst->token != NULL) {
-        free(dst->token);
-    }
-
-    dst->token = malloc(src->token_length);
-    furi_check(dst->token != NULL);
-    memcpy(dst->token, src->token, src->token_length);
-    dst->token_length = src->token_length;
+void token_info_set_defaults(TokenInfo* token_info) {
+    furi_check(token_info != NULL);
+    token_info->algo = SHA1;
+    token_info->digits = TOTP_6_DIGITS;
+    token_info->duration = TOTP_TOKEN_DURATION_DEFAULT;
+    token_info->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
+    furi_string_reset(token_info->name_n);
 }

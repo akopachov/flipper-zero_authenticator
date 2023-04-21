@@ -152,7 +152,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
             bool update_successful = true;
             TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
-            for (size_t i = 0; i < iterator_context->total_count && update_successful; i++) {
+            for (long i = iterator_context->total_count - 1; i >= 0 && update_successful; i--) {
                 iterator_context->current_index = i;
                 if (totp_token_info_iterator_load_current_token_info(iterator_context)) {
                     TokenInfo* token_info = iterator_context->current_token;

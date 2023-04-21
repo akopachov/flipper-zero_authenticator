@@ -83,6 +83,8 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
 
     TOTP_CLI_LOCK_UI(plugin_state);
 
+    token_info_set_defaults(token_info);
+
     // Reading token name
     if(!args_read_probably_quoted_string_and_trim(args, token_info->name_n)) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();

@@ -2,6 +2,7 @@
 
 #include <flipper_format/flipper_format_i.h>
 #include <flipper_format/flipper_format_stream.h>
+#include <toolbox/stream/string_stream.h>
 #include "../../types/common.h"
 
 static bool flipper_format_seek_to_siblinig_token_start(Stream* stream, StreamDirection direction) {
@@ -12,11 +13,12 @@ static bool flipper_format_seek_to_siblinig_token_start(Stream* stream, StreamDi
             break;
         }
 
-        if (!stream_read(stream, (uint8_t *)&buffer[0], sizeof(buffer))) {
+        size_t buffer_read_size;
+        if ((buffer_read_size = stream_read(stream, (uint8_t *)&buffer[0], sizeof(buffer))) == 0) {
             break;
         }
 
-        stream_seek(stream, -sizeof(buffer), StreamOffsetFromCurrent);
+        stream_seek(stream, -buffer_read_size, StreamOffsetFromCurrent);
 
         if (strncmp(buffer, ("\n" TOTP_CONFIG_KEY_TOKEN_NAME ":"), sizeof(buffer)) == 0) {
             found = true;
@@ -36,28 +38,23 @@ static bool seek_to_token(size_t token_index, TokenInfoIteratorContext* context)
     long token_index_diff = (long)token_index - (long)context->last_seek_index;
     size_t token_index_diff_weight = (size_t)labs(token_index_diff);
     StreamDirection direction = token_index_diff >= 0 ? StreamDirectionForward : StreamDirectionBackward;
-    bool edge_case = false;
     if (token_index_diff_weight > token_index || context->last_seek_offset == 0) {
         context->last_seek_offset = 0;
         context->last_seek_index = 0;
-        token_index_diff = token_index;
+        token_index_diff = token_index + 1;
         direction = StreamDirectionForward;
-        edge_case = true;
     } else if (token_index_diff_weight > (context->total_count - token_index - 1)) {
         context->last_seek_offset = stream_size(stream);
         context->last_seek_index = context->total_count - 1;
-        token_index_diff = -(context->total_count - token_index - 1);
+        token_index_diff = -(context->total_count - token_index);
         direction = StreamDirectionBackward;
-        edge_case = true;
     }
 
-    FURI_LOG_D(LOGGING_TAG, "SEEKINIG TO: %u", context->last_seek_offset);
     stream_seek(stream, context->last_seek_offset, StreamOffsetFromStart);
 
-    if (token_index_diff != 0 || edge_case) {    
+    if (token_index_diff != 0) {    
         long i = 0;
         long i_inc = token_index_diff >= 0 ? 1 : -1;
-        FURI_LOG_D(LOGGING_TAG, "Need to move by %ld tokens", token_index_diff);
         do {
             if(!flipper_format_seek_to_siblinig_token_start(stream, direction)) {
                 break;
@@ -74,9 +71,18 @@ static bool seek_to_token(size_t token_index, TokenInfoIteratorContext* context)
 
         context->last_seek_offset = stream_tell(stream);
         context->last_seek_index = token_index;
-        
+    }
 
-        FURI_LOG_D(LOGGING_TAG, "Moved to %u", context->last_seek_offset);
+    return true;
+}
+
+static bool stream_insert_stream(Stream* dst, Stream* src) {
+    uint8_t buffer[8];
+    uint8_t buffer_read_size;
+    while ((buffer_read_size = stream_read(src, buffer, sizeof(buffer))) != 0) {
+        if (!stream_insert(dst, buffer, buffer_read_size)) {
+            return false;
+        }
     }
 
     return true;
@@ -142,102 +148,161 @@ bool totp_token_info_iterator_remove_current_token_info(TokenInfoIteratorContext
 bool totp_token_info_iterator_move_current_token_info(TokenInfoIteratorContext* context, size_t new_index) {
     if (context->current_index == new_index) return true;
 
-    context->last_seek_index = 0;
-    context->last_seek_offset = 0;
-    if (!totp_token_info_iterator_remove_current_token_info(context)) return false;
-
-    Stream* stream = flipper_format_get_raw_stream(context->config_file);
-
-    context->last_seek_index = 0;
-    context->last_seek_offset = 0;
-    context->current_index = new_index;
-    if (new_index >= context->total_count - 1) {
-        stream_seek(stream, 0, StreamOffsetFromEnd);
-    } else {
-        seek_to_token(new_index, context);
-    }
-
-    context->last_seek_index = 0;
-    context->last_seek_offset = 0;
-
-    if (!stream_delete_and_insert_cstring(
-        stream, 
-        0, 
-        "\r\n" TOTP_CONFIG_KEY_TOKEN_NAME ": \r\n"
-        TOTP_CONFIG_KEY_TOKEN_SECRET ": \r\n"
-        TOTP_CONFIG_KEY_TOKEN_ALGO ": \r\n"
-        TOTP_CONFIG_KEY_TOKEN_DIGITS ": \r\n"
-        TOTP_CONFIG_KEY_TOKEN_DURATION ": \r\n"
-        TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES ": \r\n")) {
+    if (!seek_to_token(context->current_index, context)) {
         return false;
     }
 
-    context->last_seek_index = 0;
+    Stream* stream = flipper_format_get_raw_stream(context->config_file);
+    size_t begin_offset = stream_tell(stream);
+    size_t end_offset;
+    if (context->current_index >= context->total_count - 1) {
+        end_offset = stream_size(stream);
+    } else if (seek_to_token(context->current_index + 1, context)) {
+        end_offset = stream_tell(stream);
+    } else {
+        return false;
+    }
+
+    Stream* temp_stream = string_stream_alloc();
+
+    size_t moving_size = end_offset - begin_offset;
+
+    bool result = false;
+    do {
+        if (!stream_seek(stream, begin_offset, StreamOffsetFromStart)) {
+            break;
+        }
+
+        if (!stream_copy(stream, temp_stream, moving_size)) {
+            break;
+        }
+
+        if (!stream_rewind(temp_stream)) {
+            break;
+        }
+
+        if (!stream_seek(stream, begin_offset, StreamOffsetFromStart)) {
+            break;
+        }
+
+        if (!stream_delete(stream, moving_size)) {
+            break;
+        }
+
+        context->last_seek_offset = 0;
+        context->last_seek_index = 0;
+        if (new_index >= context->total_count - 1) {
+            if (!stream_seek(stream, stream_size(stream), StreamOffsetFromStart)) {
+                break;
+            }
+        } else if (!seek_to_token(new_index, context)) {
+            break;
+        }
+
+        result = stream_insert_stream(stream, temp_stream);
+    } while (false);
+
+    stream_free(temp_stream);
     context->last_seek_offset = 0;
-    context->current_index = new_index;
-    if (!totp_token_info_iterator_save_current_token_info_changes(context)) return false;
+    context->last_seek_index = 0;
 
-    context->total_count++;
-
-    return true;
+    return result;
 }
 
 bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIteratorContext* context) {
-    if (context->current_index < context->total_count) {
-        if (!seek_to_token(context->current_index, context)) {
+    bool is_new_token = context->current_index >= context->total_count;
+    Stream* stream = flipper_format_get_raw_stream(context->config_file);
+    if (is_new_token) {
+        if (!flipper_format_seek_to_end(context->config_file)) {
             return false;
         }
     } else {
-        if (!flipper_format_seek_to_end(context->config_file)) {
+        if (!seek_to_token(context->current_index, context)) {
             return false;
         }
     }
 
-    Stream* stream = flipper_format_get_raw_stream(context->config_file);
-    size_t original_offset = stream_tell(stream);
+    size_t offset_start = stream_tell(stream);
+
+    size_t offset_end;
+    if (is_new_token) {
+        offset_end = offset_start;
+    } else if (context->current_index + 1 >= context->total_count) {
+        offset_end = stream_size(stream);
+    } else if (seek_to_token(context->current_index + 1, context)) {
+        offset_end = stream_tell(stream);
+    } else {
+        return false;
+    }
+
+    FlipperFormat* temp_ff = flipper_format_string_alloc();
+
     TokenInfo* token_info = context->current_token;
     bool result = false;
-
+    
     do {
-        if(!flipper_format_insert_or_update_string(context->config_file, TOTP_CONFIG_KEY_TOKEN_NAME, token_info->name_n)) {
+        if(!flipper_format_write_string(temp_ff, TOTP_CONFIG_KEY_TOKEN_NAME, token_info->name_n)) {
             break;
         }
 
-        if(!flipper_format_insert_or_update_hex(
-                context->config_file, TOTP_CONFIG_KEY_TOKEN_SECRET, token_info->token, token_info->token_length)) {
+        if(!flipper_format_write_hex(temp_ff, TOTP_CONFIG_KEY_TOKEN_SECRET, token_info->token, token_info->token_length)) {
             break;
         }
 
         uint32_t tmp_uint32 = token_info->algo;
-        if(!flipper_format_insert_or_update_uint32(
-                context->config_file, TOTP_CONFIG_KEY_TOKEN_ALGO, &tmp_uint32, 1)) {
+        if(!flipper_format_write_uint32(temp_ff, TOTP_CONFIG_KEY_TOKEN_ALGO, &tmp_uint32, 1)) {
             break;
         }
 
         tmp_uint32 = token_info->digits;
-        if(!flipper_format_insert_or_update_uint32(context->config_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &tmp_uint32, 1)) {
+        if(!flipper_format_write_uint32(temp_ff, TOTP_CONFIG_KEY_TOKEN_DIGITS, &tmp_uint32, 1)) {
             break;
         }
 
         tmp_uint32 = token_info->duration;
-        if(!flipper_format_insert_or_update_uint32(context->config_file, TOTP_CONFIG_KEY_TOKEN_DURATION, &tmp_uint32, 1)) {
+        if(!flipper_format_write_uint32(temp_ff, TOTP_CONFIG_KEY_TOKEN_DURATION, &tmp_uint32, 1)) {
             break;
         }
 
         tmp_uint32 = token_info->automation_features;
-        if(!flipper_format_insert_or_update_uint32(
-                context->config_file, TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES, &tmp_uint32, 1)) {
+        if(!flipper_format_write_uint32(temp_ff, TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES, &tmp_uint32, 1)) {
             break;
         }
 
-        if (context->current_index >= context->total_count) {
+        Stream* temp_stream = flipper_format_get_raw_stream(temp_ff);
+
+        if (!stream_rewind(temp_stream)) {
+            break;
+        }
+
+        if (!stream_seek(stream, offset_start, StreamOffsetFromStart)) {
+            break;
+        }
+
+        if (!stream_delete(stream, offset_end - offset_start)) {
+            break;
+        }
+
+        if (!is_new_token && !stream_write_char(stream, '\n')) {
+            break;
+        }
+
+        if (!stream_insert_stream(stream, temp_stream)) {
+            break;
+        }
+
+        if (is_new_token) {
             context->total_count++;
         }
 
-        stream_seek(stream, original_offset, StreamOffsetFromStart);
-
         result = true;
     } while (false);
+
+    flipper_format_free(temp_ff);
+
+    stream_seek(stream, offset_start, StreamOffsetFromStart);
+    context->last_seek_offset = 0;
+    context->last_seek_index = 0;
 
     return result;
 }
