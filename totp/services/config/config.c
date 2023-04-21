@@ -124,91 +124,20 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
 
         flipper_format_write_header_cstr(
             fff_data_file, CONFIG_FILE_HEADER, CONFIG_FILE_ACTUAL_VERSION);
+
+        flipper_format_write_comment_cstr(fff_data_file, "Config file format specification can be found here: https://github.com/akopachov/flipper-zero_authenticator/blob/master/docs/conf-file_description.md");
+
         float tmp_tz = 0;
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-        flipper_format_write_comment_cstr(
-            fff_data_file,
-            "Timezone offset in hours. Important note: do not put '+' sign for positive values");
         flipper_format_write_float(fff_data_file, TOTP_CONFIG_KEY_TIMEZONE, &tmp_tz, 1);
 
         uint32_t tmp_uint32 = NotificationMethodSound | NotificationMethodVibro;
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-        flipper_format_write_comment_cstr(
-            fff_data_file,
-            "How to notify user when new token is generated or badusb mode is activated (possible values: 0 - do not notify, 1 - sound, 2 - vibro, 3 sound and vibro)");
         flipper_format_write_uint32(
             fff_data_file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1);
 
         tmp_uint32 = AutomationMethodBadUsb;
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-        flipper_format_write_comment_cstr(
-            fff_data_file,
-            "Automation method (0 - None, 1 - BadUSB, 2 - BadBT, 3 - BadUSB and BadBT)");
         flipper_format_write_uint32(
             fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_METHOD, &tmp_uint32, 1);
 
-        FuriString* temp_str = furi_string_alloc();
-
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-        flipper_format_write_comment_cstr(fff_data_file, "=== TOKEN SAMPLE BEGIN ===");
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-        flipper_format_write_comment_cstr(
-            fff_data_file, "# Token name which will be visible in the UI.");
-        furi_string_printf(temp_str, "%s: Sample token name", TOTP_CONFIG_KEY_TOKEN_NAME);
-        flipper_format_write_comment(fff_data_file, temp_str);
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-
-        flipper_format_write_comment_cstr(
-            fff_data_file,
-            "# Plain token secret without spaces, dashes and etc, just pure alpha-numeric characters. Important note: plain token will be encrypted and replaced by TOTP app");
-        furi_string_printf(temp_str, "%s: plaintokensecret", TOTP_CONFIG_KEY_TOKEN_SECRET);
-        flipper_format_write_comment(fff_data_file, temp_str);
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-
-        furi_string_printf(
-            temp_str,
-            " # Token hashing algorithm to use during code generation. Supported options are %d (%s), %d (%s), %d (%s), and %d (%s). If you are not use which one to use - use %d (%s)",
-            SHA1,
-            TOTP_TOKEN_ALGO_SHA1_NAME,
-            SHA256,
-            TOTP_TOKEN_ALGO_SHA256_NAME,
-            SHA512,
-            TOTP_TOKEN_ALGO_SHA512_NAME,
-            STEAM,
-            TOTP_TOKEN_ALGO_STEAM_NAME,
-            SHA1,
-            TOTP_TOKEN_ALGO_SHA1_NAME);
-        flipper_format_write_comment(fff_data_file, temp_str);
-        furi_string_printf(
-            temp_str, "%s: %d", TOTP_CONFIG_KEY_TOKEN_ALGO, SHA1);
-        flipper_format_write_comment(fff_data_file, temp_str);
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-
-        flipper_format_write_comment_cstr(
-            fff_data_file,
-            "# How many digits there should be in generated code. Available options are 5, 6 and 8. Majority websites requires 6 digits code, however some rare websites wants to get 8 digits code. If you are not sure which one to use - use 6");
-        furi_string_printf(temp_str, "%s: 6", TOTP_CONFIG_KEY_TOKEN_DIGITS);
-        flipper_format_write_comment(fff_data_file, temp_str);
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-
-        flipper_format_write_comment_cstr(
-            fff_data_file,
-            "# Token lifetime duration in seconds. Should be between 15 and 255. Majority websites requires 30, however some rare websites may require custom lifetime. If you are not sure which one to use - use 30");
-        furi_string_printf(temp_str, "%s: 30", TOTP_CONFIG_KEY_TOKEN_DURATION);
-        flipper_format_write_comment(fff_data_file, temp_str);
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-
-        flipper_format_write_comment_cstr(
-            fff_data_file,
-            "# Token input automation features (0 - None, 1 - press \"Enter\" key at the end of automation)");
-        furi_string_printf(temp_str, "%s: 0", TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES);
-        flipper_format_write_comment(fff_data_file, temp_str);
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-
-        flipper_format_write_comment_cstr(fff_data_file, "=== TOKEN SAMPLE END ===");
-        flipper_format_write_comment_cstr(fff_data_file, " ");
-
-        furi_string_free(temp_str);
         if(!flipper_format_rewind(fff_data_file)) {
             totp_close_config_file(fff_data_file);
             FURI_LOG_E(LOGGING_TAG, "Rewind error");
@@ -509,14 +438,16 @@ bool
     return update_result;
 }
 
-void totp_config_file_close(const PluginState* plugin_state) {
+void totp_config_file_close(PluginState* const plugin_state) {
     if (plugin_state->config_file_context == NULL) return;
     totp_token_info_iterator_free(plugin_state->config_file_context->token_info_iterator_context);
     totp_close_config_file(plugin_state->config_file_context->config_file);
     free(plugin_state->config_file_context);
+    plugin_state->config_file_context = NULL;
+    totp_close_storage();
 }
 
-void totp_config_file_reset(const PluginState* plugin_state) {
+void totp_config_file_reset(PluginState* const plugin_state) {
     totp_config_file_close(plugin_state);
     Storage* storage = totp_open_storage();
     storage_simply_remove(storage, CONFIG_FILE_PATH);

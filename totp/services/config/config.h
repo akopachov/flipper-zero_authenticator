@@ -62,6 +62,6 @@ bool
 /**
  * @brief Reset all the settings to default
  */
-void totp_config_file_reset();
+void totp_config_file_reset(PluginState* const plugin_state);
 
-void totp_config_file_close(const PluginState* plugin_state);
+void totp_config_file_close(PluginState* const plugin_state);
