@@ -84,11 +84,14 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     }
 
     if(confirmed) {
+        TOTP_CLI_PRINT_PROCESSING();
         if(totp_token_info_iterator_remove_current_token_info(iterator_context)) {
+            TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully deleted\r\n", token_info_name);
             iterator_context->current_index = 0;
         } else {
+            TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
             iterator_context->current_index = original_token_index;
         }

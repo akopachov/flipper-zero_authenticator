@@ -136,10 +136,13 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
     furi_string_secure_free(temp_str);
 
     if(!update_token_secret || (token_secret_read && token_secret_set)) {
+        TOTP_CLI_PRINT_PROCESSING();
         if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
+            TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully updated\r\n", furi_string_get_cstr(token_info->name_n));
         } else {
+            TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
         }
     }

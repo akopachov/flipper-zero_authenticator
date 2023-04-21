@@ -62,11 +62,15 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
 
     iterator_context->current_index = token_index;
 
+    TOTP_CLI_PRINT_PROCESSING();
+
     if (totp_token_info_iterator_load_current_token_info(iterator_context) &&
         totp_token_info_iterator_move_current_token_info(iterator_context, new_token_index)) {
+        TOTP_CLI_DELETE_LAST_LINE();
         TOTP_CLI_PRINTF_SUCCESS(
             "Token \"%s\" has been successfully updated\r\n", furi_string_get_cstr(iterator_context->current_token->name_n));
     } else {
+        TOTP_CLI_DELETE_LAST_LINE();
         TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
     }
 

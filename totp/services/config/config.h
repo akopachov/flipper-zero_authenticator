@@ -15,6 +15,11 @@ typedef uint8_t TotpConfigFileUpdateResult;
 char* totp_config_file_backup();
 
 /**
+ * @brief Checks and deletes all the obsolete backup files.
+ */
+void totp_config_file_drop_old_backups();
+
+/**
  * @brief Loads basic information from an application config file into application state without loading all the tokens
  * @param plugin_state application state
  * @return Config file open result

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <flipper_format/flipper_format.h>
+#include <furi_hal_rtc.h>
+#include <toolbox/dir_walk.h>
 #include "../../types/common.h"
 #include "../../types/token_info.h"
 #include "../../features_config.h"
@@ -9,10 +11,14 @@
 
 #define CONFIG_FILE_DIRECTORY_PATH EXT_PATH("authenticator")
 #define CONFIG_FILE_PATH CONFIG_FILE_DIRECTORY_PATH "/totp.conf"
-#define CONFIG_FILE_BACKUP_BASE_PATH CONFIG_FILE_PATH ".backup"
+#define CONFIG_FILE_BACKUP_DIR CONFIG_FILE_DIRECTORY_PATH "/backups"
+#define CONFIG_FILE_BACKUP_BASE_PATH CONFIG_FILE_BACKUP_DIR "/totp.conf"
 #define CONFIG_FILE_TEMP_PATH CONFIG_FILE_PATH ".tmp"
 #define CONFIG_FILE_ORIG_PATH CONFIG_FILE_PATH ".orig"
 #define CONFIG_FILE_PATH_PREVIOUS EXT_PATH("apps/Misc") "/totp.conf"
+
+// Backup file lifetime is 7 days
+#define BACKUP_FILE_LIFETIME (604800)
 
 /**
  * @brief Opens storage record
@@ -45,16 +51,25 @@ static void totp_close_config_file(FlipperFormat* file) {
  * @return backup path if backup successfully taken; \c NULL otherwise
  */
 static char* totp_config_file_backup_i(Storage* storage) {
-    uint8_t backup_path_size = sizeof(CONFIG_FILE_BACKUP_BASE_PATH) + 5;
+    if (!storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
+        if (!storage_simply_mkdir(storage, CONFIG_FILE_BACKUP_DIR)) {
+            return NULL;
+        }
+    }
+
+    FuriHalRtcDateTime current_datetime;
+    furi_hal_rtc_get_datetime(&current_datetime);
+
+    uint8_t backup_path_size = sizeof(CONFIG_FILE_BACKUP_BASE_PATH) + 14;
     char* backup_path = malloc(backup_path_size);
     furi_check(backup_path != NULL);
     memcpy(backup_path, CONFIG_FILE_BACKUP_BASE_PATH, sizeof(CONFIG_FILE_BACKUP_BASE_PATH));
     uint16_t i = 1;
     bool backup_file_exists;
-    while((backup_file_exists = storage_common_exists(storage, backup_path)) && i <= 9999) {
-        snprintf(backup_path, backup_path_size, CONFIG_FILE_BACKUP_BASE_PATH ".%" PRIu16, i);
+    do {
+        snprintf(backup_path, backup_path_size, CONFIG_FILE_BACKUP_BASE_PATH ".%4" PRIu16 "%02" PRIu8 "%02" PRIu8 "-%4" PRIu16, current_datetime.year, current_datetime.month, current_datetime.day, i);
         i++;
-    }
+    } while((backup_file_exists = storage_common_exists(storage, backup_path)) && i <= 9999);
 
     if(backup_file_exists ||
        storage_common_copy(storage, CONFIG_FILE_PATH, backup_path) != FSE_OK) {
@@ -150,10 +165,40 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
 }
 
 char* totp_config_file_backup() {
+    totp_config_file_drop_old_backups();
     Storage* storage = totp_open_storage();
     char* result = totp_config_file_backup_i(storage);
     totp_close_storage();
     return result;
+}
+
+void totp_config_file_drop_old_backups() {
+    Storage* storage = totp_open_storage();
+
+    if (storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
+        uint32_t current_timestamp = furi_hal_rtc_get_timestamp();
+
+        DirWalk* dir_walk = dir_walk_alloc(storage);
+        if (dir_walk_open(dir_walk, CONFIG_FILE_BACKUP_DIR)) {
+            FileInfo fileinfo;
+            FuriString* filePath = furi_string_alloc();
+            while(dir_walk_read(dir_walk, filePath, &fileinfo) == DirWalkOK) {
+                uint32_t file_ts;
+                if (storage_common_timestamp(storage, furi_string_get_cstr(filePath), &file_ts) == FSE_OK &&
+                    current_timestamp - file_ts >= BACKUP_FILE_LIFETIME) {
+                    storage_common_remove(storage, furi_string_get_cstr(filePath));
+                    FURI_LOG_I(LOGGING_TAG, "Backup file %s dropped because it is older than 7days", furi_string_get_cstr(filePath));
+                }
+            }
+
+            furi_string_free(filePath);
+            dir_walk_close(dir_walk);
+        }
+
+        dir_walk_free(dir_walk);
+    }
+
+    totp_close_storage();
 }
 
 bool totp_config_file_update_timezone_offset(const PluginState* plugin_state) {

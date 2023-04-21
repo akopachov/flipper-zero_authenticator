@@ -145,10 +145,13 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     if(secret_set) {
         size_t previous_index = iterator_context->current_index;
         iterator_context->current_index = iterator_context->total_count;
+        TOTP_CLI_PRINT_PROCESSING();
         if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
+            TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully added\r\n", furi_string_get_cstr(token_info->name_n));
         } else {
+            TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
             iterator_context->current_index = previous_index;
         }
