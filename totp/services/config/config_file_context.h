@@ -5,6 +5,8 @@
 
 typedef struct {
     FlipperFormat* config_file;
+
+    Storage* storage;
     
     /**
      * @brief Token list iterator context 

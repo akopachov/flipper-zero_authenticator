@@ -10,14 +10,16 @@ typedef uint8_t TotpConfigFileUpdateResult;
 
 /**
  * @brief Tries to take a config file backup
+ * @param plugin_state application state
  * @return backup path if backup successfully taken; \c NULL otherwise
  */
-char* totp_config_file_backup();
+char* totp_config_file_backup(const PluginState* plugin_state);
 
 /**
  * @brief Checks and deletes all the obsolete backup files.
+ * @param plugin_state application state
  */
-void totp_config_file_drop_old_backups();
+void totp_config_file_drop_old_backups(const PluginState* plugin_state);
 
 /**
  * @brief Loads basic information from an application config file into application state without loading all the tokens
@@ -28,14 +30,14 @@ bool totp_config_file_load(PluginState* const plugin_state);
 
 /**
  * @brief Updates timezone offset in an application config file
- * @param new_timezone_offset new timezone offset to be set
+ * @param plugin_state application state
  * @return Config file update result
  */
 bool totp_config_file_update_timezone_offset(const PluginState* plugin_state);
 
 /**
  * @brief Updates notification method in an application config file
- * @param new_notification_method new notification method to be set
+ * @param plugin_state application state
  * @return Config file update result
  */
 bool
@@ -43,7 +45,7 @@ bool
 
 /**
  * @brief Updates automation method in an application config file
- * @param new_automation_method new automation method to be set
+ * @param plugin_state application state
  * @return Config file update result
  */
 bool
@@ -66,7 +68,12 @@ bool
 
 /**
  * @brief Reset all the settings to default
+ * @param plugin_state application state
  */
 void totp_config_file_reset(PluginState* const plugin_state);
 
+/**
+ * @brief Closes config file and releases all the resources
+ * @param plugin_state application state
+ */
 void totp_config_file_close(PluginState* const plugin_state);

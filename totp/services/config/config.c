@@ -67,7 +67,7 @@ static char* totp_config_file_backup_i(Storage* storage) {
     uint16_t i = 1;
     bool backup_file_exists;
     do {
-        snprintf(backup_path, backup_path_size, CONFIG_FILE_BACKUP_BASE_PATH ".%4" PRIu16 "%02" PRIu8 "%02" PRIu8 "-%4" PRIu16, current_datetime.year, current_datetime.month, current_datetime.day, i);
+        snprintf(backup_path, backup_path_size, CONFIG_FILE_BACKUP_BASE_PATH ".%4" PRIu16 "%02" PRIu8 "%02" PRIu8 "-%" PRIu16, current_datetime.year, current_datetime.month, current_datetime.day, i);
         i++;
     } while((backup_file_exists = storage_common_exists(storage, backup_path)) && i <= 9999);
 
@@ -164,16 +164,24 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
     return true;
 }
 
-char* totp_config_file_backup() {
-    totp_config_file_drop_old_backups();
-    Storage* storage = totp_open_storage();
-    char* result = totp_config_file_backup_i(storage);
-    totp_close_storage();
+char* totp_config_file_backup(const PluginState* plugin_state) {
+    totp_config_file_drop_old_backups(plugin_state);
+    if (plugin_state->config_file_context != NULL) {
+        totp_close_config_file(plugin_state->config_file_context->config_file);
+    }
+
+    char* result = totp_config_file_backup_i(plugin_state->config_file_context->storage);
+
+    if (plugin_state->config_file_context != NULL) {
+        totp_open_config_file(plugin_state->config_file_context->storage, &plugin_state->config_file_context->config_file);
+        plugin_state->config_file_context->token_info_iterator_context->config_file = plugin_state->config_file_context->config_file;
+    }
+
     return result;
 }
 
-void totp_config_file_drop_old_backups() {
-    Storage* storage = totp_open_storage();
+void totp_config_file_drop_old_backups(const PluginState* plugin_state) {
+    Storage* storage = plugin_state->config_file_context->storage;
 
     if (storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
         uint32_t current_timestamp = furi_hal_rtc_get_timestamp();
@@ -197,8 +205,6 @@ void totp_config_file_drop_old_backups() {
 
         dir_walk_free(dir_walk);
     }
-
-    totp_close_storage();
 }
 
 bool totp_config_file_update_timezone_offset(const PluginState* plugin_state) {
@@ -442,6 +448,7 @@ bool totp_config_file_load(PluginState* const plugin_state) {
 
         plugin_state->config_file_context = malloc(sizeof(ConfigFileContext));
         furi_check(plugin_state->config_file_context != NULL);
+        plugin_state->config_file_context->storage = storage;
         plugin_state->config_file_context->config_file = fff_data_file;
         plugin_state->config_file_context->token_info_iterator_context = totp_token_info_iterator_alloc(plugin_state->config_file_context->config_file, plugin_state->iv);
     } while(false);

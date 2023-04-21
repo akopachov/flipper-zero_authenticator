@@ -119,7 +119,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                 memset(&new_pin[0], 0, TOTP_IV_SIZE);
             }
 
-            char* backup_path = totp_config_file_backup();
+            char* backup_path = totp_config_file_backup(plugin_state);
             if(backup_path != NULL) {
                 TOTP_CLI_PRINTF_WARNING("Backup conf file %s has been created\r\n", backup_path);
                 TOTP_CLI_PRINTF_WARNING(
@@ -132,7 +132,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                 break;
             }
 
-            TOTP_CLI_PRINTF("Encrypting, please wait...\r\n");
+            TOTP_CLI_PRINTF("Encrypting crypto signatures...\r\n");
 
             memset(&plugin_state->iv[0], 0, TOTP_IV_SIZE);
             memset(&plugin_state->base_iv[0], 0, TOTP_IV_SIZE);
@@ -150,9 +150,12 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
             memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
 
+            TOTP_CLI_DELETE_LAST_LINE();
+
             bool update_successful = true;
             TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
             for (long i = iterator_context->total_count - 1; i >= 0 && update_successful; i--) {
+                TOTP_CLI_PRINTF("Encrypting token %" PRId32 " of %" PRIu16 "\r\n", iterator_context->total_count - i, iterator_context->total_count);
                 iterator_context->current_index = i;
                 if (totp_token_info_iterator_load_current_token_info(iterator_context)) {
                     TokenInfo* token_info = iterator_context->current_token;
@@ -171,9 +174,9 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                 } else {
                     update_successful = false;
                 }
-            }
 
-            TOTP_CLI_DELETE_LAST_LINE();
+                TOTP_CLI_DELETE_LAST_LINE();
+            }
 
             if(update_successful && totp_config_file_update_crypto_signatures(plugin_state)) {
                 if(do_change) {
