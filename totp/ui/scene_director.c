@@ -7,9 +7,7 @@
 #include "scenes/app_settings/totp_app_settings.h"
 #include "scenes/standby/standby.h"
 
-void totp_scene_director_activate_scene(
-    PluginState* const plugin_state,
-    Scene scene) {
+void totp_scene_director_activate_scene(PluginState* const plugin_state, Scene scene) {
     totp_scene_director_deactivate_active_scene(plugin_state);
     switch(scene) {
     case TotpSceneGenerateToken:

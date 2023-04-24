@@ -21,8 +21,7 @@ typedef struct {
     Control selected_control;
 } SceneState;
 
-void totp_scene_token_menu_activate(
-    PluginState* plugin_state) {
+void totp_scene_token_menu_activate(PluginState* plugin_state) {
     SceneState* scene_state = malloc(sizeof(SceneState));
     furi_check(scene_state != NULL);
     plugin_state->current_scene_state = scene_state;
@@ -98,7 +97,7 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
         totp_roll_value_uint8_t(
             &scene_state->selected_control, 1, AddNewToken, AppSettings, RollOverflowBehaviorRoll);
         if(scene_state->selected_control == DeleteToken &&
-           plugin_state->config_file_context->token_info_iterator_context->total_count) {
+           plugin_state->config_file_context->token_info_iterator_context->total_count == 0) {
             scene_state->selected_control++;
         }
         break;
@@ -109,8 +108,7 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
     case InputKeyOk:
         switch(scene_state->selected_control) {
         case AddNewToken: {
-            totp_scene_director_activate_scene(
-                    plugin_state, TotpSceneAddNewToken);
+            totp_scene_director_activate_scene(plugin_state, TotpSceneAddNewToken);
             break;
         }
         case DeleteToken: {
@@ -129,8 +127,8 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
             dialog_message_free(message);
             if(dialog_result == DialogMessageButtonRight &&
                plugin_state->config_file_context->token_info_iterator_context->total_count > 0) {
-
-                if(!totp_token_info_iterator_remove_current_token_info(plugin_state->config_file_context->token_info_iterator_context)) {
+                if(!totp_token_info_iterator_remove_current_token_info(
+                       plugin_state->config_file_context->token_info_iterator_context)) {
                     totp_dialogs_config_updating_error(plugin_state);
                     return false;
                 }

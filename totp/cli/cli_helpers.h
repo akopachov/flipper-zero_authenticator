@@ -58,14 +58,14 @@
 #define TOTP_CLI_PRINT_ERROR_LOADING_TOKEN_INFO() \
     TOTP_CLI_PRINTF_ERROR("An error has occurred during loading token information\r\n")
 
-#define TOTP_CLI_PRINT_PROCESSING() \
-    TOTP_CLI_PRINTF("Processing, please wait...\r\n")
+#define TOTP_CLI_PRINT_PROCESSING() TOTP_CLI_PRINTF("Processing, please wait...\r\n")
 
-#define TOTP_CLI_LOCK_UI(plugin_state) \
+#define TOTP_CLI_LOCK_UI(plugin_state)                    \
     Scene __previous_scene = plugin_state->current_scene; \
     totp_scene_director_activate_scene(plugin_state, TotpSceneStandby)
 
-#define TOTP_CLI_UNLOCK_UI(plugin_state) totp_scene_director_activate_scene(plugin_state, __previous_scene)
+#define TOTP_CLI_UNLOCK_UI(plugin_state) \
+    totp_scene_director_activate_scene(plugin_state, __previous_scene)
 
 /**
  * @brief Checks whether user is authenticated and entered correct PIN.

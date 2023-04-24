@@ -34,7 +34,8 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
 
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number < 1 ||
-       (size_t)token_number > plugin_state->config_file_context->token_info_iterator_context->total_count) {
+       (size_t)token_number >
+           plugin_state->config_file_context->token_info_iterator_context->total_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
@@ -42,12 +43,13 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
     int new_token_number = 0;
 
     if(!args_read_int_and_trim(args, &new_token_number) || new_token_number < 1 ||
-       (size_t)new_token_number > plugin_state->config_file_context->token_info_iterator_context->total_count) {
+       (size_t)new_token_number >
+           plugin_state->config_file_context->token_info_iterator_context->total_count) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
 
-    if (token_number == new_token_number) {
+    if(token_number == new_token_number) {
         TOTP_CLI_PRINTF_ERROR("New token number matches current token number\r\n");
         return;
     }
@@ -57,18 +59,20 @@ void totp_cli_command_move_handle(PluginState* plugin_state, FuriString* args, C
     size_t token_index = token_number - 1;
     size_t new_token_index = new_token_number - 1;
 
-    TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
+    TokenInfoIteratorContext* iterator_context =
+        plugin_state->config_file_context->token_info_iterator_context;
     size_t original_token_index = iterator_context->current_index;
 
     iterator_context->current_index = token_index;
 
     TOTP_CLI_PRINT_PROCESSING();
 
-    if (totp_token_info_iterator_load_current_token_info(iterator_context) &&
-        totp_token_info_iterator_move_current_token_info(iterator_context, new_token_index)) {
+    if(totp_token_info_iterator_load_current_token_info(iterator_context) &&
+       totp_token_info_iterator_move_current_token_info(iterator_context, new_token_index)) {
         TOTP_CLI_DELETE_LAST_LINE();
         TOTP_CLI_PRINTF_SUCCESS(
-            "Token \"%s\" has been successfully updated\r\n", furi_string_get_cstr(iterator_context->current_token->name_n));
+            "Token \"%s\" has been successfully updated\r\n",
+            furi_string_get_cstr(iterator_context->current_token->name));
     } else {
         TOTP_CLI_DELETE_LAST_LINE();
         TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();

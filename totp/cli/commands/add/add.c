@@ -74,11 +74,12 @@ void totp_cli_command_add_docopt_options() {
 }
 
 void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
-    if (!totp_cli_ensure_authenticated(plugin_state, cli)) {
+    if(!totp_cli_ensure_authenticated(plugin_state, cli)) {
         return;
     }
-    
-    TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
+
+    TokenInfoIteratorContext* iterator_context =
+        plugin_state->config_file_context->token_info_iterator_context;
     TokenInfo* token_info = iterator_context->current_token;
 
     TOTP_CLI_LOCK_UI(plugin_state);
@@ -86,7 +87,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     token_info_set_defaults(token_info);
 
     // Reading token name
-    if(!args_read_probably_quoted_string_and_trim(args, token_info->name_n)) {
+    if(!args_read_probably_quoted_string_and_trim(args, token_info->name)) {
         TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         totp_token_info_iterator_load_current_token_info(iterator_context);
         TOTP_CLI_UNLOCK_UI(plugin_state);
@@ -149,7 +150,8 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
             TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINTF_SUCCESS(
-                "Token \"%s\" has been successfully added\r\n", furi_string_get_cstr(token_info->name_n));
+                "Token \"%s\" has been successfully added\r\n",
+                furi_string_get_cstr(token_info->name));
         } else {
             TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();

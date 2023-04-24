@@ -4,9 +4,14 @@
 #include <flipper_format/flipper_format.h>
 #include <furi_hal_rtc.h>
 #include <toolbox/dir_walk.h>
+#include <flipper_format/flipper_format_i.h>
+#include <flipper_format/flipper_format_stream.h>
+#include <toolbox/stream/string_stream.h>
+#include <memset_s.h>
 #include "../../types/common.h"
 #include "../../types/token_info.h"
 #include "../../features_config.h"
+#include "../crypto/crypto.h"
 #include "migrations/common_migration.h"
 
 #define CONFIG_FILE_DIRECTORY_PATH EXT_PATH("authenticator")
@@ -18,7 +23,8 @@
 #define CONFIG_FILE_PATH_PREVIOUS EXT_PATH("apps/Misc") "/totp.conf"
 
 // Backup file lifetime is 7 days
-#define BACKUP_FILE_LIFETIME (604800)
+#define BACKUP_FILE_LIFETIME_DAYS (7)
+#define BACKUP_FILE_LIFETIME (BACKUP_FILE_LIFETIME_DAYS * 86400)
 
 /**
  * @brief Opens storage record
@@ -51,8 +57,8 @@ static void totp_close_config_file(FlipperFormat* file) {
  * @return backup path if backup successfully taken; \c NULL otherwise
  */
 static char* totp_config_file_backup_i(Storage* storage) {
-    if (!storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
-        if (!storage_simply_mkdir(storage, CONFIG_FILE_BACKUP_DIR)) {
+    if(!storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
+        if(!storage_simply_mkdir(storage, CONFIG_FILE_BACKUP_DIR)) {
             return NULL;
         }
     }
@@ -67,7 +73,14 @@ static char* totp_config_file_backup_i(Storage* storage) {
     uint16_t i = 1;
     bool backup_file_exists;
     do {
-        snprintf(backup_path, backup_path_size, CONFIG_FILE_BACKUP_BASE_PATH ".%4" PRIu16 "%02" PRIu8 "%02" PRIu8 "-%" PRIu16, current_datetime.year, current_datetime.month, current_datetime.day, i);
+        snprintf(
+            backup_path,
+            backup_path_size,
+            CONFIG_FILE_BACKUP_BASE_PATH ".%4" PRIu16 "%02" PRIu8 "%02" PRIu8 "-%" PRIu16,
+            current_datetime.year,
+            current_datetime.month,
+            current_datetime.day,
+            i);
         i++;
     } while((backup_file_exists = storage_common_exists(storage, backup_path)) && i <= 9999);
 
@@ -140,7 +153,9 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
         flipper_format_write_header_cstr(
             fff_data_file, CONFIG_FILE_HEADER, CONFIG_FILE_ACTUAL_VERSION);
 
-        flipper_format_write_comment_cstr(fff_data_file, "Config file format specification can be found here: https://github.com/akopachov/flipper-zero_authenticator/blob/master/docs/conf-file_description.md");
+        flipper_format_write_comment_cstr(
+            fff_data_file,
+            "Config file format specification can be found here: https://github.com/akopachov/flipper-zero_authenticator/blob/master/docs/conf-file_description.md");
 
         float tmp_tz = 0;
         flipper_format_write_float(fff_data_file, TOTP_CONFIG_KEY_TIMEZONE, &tmp_tz, 1);
@@ -166,15 +181,18 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
 
 char* totp_config_file_backup(const PluginState* plugin_state) {
     totp_config_file_drop_old_backups(plugin_state);
-    if (plugin_state->config_file_context != NULL) {
+    if(plugin_state->config_file_context != NULL) {
         totp_close_config_file(plugin_state->config_file_context->config_file);
     }
 
     char* result = totp_config_file_backup_i(plugin_state->config_file_context->storage);
 
-    if (plugin_state->config_file_context != NULL) {
-        totp_open_config_file(plugin_state->config_file_context->storage, &plugin_state->config_file_context->config_file);
-        plugin_state->config_file_context->token_info_iterator_context->config_file = plugin_state->config_file_context->config_file;
+    if(plugin_state->config_file_context != NULL) {
+        totp_open_config_file(
+            plugin_state->config_file_context->storage,
+            &plugin_state->config_file_context->config_file);
+        plugin_state->config_file_context->token_info_iterator_context->config_file =
+            plugin_state->config_file_context->config_file;
     }
 
     return result;
@@ -183,19 +201,25 @@ char* totp_config_file_backup(const PluginState* plugin_state) {
 void totp_config_file_drop_old_backups(const PluginState* plugin_state) {
     Storage* storage = plugin_state->config_file_context->storage;
 
-    if (storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
+    if(storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
         uint32_t current_timestamp = furi_hal_rtc_get_timestamp();
 
         DirWalk* dir_walk = dir_walk_alloc(storage);
-        if (dir_walk_open(dir_walk, CONFIG_FILE_BACKUP_DIR)) {
+        if(dir_walk_open(dir_walk, CONFIG_FILE_BACKUP_DIR)) {
             FileInfo fileinfo;
             FuriString* filePath = furi_string_alloc();
             while(dir_walk_read(dir_walk, filePath, &fileinfo) == DirWalkOK) {
                 uint32_t file_ts;
-                if (storage_common_timestamp(storage, furi_string_get_cstr(filePath), &file_ts) == FSE_OK &&
-                    current_timestamp - file_ts >= BACKUP_FILE_LIFETIME) {
+                if(storage_common_timestamp(storage, furi_string_get_cstr(filePath), &file_ts) ==
+                       FSE_OK &&
+                   current_timestamp - file_ts >= BACKUP_FILE_LIFETIME &&
+                   furi_string_search_str(filePath, "totp.conf") != FURI_STRING_FAILURE) {
                     storage_common_remove(storage, furi_string_get_cstr(filePath));
-                    FURI_LOG_I(LOGGING_TAG, "Backup file %s dropped because it is older than 7days", furi_string_get_cstr(filePath));
+                    FURI_LOG_I(
+                        LOGGING_TAG,
+                        "Backup file %s dropped because it is older than %d days",
+                        furi_string_get_cstr(filePath),
+                        BACKUP_FILE_LIFETIME_DAYS);
                 }
             }
 
@@ -214,7 +238,7 @@ bool totp_config_file_update_timezone_offset(const PluginState* plugin_state) {
 
     do {
         if(!flipper_format_insert_or_update_float(
-                file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1)) {
+               file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1)) {
             update_result = false;
             break;
         }
@@ -225,8 +249,7 @@ bool totp_config_file_update_timezone_offset(const PluginState* plugin_state) {
     return update_result;
 }
 
-bool
-    totp_config_file_update_notification_method(const PluginState* plugin_state) {
+bool totp_config_file_update_notification_method(const PluginState* plugin_state) {
     FlipperFormat* file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(file);
     bool update_result = true;
@@ -234,7 +257,7 @@ bool
     do {
         uint32_t tmp_uint32 = plugin_state->notification_method;
         if(!flipper_format_insert_or_update_uint32(
-                file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1)) {
+               file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1)) {
             update_result = false;
             break;
         }
@@ -245,8 +268,7 @@ bool
     return update_result;
 }
 
-bool
-    totp_config_file_update_automation_method(const PluginState* plugin_state) {
+bool totp_config_file_update_automation_method(const PluginState* plugin_state) {
     FlipperFormat* file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(file);
     bool update_result = true;
@@ -254,7 +276,7 @@ bool
     do {
         uint32_t tmp_uint32 = plugin_state->automation_method;
         if(!flipper_format_insert_or_update_uint32(
-                file, TOTP_CONFIG_KEY_AUTOMATION_METHOD, &tmp_uint32, 1)) {
+               file, TOTP_CONFIG_KEY_AUTOMATION_METHOD, &tmp_uint32, 1)) {
             update_result = false;
             break;
         }
@@ -271,20 +293,20 @@ bool totp_config_file_update_user_settings(const PluginState* plugin_state) {
     bool update_result = true;
     do {
         if(!flipper_format_insert_or_update_float(
-                file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1)) {
+               file, TOTP_CONFIG_KEY_TIMEZONE, &plugin_state->timezone_offset, 1)) {
             update_result = false;
             break;
         }
         uint32_t tmp_uint32 = plugin_state->notification_method;
         if(!flipper_format_insert_or_update_uint32(
-                file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1)) {
+               file, TOTP_CONFIG_KEY_NOTIFICATION_METHOD, &tmp_uint32, 1)) {
             update_result = false;
             break;
         }
 
         tmp_uint32 = plugin_state->automation_method;
         if(!flipper_format_insert_or_update_uint32(
-                file, TOTP_CONFIG_KEY_AUTOMATION_METHOD, &tmp_uint32, 1)) {
+               file, TOTP_CONFIG_KEY_AUTOMATION_METHOD, &tmp_uint32, 1)) {
             update_result = false;
             break;
         }
@@ -298,7 +320,7 @@ bool totp_config_file_update_user_settings(const PluginState* plugin_state) {
 bool totp_config_file_load(PluginState* const plugin_state) {
     Storage* storage = totp_open_storage();
     FlipperFormat* fff_data_file;
-    if (!totp_open_config_file(storage, &fff_data_file)) {
+    if(!totp_open_config_file(storage, &fff_data_file)) {
         totp_close_storage();
         return false;
     }
@@ -315,7 +337,6 @@ bool totp_config_file_load(PluginState* const plugin_state) {
         uint32_t file_version;
         if(!flipper_format_read_header(fff_data_file, temp_str, &file_version)) {
             FURI_LOG_E(LOGGING_TAG, "Missing or incorrect header");
-            FURI_LOG_D(LOGGING_TAG, "Line 339");
             result = false;
             break;
         }
@@ -450,36 +471,37 @@ bool totp_config_file_load(PluginState* const plugin_state) {
         furi_check(plugin_state->config_file_context != NULL);
         plugin_state->config_file_context->storage = storage;
         plugin_state->config_file_context->config_file = fff_data_file;
-        plugin_state->config_file_context->token_info_iterator_context = totp_token_info_iterator_alloc(plugin_state->config_file_context->config_file, plugin_state->iv);
+        plugin_state->config_file_context->token_info_iterator_context =
+            totp_token_info_iterator_alloc(
+                plugin_state->config_file_context->config_file, plugin_state->iv);
     } while(false);
 
     furi_string_free(temp_str);
     return result;
 }
 
-bool
-    totp_config_file_update_crypto_signatures(const PluginState* plugin_state) {
+bool totp_config_file_update_crypto_signatures(const PluginState* plugin_state) {
     FlipperFormat* config_file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(config_file);
     bool update_result = true;
     do {
         if(!flipper_format_insert_or_update_hex(
-                config_file, TOTP_CONFIG_KEY_BASE_IV, plugin_state->base_iv, TOTP_IV_SIZE)) {
+               config_file, TOTP_CONFIG_KEY_BASE_IV, plugin_state->base_iv, TOTP_IV_SIZE)) {
             update_result = false;
             break;
         }
 
         if(!flipper_format_insert_or_update_hex(
-                config_file,
-                TOTP_CONFIG_KEY_CRYPTO_VERIFY,
-                plugin_state->crypto_verify_data,
-                plugin_state->crypto_verify_data_length)) {
+               config_file,
+               TOTP_CONFIG_KEY_CRYPTO_VERIFY,
+               plugin_state->crypto_verify_data,
+               plugin_state->crypto_verify_data_length)) {
             update_result = false;
             break;
         }
 
         if(!flipper_format_insert_or_update_bool(
-                config_file, TOTP_CONFIG_KEY_PINSET, &plugin_state->pin_set, 1)) {
+               config_file, TOTP_CONFIG_KEY_PINSET, &plugin_state->pin_set, 1)) {
             update_result = false;
             break;
         }
@@ -491,7 +513,7 @@ bool
 }
 
 void totp_config_file_close(PluginState* const plugin_state) {
-    if (plugin_state->config_file_context == NULL) return;
+    if(plugin_state->config_file_context == NULL) return;
     totp_token_info_iterator_free(plugin_state->config_file_context->token_info_iterator_context);
     totp_close_config_file(plugin_state->config_file_context->config_file);
     free(plugin_state->config_file_context);
@@ -504,4 +526,115 @@ void totp_config_file_reset(PluginState* const plugin_state) {
     Storage* storage = totp_open_storage();
     storage_simply_remove(storage, CONFIG_FILE_PATH);
     totp_close_storage();
+}
+
+bool totp_config_file_update_encryption(
+    PluginState* plugin_state,
+    const uint8_t* new_pin,
+    uint8_t new_pin_length) {
+    FlipperFormat* config_file =
+        plugin_state->config_file_context->token_info_iterator_context->config_file;
+    Stream* stream = flipper_format_get_raw_stream(config_file);
+    size_t original_offset = stream_tell(stream);
+    if(!stream_rewind(stream)) {
+        return false;
+    }
+
+    uint8_t old_iv[TOTP_IV_SIZE];
+    memcpy(&old_iv[0], &plugin_state->iv[0], TOTP_IV_SIZE);
+
+    memset(&plugin_state->iv[0], 0, TOTP_IV_SIZE);
+    memset(&plugin_state->base_iv[0], 0, TOTP_IV_SIZE);
+    if(plugin_state->crypto_verify_data != NULL) {
+        free(plugin_state->crypto_verify_data);
+        plugin_state->crypto_verify_data = NULL;
+    }
+
+    CryptoSeedIVResult seed_result =
+        totp_crypto_seed_iv(plugin_state, new_pin_length > 0 ? new_pin : NULL, new_pin_length);
+    if(seed_result & CRYPTO_SEED_IV_RESULT_FLAG_SUCCESS &&
+       seed_result & CRYPTO_SEED_IV_RESULT_FLAG_NEW_CRYPTO_VERIFY_DATA) {
+        if(!totp_config_file_update_crypto_signatures(plugin_state)) {
+            return false;
+        }
+    } else if(seed_result == CRYPTO_SEED_IV_RESULT_FAILED) {
+        return false;
+    }
+
+    char buffer[sizeof(TOTP_CONFIG_KEY_TOKEN_SECRET) + 1];
+    bool result = true;
+
+    while(result) {
+        if(!stream_seek_to_char(stream, '\n', StreamDirectionForward)) {
+            break;
+        }
+
+        size_t buffer_read_size;
+        if((buffer_read_size = stream_read(stream, (uint8_t*)&buffer[0], sizeof(buffer))) == 0) {
+            break;
+        }
+
+        if(!stream_seek(stream, -buffer_read_size, StreamOffsetFromCurrent)) {
+            result = false;
+            break;
+        }
+
+        if(strncmp(buffer, ("\n" TOTP_CONFIG_KEY_TOKEN_SECRET ":"), sizeof(buffer)) == 0) {
+            uint32_t secret_bytes_count;
+            if(!flipper_format_get_value_count(
+                   config_file, TOTP_CONFIG_KEY_TOKEN_SECRET, &secret_bytes_count)) {
+                secret_bytes_count = 0;
+            }
+
+            if(secret_bytes_count > 1) {
+                size_t secret_token_start = stream_tell(stream) + 1;
+                uint8_t* encrypted_token = malloc(secret_bytes_count);
+                furi_check(encrypted_token != NULL);
+
+                if(!flipper_format_read_hex(
+                       config_file,
+                       TOTP_CONFIG_KEY_TOKEN_SECRET,
+                       encrypted_token,
+                       secret_bytes_count)) {
+                    result = false;
+                    free(encrypted_token);
+                    break;
+                }
+
+                size_t plain_token_length;
+                uint8_t* plain_token = totp_crypto_decrypt(
+                    encrypted_token, secret_bytes_count, &old_iv[0], &plain_token_length);
+
+                free(encrypted_token);
+                size_t encrypted_token_length;
+                encrypted_token = totp_crypto_encrypt(
+                    plain_token, plain_token_length, &plugin_state->iv[0], &encrypted_token_length);
+
+                memset_s(plain_token, plain_token_length, 0, plain_token_length);
+                free(plain_token);
+
+                if(!stream_seek(stream, secret_token_start, StreamOffsetFromStart)) {
+                    result = false;
+                    free(encrypted_token);
+                    break;
+                }
+
+                if(!flipper_format_write_hex(
+                       config_file,
+                       TOTP_CONFIG_KEY_TOKEN_SECRET,
+                       encrypted_token,
+                       encrypted_token_length)) {
+                    free(encrypted_token);
+                    result = false;
+                    break;
+                }
+
+                free(encrypted_token);
+            }
+        }
+    }
+
+    stream_seek(stream, original_offset, StreamOffsetFromStart);
+
+    return result;
 }

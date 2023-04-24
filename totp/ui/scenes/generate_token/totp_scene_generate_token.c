@@ -128,15 +128,17 @@ static const NotificationSequence*
 
 static void update_totp_params(PluginState* const plugin_state) {
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
-    if (totp_token_info_iterator_load_current_token_info(plugin_state->config_file_context->token_info_iterator_context)) {
+    if(totp_token_info_iterator_load_current_token_info(
+           plugin_state->config_file_context->token_info_iterator_context)) {
         totp_generate_code_worker_notify(
-                scene_state->generate_code_worker_context, TotpGenerateCodeWorkerEventForceUpdate);
+            scene_state->generate_code_worker_context, TotpGenerateCodeWorkerEventForceUpdate);
     }
 }
 
 static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin_state) {
     SceneState* scene_state = plugin_state->current_scene_state;
-    uint8_t code_length = plugin_state->config_file_context->token_info_iterator_context->current_token->digits;
+    uint8_t code_length =
+        plugin_state->config_file_context->token_info_iterator_context->current_token->digits;
     uint8_t offset_x = scene_state->ui_precalculated_dimensions.code_offset_x;
     uint8_t char_width = modeNine_15ptFontInfo.charInfo[0].width;
     uint8_t offset_x_inc = scene_state->ui_precalculated_dimensions.code_offset_x_inc;
@@ -160,7 +162,8 @@ static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin
 static void on_new_token_code_generated(bool time_left, void* context) {
     const PluginState* plugin_state = context;
     SceneState* scene_state = plugin_state->current_scene_state;
-    TokenInfo* current_token = plugin_state->config_file_context->token_info_iterator_context->current_token;
+    TokenInfo* current_token =
+        plugin_state->config_file_context->token_info_iterator_context->current_token;
     uint8_t char_width = modeNine_15ptFontInfo.charInfo[0].width;
     scene_state->ui_precalculated_dimensions.code_total_length =
         current_token->digits * (char_width + modeNine_15ptFontInfo.spacePixels);
@@ -257,7 +260,8 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
     const SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
 
     canvas_set_font(canvas, FontPrimary);
-    const char* token_name_cstr = furi_string_get_cstr(plugin_state->config_file_context->token_info_iterator_context->current_token->name_n);
+    const char* token_name_cstr = furi_string_get_cstr(
+        plugin_state->config_file_context->token_info_iterator_context->current_token->name);
     uint16_t token_name_width = canvas_string_width(canvas, token_name_cstr);
     if(SCREEN_WIDTH - token_name_width > 18) {
         canvas_draw_str_aligned(
@@ -269,12 +273,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
             token_name_cstr);
     } else {
         canvas_draw_str_aligned(
-            canvas,
-            9,
-            SCREEN_HEIGHT_CENTER - 20,
-            AlignLeft,
-            AlignCenter,
-            token_name_cstr);
+            canvas, 9, SCREEN_HEIGHT_CENTER - 20, AlignLeft, AlignCenter, token_name_cstr);
         canvas_set_color(canvas, ColorWhite);
         canvas_draw_box(canvas, 0, SCREEN_HEIGHT_CENTER - 24, 9, 9);
         canvas_draw_box(canvas, SCREEN_WIDTH - 10, SCREEN_HEIGHT_CENTER - 24, 9, 9);
@@ -345,7 +344,8 @@ bool totp_scene_generate_token_handle_event(
             totp_usb_type_code_worker_notify(
                 scene_state->usb_type_code_worker_context,
                 TotpUsbTypeCodeWorkerEventType,
-                plugin_state->config_file_context->token_info_iterator_context->current_token->automation_features);
+                plugin_state->config_file_context->token_info_iterator_context->current_token
+                    ->automation_features);
             notification_message(
                 plugin_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));
@@ -359,7 +359,8 @@ bool totp_scene_generate_token_handle_event(
             totp_bt_type_code_worker_notify(
                 plugin_state->bt_type_code_worker_context,
                 TotpBtTypeCodeWorkerEventType,
-                plugin_state->config_file_context->token_info_iterator_context->current_token->automation_features);
+                plugin_state->config_file_context->token_info_iterator_context->current_token
+                    ->automation_features);
             notification_message(
                 plugin_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));

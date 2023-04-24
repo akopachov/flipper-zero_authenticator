@@ -18,7 +18,9 @@ TokenInfoIteratorContext* totp_token_info_iterator_alloc(FlipperFormat* config_f
 
 bool totp_token_info_iterator_load_current_token_info(TokenInfoIteratorContext* context);
 
-bool totp_token_info_iterator_move_current_token_info(TokenInfoIteratorContext* context, size_t new_index);
+bool totp_token_info_iterator_move_current_token_info(
+    TokenInfoIteratorContext* context,
+    size_t new_index);
 
 bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIteratorContext* context);
 

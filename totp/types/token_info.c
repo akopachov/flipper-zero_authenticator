@@ -8,7 +8,7 @@
 TokenInfo* token_info_alloc() {
     TokenInfo* tokenInfo = malloc(sizeof(TokenInfo));
     furi_check(tokenInfo != NULL);
-    tokenInfo->name_n = furi_string_alloc();
+    tokenInfo->name = furi_string_alloc();
     token_info_set_defaults(tokenInfo);
     return tokenInfo;
 }
@@ -16,7 +16,7 @@ TokenInfo* token_info_alloc() {
 void token_info_free(TokenInfo* token_info) {
     if(token_info == NULL) return;
     free(token_info->token);
-    furi_string_free(token_info->name_n);
+    furi_string_free(token_info->name);
     free(token_info);
 }
 
@@ -50,10 +50,10 @@ bool token_info_set_secret(
 
     bool result;
     if(plain_secret_length > 0) {
-        if (token_info->token != NULL) {
+        if(token_info->token != NULL) {
             free(token_info->token);
         }
-        
+
         token_info->token =
             totp_crypto_encrypt(plain_secret, plain_secret_length, iv, &token_info->token_length);
         result = true;
@@ -166,8 +166,8 @@ TokenInfo* token_info_clone(const TokenInfo* src) {
     furi_check(clone->token != NULL);
     memcpy(clone->token, src->token, src->token_length);
 
-    clone->name_n = furi_string_alloc();
-    furi_string_set(clone->name_n, src->name_n);
+    clone->name = furi_string_alloc();
+    furi_string_set(clone->name, src->name);
 
     return clone;
 }
@@ -178,5 +178,5 @@ void token_info_set_defaults(TokenInfo* token_info) {
     token_info->digits = TOTP_6_DIGITS;
     token_info->duration = TOTP_TOKEN_DURATION_DEFAULT;
     token_info->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
-    furi_string_reset(token_info->name_n);
+    furi_string_reset(token_info->name);
 }

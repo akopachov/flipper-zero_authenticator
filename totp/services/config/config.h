@@ -40,16 +40,14 @@ bool totp_config_file_update_timezone_offset(const PluginState* plugin_state);
  * @param plugin_state application state
  * @return Config file update result
  */
-bool
-    totp_config_file_update_notification_method(const PluginState* plugin_state);
+bool totp_config_file_update_notification_method(const PluginState* plugin_state);
 
 /**
  * @brief Updates automation method in an application config file
  * @param plugin_state application state
  * @return Config file update result
  */
-bool
-    totp_config_file_update_automation_method(const PluginState* plugin_state);
+bool totp_config_file_update_automation_method(const PluginState* plugin_state);
 
 /**
  * @brief Updates application user settings
@@ -63,8 +61,7 @@ bool totp_config_file_update_user_settings(const PluginState* plugin_state);
  * @param plugin_state application state
  * @return Config file update result
  */
-bool
-    totp_config_file_update_crypto_signatures(const PluginState* plugin_state);
+bool totp_config_file_update_crypto_signatures(const PluginState* plugin_state);
 
 /**
  * @brief Reset all the settings to default
@@ -77,3 +74,15 @@ void totp_config_file_reset(PluginState* const plugin_state);
  * @param plugin_state application state
  */
 void totp_config_file_close(PluginState* const plugin_state);
+
+/**
+ * @brief Updates config file encryption by re-encrypting it using new user's PIN and new randomly generated IV
+ * @param plugin_state application state
+ * @param new_pin new user's PIN
+ * @param new_pin_length new user's PIN length
+ * @return \c true if config file encryption successfully updated; \c false otherwise
+ */
+bool totp_config_file_update_encryption(
+    PluginState* plugin_state,
+    const uint8_t* new_pin,
+    uint8_t new_pin_length);

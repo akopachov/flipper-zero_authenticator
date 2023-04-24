@@ -132,53 +132,16 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                 break;
             }
 
-            TOTP_CLI_PRINTF("Encrypting crypto signatures...\r\n");
+            TOTP_CLI_PRINTF("Encrypting...\r\n");
 
-            memset(&plugin_state->iv[0], 0, TOTP_IV_SIZE);
-            memset(&plugin_state->base_iv[0], 0, TOTP_IV_SIZE);
-            if(plugin_state->crypto_verify_data != NULL) {
-                free(plugin_state->crypto_verify_data);
-                plugin_state->crypto_verify_data = NULL;
-            }
-
-            if(!totp_crypto_seed_iv(
-                   plugin_state, new_pin_length > 0 ? &new_pin[0] : NULL, new_pin_length)) {
-                memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
-                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
-                break;
-            }
+            bool update_result =
+                totp_config_file_update_encryption(plugin_state, new_pin, new_pin_length);
 
             memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
 
             TOTP_CLI_DELETE_LAST_LINE();
 
-            bool update_successful = true;
-            TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
-            for (long i = iterator_context->total_count - 1; i >= 0 && update_successful; i--) {
-                TOTP_CLI_PRINTF("Encrypting token %" PRId32 " of %" PRIu16 "\r\n", iterator_context->total_count - i, iterator_context->total_count);
-                iterator_context->current_index = i;
-                if (totp_token_info_iterator_load_current_token_info(iterator_context)) {
-                    TokenInfo* token_info = iterator_context->current_token;
-                    size_t plain_token_length;
-                    uint8_t* plain_token = totp_crypto_decrypt(
-                        token_info->token, token_info->token_length, &old_iv[0], &plain_token_length);
-                    free(token_info->token);
-                    token_info->token = totp_crypto_encrypt(
-                        plain_token,
-                        plain_token_length,
-                        &plugin_state->iv[0],
-                        &token_info->token_length);
-                    memset_s(plain_token, plain_token_length, 0, plain_token_length);
-                    free(plain_token);
-                    update_successful = totp_token_info_iterator_save_current_token_info_changes(iterator_context);
-                } else {
-                    update_successful = false;
-                }
-
-                TOTP_CLI_DELETE_LAST_LINE();
-            }
-
-            if(update_successful && totp_config_file_update_crypto_signatures(plugin_state)) {
+            if(update_result) {
                 if(do_change) {
                     TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully changed\r\n");
                 } else if(do_remove) {

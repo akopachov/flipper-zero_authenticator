@@ -36,7 +36,8 @@ void totp_cli_command_update_docopt_options() {
 static bool
     totp_cli_try_read_name(TokenInfo* token_info, FuriString* arg, FuriString* args, bool* parsed) {
     if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_ARG_NAME_PREFIX) == 0) {
-        if(!args_read_probably_quoted_string_and_trim(args, token_info->name_n) || furi_string_empty(token_info->name_n)) {
+        if(!args_read_probably_quoted_string_and_trim(args, token_info->name) ||
+           furi_string_empty(token_info->name)) {
             totp_cli_printf_missed_argument_value(TOTP_CLI_COMMAND_ARG_NAME_PREFIX);
         } else {
             *parsed = true;
@@ -65,7 +66,8 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
 
     FuriString* temp_str = furi_string_alloc();
 
-    TokenInfoIteratorContext* iterator_context = plugin_state->config_file_context->token_info_iterator_context;
+    TokenInfoIteratorContext* iterator_context =
+        plugin_state->config_file_context->token_info_iterator_context;
 
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
@@ -140,7 +142,8 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
         if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
             TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINTF_SUCCESS(
-                "Token \"%s\" has been successfully updated\r\n", furi_string_get_cstr(token_info->name_n));
+                "Token \"%s\" has been successfully updated\r\n",
+                furi_string_get_cstr(token_info->name));
         } else {
             TOTP_CLI_DELETE_LAST_LINE();
             TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();

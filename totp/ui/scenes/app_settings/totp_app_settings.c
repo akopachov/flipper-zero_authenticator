@@ -42,8 +42,7 @@ typedef struct {
     Control selected_control;
 } SceneState;
 
-void totp_scene_app_settings_activate(
-    PluginState* plugin_state) {
+void totp_scene_app_settings_activate(PluginState* plugin_state) {
     SceneState* scene_state = malloc(sizeof(SceneState));
     furi_check(scene_state != NULL);
     plugin_state->current_scene_state = scene_state;
