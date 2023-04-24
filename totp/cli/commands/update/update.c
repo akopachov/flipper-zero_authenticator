@@ -72,7 +72,7 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
        (size_t)token_number > iterator_context->total_count) {
-        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+        totp_cli_print_invalid_arguments();
         return;
     }
 
@@ -102,7 +102,7 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
         }
 
         if(!parsed) {
-            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+            totp_cli_print_invalid_arguments();
             furi_string_free(temp_str);
             iterator_context->current_index = previous_index;
             totp_token_info_iterator_load_current_token_info(iterator_context);
@@ -116,7 +116,7 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
         furi_string_reset(temp_str);
         TOTP_CLI_PRINTF("Enter token secret and confirm with [ENTER]\r\n");
         token_secret_read = totp_cli_read_line(cli, temp_str, mask_user_input);
-        TOTP_CLI_DELETE_LAST_LINE();
+        totp_cli_delete_last_line();
         if(!token_secret_read) {
             TOTP_CLI_PRINTF_INFO("Cancelled by user\r\n");
         }
@@ -138,15 +138,15 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
     furi_string_secure_free(temp_str);
 
     if(!update_token_secret || (token_secret_read && token_secret_set)) {
-        TOTP_CLI_PRINT_PROCESSING();
+        totp_cli_print_processing();
         if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
-            TOTP_CLI_DELETE_LAST_LINE();
+            totp_cli_delete_last_line();
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully updated\r\n",
                 furi_string_get_cstr(token_info->name));
         } else {
-            TOTP_CLI_DELETE_LAST_LINE();
-            TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+            totp_cli_delete_last_line();
+            totp_cli_print_error_updating_config_file();
         }
     }
 

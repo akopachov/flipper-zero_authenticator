@@ -57,7 +57,7 @@ void totp_cli_command_details_handle(PluginState* plugin_state, FuriString* args
         plugin_state->config_file_context->token_info_iterator_context;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
        (size_t)token_number > iterator_context->total_count) {
-        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+        totp_cli_print_invalid_arguments();
         return;
     }
 
@@ -82,7 +82,7 @@ void totp_cli_command_details_handle(PluginState* plugin_state, FuriString* args
         print_automation_features(token_info);
         TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
     } else {
-        TOTP_CLI_PRINT_ERROR_LOADING_TOKEN_INFO();
+        totp_cli_print_error_loading_token_info();
     }
 
     iterator_context->current_index = original_token_index;

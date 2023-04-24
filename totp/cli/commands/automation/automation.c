@@ -31,7 +31,7 @@ void totp_cli_command_automation_docopt_arguments() {
         "\r\n");
 }
 
-static void totp_cli_command_automation_print_method(AutomationMethod method, char* color) {
+static void totp_cli_command_automation_print_method(AutomationMethod method, const char* color) {
 #ifdef TOTP_BADBT_TYPE_ENABLED
     bool has_previous_method = false;
 #endif
@@ -88,7 +88,7 @@ void totp_cli_command_automation_handle(PluginState* plugin_state, FuriString* a
 
     do {
         if(!args_valid) {
-            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+            totp_cli_print_invalid_arguments();
             break;
         }
 
@@ -101,7 +101,7 @@ void totp_cli_command_automation_handle(PluginState* plugin_state, FuriString* a
                 totp_cli_command_automation_print_method(new_method, TOTP_CLI_COLOR_SUCCESS);
                 cli_nl();
             } else {
-                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+                totp_cli_print_error_updating_config_file();
             }
 
 #ifdef TOTP_BADBT_TYPE_ENABLED

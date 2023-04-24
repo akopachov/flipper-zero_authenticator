@@ -88,7 +88,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
 
     // Reading token name
     if(!args_read_probably_quoted_string_and_trim(args, token_info->name)) {
-        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+        totp_cli_print_invalid_arguments();
         totp_token_info_iterator_load_current_token_info(iterator_context);
         TOTP_CLI_UNLOCK_UI(plugin_state);
         return;
@@ -112,7 +112,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         }
 
         if(!parsed) {
-            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+            totp_cli_print_invalid_arguments();
             furi_string_free(temp_str);
             totp_token_info_iterator_load_current_token_info(iterator_context);
             TOTP_CLI_UNLOCK_UI(plugin_state);
@@ -124,7 +124,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     furi_string_reset(temp_str);
     TOTP_CLI_PRINTF("Enter token secret and confirm with [ENTER]\r\n");
     if(!totp_cli_read_line(cli, temp_str, mask_user_input)) {
-        TOTP_CLI_DELETE_LAST_LINE();
+        totp_cli_delete_last_line();
         TOTP_CLI_PRINTF_INFO("Cancelled by user\r\n");
         furi_string_secure_free(temp_str);
         totp_token_info_iterator_load_current_token_info(iterator_context);
@@ -132,7 +132,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         return;
     }
 
-    TOTP_CLI_DELETE_LAST_LINE();
+    totp_cli_delete_last_line();
 
     bool secret_set = token_info_set_secret(
         token_info,
@@ -146,15 +146,15 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     if(secret_set) {
         size_t previous_index = iterator_context->current_index;
         iterator_context->current_index = iterator_context->total_count;
-        TOTP_CLI_PRINT_PROCESSING();
+        totp_cli_print_processing();
         if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
-            TOTP_CLI_DELETE_LAST_LINE();
+            totp_cli_delete_last_line();
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully added\r\n",
                 furi_string_get_cstr(token_info->name));
         } else {
-            TOTP_CLI_DELETE_LAST_LINE();
-            TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+            totp_cli_delete_last_line();
+            totp_cli_print_error_updating_config_file();
             iterator_context->current_index = previous_index;
         }
     } else {

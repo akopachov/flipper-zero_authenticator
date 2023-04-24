@@ -28,7 +28,8 @@ void totp_cli_command_notification_docopt_arguments() {
         ", " TOTP_CLI_COMMAND_NOTIFICATION_METHOD_VIBRO "\r\n");
 }
 
-static void totp_cli_command_notification_print_method(NotificationMethod method, char* color) {
+static void
+    totp_cli_command_notification_print_method(NotificationMethod method, const char* color) {
     bool has_previous_method = false;
     if(method & NotificationMethodSound) {
         TOTP_CLI_PRINTF_COLORFUL(color, "\"" TOTP_CLI_COMMAND_NOTIFICATION_METHOD_SOUND "\"");
@@ -73,7 +74,7 @@ void totp_cli_command_notification_handle(PluginState* plugin_state, FuriString*
 
     do {
         if(!args_valid) {
-            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+            totp_cli_print_invalid_arguments();
             break;
         }
 
@@ -86,7 +87,7 @@ void totp_cli_command_notification_handle(PluginState* plugin_state, FuriString*
                 totp_cli_command_notification_print_method(new_method, TOTP_CLI_COLOR_SUCCESS);
                 cli_nl();
             } else {
-                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+                totp_cli_print_error_updating_config_file();
             }
 
             TOTP_CLI_UNLOCK_UI(plugin_state);

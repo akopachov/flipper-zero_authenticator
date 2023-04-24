@@ -20,6 +20,8 @@
 #define TOTP_TOKEN_AUTOMATION_FEATURE_TAB_AT_THE_END_NAME "tab"
 #define TOTP_TOKEN_AUTOMATION_FEATURE_TYPE_SLOWER_NAME "slower"
 
+#define TOTP_TOKEN_DIGITS_MAX_COUNT (8)
+
 typedef uint8_t TokenHashAlgo;
 typedef uint8_t TokenDigitsCount;
 typedef uint8_t TokenAutomationFeature;
@@ -110,8 +112,6 @@ enum PlainTokenSecretEncodings {
      */
     PLAIN_TOKEN_ENCODING_BASE64 = 1
 };
-
-#define TOTP_TOKEN_DIGITS_MAX_COUNT (8)
 
 /**
  * @brief TOTP token information

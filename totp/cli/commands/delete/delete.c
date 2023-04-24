@@ -40,7 +40,7 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
        (size_t)token_number >
            plugin_state->config_file_context->token_info_iterator_context->total_count) {
-        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+        totp_cli_print_invalid_arguments();
         return;
     }
 
@@ -51,7 +51,7 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
             confirm_needed = false;
         } else {
             totp_cli_printf_unknown_argument(temp_str);
-            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
+            totp_cli_print_invalid_arguments();
             furi_string_free(temp_str);
             return;
         }
@@ -86,15 +86,15 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
     }
 
     if(confirmed) {
-        TOTP_CLI_PRINT_PROCESSING();
+        totp_cli_print_processing();
         if(totp_token_info_iterator_remove_current_token_info(iterator_context)) {
-            TOTP_CLI_DELETE_LAST_LINE();
+            totp_cli_delete_last_line();
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully deleted\r\n", token_info_name);
             iterator_context->current_index = 0;
         } else {
-            TOTP_CLI_DELETE_LAST_LINE();
-            TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+            totp_cli_delete_last_line();
+            totp_cli_print_error_updating_config_file();
             iterator_context->current_index = original_token_index;
         }
     } else {

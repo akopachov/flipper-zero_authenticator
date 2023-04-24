@@ -260,9 +260,7 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
 
             if(token_secret_set) {
                 furi_string_set_strn(
-                    tokenInfo->name,
-                    scene_state->token_name,
-                    scene_state->token_name_length + 1);
+                    tokenInfo->name, scene_state->token_name, scene_state->token_name_length + 1);
                 tokenInfo->algo = scene_state->algo;
                 tokenInfo->digits = TOKEN_DIGITS_VALUE_LIST[scene_state->digits_count_index];
                 tokenInfo->duration = scene_state->duration;

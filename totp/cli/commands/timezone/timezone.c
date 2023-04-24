@@ -38,7 +38,7 @@ void totp_cli_command_timezone_handle(PluginState* plugin_state, FuriString* arg
             if(totp_config_file_update_timezone_offset(plugin_state)) {
                 TOTP_CLI_PRINTF_SUCCESS("Timezone is set to %f\r\n", (double)tz);
             } else {
-                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
+                totp_cli_print_error_updating_config_file();
             }
             TOTP_CLI_UNLOCK_UI(plugin_state);
         } else {

@@ -4,8 +4,14 @@
 #include "token_info_iterator.h"
 
 typedef struct {
+    /**
+     * @brief Config file reference
+     */
     FlipperFormat* config_file;
 
+    /**
+     * @brief Storage reference
+     */
     Storage* storage;
 
     /**
