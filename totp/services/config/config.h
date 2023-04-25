@@ -4,6 +4,7 @@
 #include "../../types/token_info.h"
 #include "config_file_context.h"
 #include "constants.h"
+#include "token_info_iterator.h"
 
 typedef uint8_t TotpConfigFileOpenResult;
 typedef uint8_t TotpConfigFileUpdateResult;
@@ -86,3 +87,10 @@ bool totp_config_file_update_encryption(
     PluginState* plugin_state,
     const uint8_t* new_pin,
     uint8_t new_pin_length);
+
+/**
+ * @brief Gets token info iterator context
+ * @param plugin_state application state
+ * @return token info iterator context
+ */
+TokenInfoIteratorContext* totp_config_get_token_iterator_context(const PluginState* plugin_state);

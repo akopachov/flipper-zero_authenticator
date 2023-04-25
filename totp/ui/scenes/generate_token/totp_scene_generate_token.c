@@ -126,19 +126,20 @@ static const NotificationSequence*
     return (NotificationSequence*)scene_state->notification_sequence_automation;
 }
 
-static void update_totp_params(PluginState* const plugin_state) {
+static void update_totp_params(PluginState* const plugin_state, size_t token_index) {
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
-    if(totp_token_info_iterator_load_current_token_info(
-           plugin_state->config_file_context->token_info_iterator_context)) {
+    TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+    if(totp_token_info_iterator_go_to(iterator_context, token_index)) {
         totp_generate_code_worker_notify(
             scene_state->generate_code_worker_context, TotpGenerateCodeWorkerEventForceUpdate);
     }
 }
 
 static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin_state) {
-    SceneState* scene_state = plugin_state->current_scene_state;
+    const SceneState* scene_state = plugin_state->current_scene_state;
+    const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
     uint8_t code_length =
-        plugin_state->config_file_context->token_info_iterator_context->current_token->digits;
+        totp_token_info_iterator_get_current_token(iterator_context)->digits;
     uint8_t offset_x = scene_state->ui_precalculated_dimensions.code_offset_x;
     uint8_t char_width = modeNine_15ptFontInfo.charInfo[0].width;
     uint8_t offset_x_inc = scene_state->ui_precalculated_dimensions.code_offset_x_inc;
@@ -162,8 +163,9 @@ static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin
 static void on_new_token_code_generated(bool time_left, void* context) {
     const PluginState* plugin_state = context;
     SceneState* scene_state = plugin_state->current_scene_state;
-    TokenInfo* current_token =
-        plugin_state->config_file_context->token_info_iterator_context->current_token;
+    const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+    const TokenInfo* current_token = totp_token_info_iterator_get_current_token(iterator_context);
+
     uint8_t char_width = modeNine_15ptFontInfo.charInfo[0].width;
     scene_state->ui_precalculated_dimensions.code_total_length =
         current_token->digits * (char_width + modeNine_15ptFontInfo.spacePixels);
@@ -220,10 +222,10 @@ void totp_scene_generate_token_activate(PluginState* plugin_state) {
             scene_state->last_code_update_sync);
     }
 #endif
-
+    const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
     scene_state->generate_code_worker_context = totp_generate_code_worker_start(
         scene_state->last_code,
-        &plugin_state->config_file_context->token_info_iterator_context->current_token,
+        totp_token_info_iterator_get_current_token(iterator_context),
         scene_state->last_code_update_sync,
         plugin_state->timezone_offset,
         plugin_state->iv);
@@ -235,11 +237,13 @@ void totp_scene_generate_token_activate(PluginState* plugin_state) {
         scene_state->generate_code_worker_context,
         &on_code_lifetime_updated_generated,
         scene_state);
-    update_totp_params(plugin_state);
+
+    update_totp_params(plugin_state, totp_token_info_iterator_get_current_token_index(iterator_context));
 }
 
 void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_state) {
-    if(plugin_state->config_file_context->token_info_iterator_context->total_count == 0) {
+    const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+    if(totp_token_info_iterator_get_total_count(iterator_context) == 0) {
         canvas_draw_str_aligned(
             canvas,
             SCREEN_WIDTH_CENTER,
@@ -261,7 +265,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
 
     canvas_set_font(canvas, FontPrimary);
     const char* token_name_cstr = furi_string_get_cstr(
-        plugin_state->config_file_context->token_info_iterator_context->current_token->name);
+        totp_token_info_iterator_get_current_token(iterator_context)->name);
     uint16_t token_name_width = canvas_string_width(canvas, token_name_cstr);
     if(SCREEN_WIDTH - token_name_width > 18) {
         canvas_draw_str_aligned(
@@ -288,8 +292,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
         SCREEN_HEIGHT - PROGRESS_BAR_MARGIN - PROGRESS_BAR_HEIGHT,
         scene_state->ui_precalculated_dimensions.progress_bar_width,
         PROGRESS_BAR_HEIGHT);
-
-    if(plugin_state->config_file_context->token_info_iterator_context->total_count > 1) {
+    if(totp_token_info_iterator_get_total_count(iterator_context) > 1) {
         canvas_draw_icon(canvas, 0, SCREEN_HEIGHT_CENTER - 24, &I_totp_arrow_left_8x9);
         canvas_draw_icon(
             canvas, SCREEN_WIDTH - 9, SCREEN_HEIGHT_CENTER - 24, &I_totp_arrow_right_8x9);
@@ -313,7 +316,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
 #ifdef TOTP_BADBT_TYPE_ENABLED
     if(plugin_state->automation_method & AutomationMethodBadBt &&
        plugin_state->bt_type_code_worker_context != NULL &&
-       plugin_state->bt_type_code_worker_context->is_advertising) {
+       totp_bt_type_code_worker_is_advertising(plugin_state->bt_type_code_worker_context)) {
         canvas_draw_icon(
             canvas,
             SCREEN_WIDTH_CENTER +
@@ -341,11 +344,11 @@ bool totp_scene_generate_token_handle_event(
         if(event->input.key == InputKeyDown &&
            plugin_state->automation_method & AutomationMethodBadUsb) {
             scene_state = (SceneState*)plugin_state->current_scene_state;
+            const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
             totp_usb_type_code_worker_notify(
                 scene_state->usb_type_code_worker_context,
                 TotpUsbTypeCodeWorkerEventType,
-                plugin_state->config_file_context->token_info_iterator_context->current_token
-                    ->automation_features);
+                totp_token_info_iterator_get_current_token(iterator_context)->automation_features);
             notification_message(
                 plugin_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));
@@ -356,11 +359,11 @@ bool totp_scene_generate_token_handle_event(
             event->input.key == InputKeyUp &&
             plugin_state->automation_method & AutomationMethodBadBt) {
             scene_state = (SceneState*)plugin_state->current_scene_state;
+            const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
             totp_bt_type_code_worker_notify(
                 plugin_state->bt_type_code_worker_context,
                 TotpBtTypeCodeWorkerEventType,
-                plugin_state->config_file_context->token_info_iterator_context->current_token
-                    ->automation_features);
+                totp_token_info_iterator_get_current_token(iterator_context)->automation_features);
             notification_message(
                 plugin_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));
@@ -373,30 +376,37 @@ bool totp_scene_generate_token_handle_event(
         return true;
     }
 
-    scene_state = (SceneState*)plugin_state->current_scene_state;
     switch(event->input.key) {
     case InputKeyUp:
         break;
     case InputKeyDown:
         break;
-    case InputKeyRight:
+    case InputKeyRight: {
+        const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+        size_t current_token_index = totp_token_info_iterator_get_current_token_index(iterator_context);
         totp_roll_value_size_t(
-            &plugin_state->config_file_context->token_info_iterator_context->current_index,
+            &current_token_index,
             1,
             0,
-            plugin_state->config_file_context->token_info_iterator_context->total_count - 1,
+            totp_token_info_iterator_get_total_count(iterator_context) - 1,
             RollOverflowBehaviorRoll);
-        update_totp_params(plugin_state);
+
+        update_totp_params(plugin_state, current_token_index);
         break;
-    case InputKeyLeft:
+    }
+    case InputKeyLeft: {
+        const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+        size_t current_token_index = totp_token_info_iterator_get_current_token_index(iterator_context);
         totp_roll_value_size_t(
-            &plugin_state->config_file_context->token_info_iterator_context->current_index,
+            &current_token_index,
             -1,
             0,
-            plugin_state->config_file_context->token_info_iterator_context->total_count - 1,
+            totp_token_info_iterator_get_total_count(iterator_context) - 1,
             RollOverflowBehaviorRoll);
-        update_totp_params(plugin_state);
+
+        update_totp_params(plugin_state, current_token_index);
         break;
+    }
     case InputKeyOk:
         totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu);
         break;

@@ -29,7 +29,8 @@ void totp_scene_token_menu_activate(PluginState* plugin_state) {
 
 void totp_scene_token_menu_render(Canvas* const canvas, PluginState* plugin_state) {
     const SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
-    if(plugin_state->config_file_context->token_info_iterator_context->total_count == 0) {
+    const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+    if(totp_token_info_iterator_get_total_count(iterator_context) == 0) {
         ui_control_button_render(
             canvas,
             SCREEN_WIDTH_CENTER - 36,
@@ -85,22 +86,26 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
     }
 
     switch(event->input.key) {
-    case InputKeyUp:
+    case InputKeyUp: {
+        const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
         totp_roll_value_uint8_t(
             &scene_state->selected_control, -1, AddNewToken, AppSettings, RollOverflowBehaviorRoll);
         if(scene_state->selected_control == DeleteToken &&
-           plugin_state->config_file_context->token_info_iterator_context->total_count == 0) {
+            totp_token_info_iterator_get_total_count(iterator_context) == 0) {
             scene_state->selected_control--;
         }
         break;
-    case InputKeyDown:
+    }
+    case InputKeyDown: {
+        const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
         totp_roll_value_uint8_t(
             &scene_state->selected_control, 1, AddNewToken, AppSettings, RollOverflowBehaviorRoll);
         if(scene_state->selected_control == DeleteToken &&
-           plugin_state->config_file_context->token_info_iterator_context->total_count == 0) {
+           totp_token_info_iterator_get_total_count(iterator_context) == 0) {
             scene_state->selected_control++;
         }
         break;
+    }
     case InputKeyRight:
         break;
     case InputKeyLeft:
@@ -125,10 +130,10 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
             DialogMessageButton dialog_result =
                 dialog_message_show(plugin_state->dialogs_app, message);
             dialog_message_free(message);
+            TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
             if(dialog_result == DialogMessageButtonRight &&
-               plugin_state->config_file_context->token_info_iterator_context->total_count > 0) {
-                if(!totp_token_info_iterator_remove_current_token_info(
-                       plugin_state->config_file_context->token_info_iterator_context)) {
+               totp_token_info_iterator_get_total_count(iterator_context) > 0) {
+                if(!totp_token_info_iterator_remove_current_token_info(iterator_context)) {
                     totp_dialogs_config_updating_error(plugin_state);
                     return false;
                 }

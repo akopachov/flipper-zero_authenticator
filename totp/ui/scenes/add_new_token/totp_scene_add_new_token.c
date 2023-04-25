@@ -41,6 +41,15 @@ typedef struct {
     FuriString* duration_text;
 } SceneState;
 
+struct TotpAddContext {
+    SceneState* scene_state;
+    uint8_t* iv;
+};
+
+enum TotpIteratorUpdateTokenResultsEx {
+    TotpIteratorUpdateTokenResultInvalidSecret = 1
+};
+
 static void on_token_name_user_comitted(InputTextSceneCallbackResult* result) {
     SceneState* scene_state = result->callback_data;
     free(scene_state->token_name);
@@ -61,6 +70,25 @@ static void on_token_secret_user_comitted(InputTextSceneCallbackResult* result) 
 
 static void update_duration_text(SceneState* scene_state) {
     furi_string_printf(scene_state->duration_text, "%d sec.", scene_state->duration);
+}
+
+static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* tokenInfo, void* context) {
+    struct TotpAddContext* context_t = context;
+    if (!token_info_set_secret(
+        tokenInfo,
+        context_t->scene_state->token_secret,
+        context_t->scene_state->token_secret_length,
+        PLAIN_TOKEN_ENCODING_BASE32,
+        context_t->iv)) {
+        return TotpIteratorUpdateTokenResultInvalidSecret;
+    }
+
+    furi_string_set_strn(tokenInfo->name, context_t->scene_state->token_name, context_t->scene_state->token_name_length + 1);
+    tokenInfo->algo = context_t->scene_state->algo;
+    tokenInfo->digits = TOKEN_DIGITS_VALUE_LIST[context_t->scene_state->digits_count_index];
+    tokenInfo->duration = context_t->scene_state->duration;
+
+    return TotpIteratorUpdateTokenResultSuccess;
 }
 
 void totp_scene_add_new_token_activate(PluginState* plugin_state) {
@@ -249,41 +277,16 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
         case TokenDurationSelect:
             break;
         case ConfirmButton: {
-            TokenInfo* tokenInfo =
-                plugin_state->config_file_context->token_info_iterator_context->current_token;
-            bool token_secret_set = token_info_set_secret(
-                tokenInfo,
-                scene_state->token_secret,
-                scene_state->token_secret_length,
-                PLAIN_TOKEN_ENCODING_BASE32,
-                &plugin_state->iv[0]);
+            struct TotpAddContext add_context = { .iv = plugin_state->iv, .scene_state = scene_state };
+            TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+            TotpIteratorUpdateTokenResult add_result = totp_token_info_iterator_add_new_token(
+                iterator_context,
+                &add_token_handler,
+                &add_context);
 
-            if(token_secret_set) {
-                furi_string_set_strn(
-                    tokenInfo->name, scene_state->token_name, scene_state->token_name_length + 1);
-                tokenInfo->algo = scene_state->algo;
-                tokenInfo->digits = TOKEN_DIGITS_VALUE_LIST[scene_state->digits_count_index];
-                tokenInfo->duration = scene_state->duration;
-
-                size_t previous_token_index =
-                    plugin_state->config_file_context->token_info_iterator_context->current_index;
-                plugin_state->config_file_context->token_info_iterator_context->current_index =
-                    plugin_state->config_file_context->token_info_iterator_context->total_count;
-
-                if(!totp_token_info_iterator_save_current_token_info_changes(
-                       plugin_state->config_file_context->token_info_iterator_context)) {
-                    plugin_state->config_file_context->token_info_iterator_context->current_index =
-                        previous_token_index;
-                    totp_token_info_iterator_load_current_token_info(
-                        plugin_state->config_file_context->token_info_iterator_context);
-                    totp_dialogs_config_updating_error(plugin_state);
-                    return false;
-                }
-
+            if (add_result == TotpIteratorUpdateTokenResultSuccess) {
                 totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
-            } else {
-                totp_token_info_iterator_load_current_token_info(
-                    plugin_state->config_file_context->token_info_iterator_context);
+            } else if (add_result == TotpIteratorUpdateTokenResultInvalidSecret) {
                 DialogMessage* message = dialog_message_alloc();
                 dialog_message_set_buttons(message, "Back", NULL, NULL);
                 dialog_message_set_text(
@@ -297,7 +300,10 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
                 dialog_message_free(message);
                 scene_state->selected_control = TokenSecretTextBox;
                 update_screen_y_offset(scene_state);
+            } else if (add_result == TotpIteratorUpdateTokenResultFileUpdateFailed) {
+                totp_dialogs_config_updating_error(plugin_state);
             }
+
             break;
         }
         default:

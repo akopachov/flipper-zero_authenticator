@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "../../../types/token_info.h"
 #include "../../../services/config/constants.h"
+#include "../../../services/config/config.h"
 #include "../../../ui/scene_director.h"
 #include "../../cli_helpers.h"
 
@@ -20,24 +21,23 @@ void totp_cli_command_list_handle(PluginState* plugin_state, Cli* cli) {
         return;
     }
 
-    TokenInfoIteratorContext* iterator_context =
-        plugin_state->config_file_context->token_info_iterator_context;
-    if(iterator_context->total_count <= 0) {
+    TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+    size_t total_count = totp_token_info_iterator_get_total_count(iterator_context);
+    if(total_count <= 0) {
         TOTP_CLI_PRINTF("There are no tokens");
         return;
     }
 
     TOTP_CLI_LOCK_UI(plugin_state);
 
-    size_t original_index = iterator_context->current_index;
+    size_t original_index = totp_token_info_iterator_get_current_token_index(iterator_context);
 
     TOTP_CLI_PRINTF("+-----+---------------------------+--------+----+-----+\r\n");
     TOTP_CLI_PRINTF("| %-3s | %-25s | %-6s | %-s | %-s |\r\n", "#", "Name", "Algo", "Ln", "Dur");
     TOTP_CLI_PRINTF("+-----+---------------------------+--------+----+-----+\r\n");
-    for(size_t i = 0; i < iterator_context->total_count; i++) {
-        iterator_context->current_index = i;
-        totp_token_info_iterator_load_current_token_info(iterator_context);
-        TokenInfo* token_info = iterator_context->current_token;
+    for(size_t i = 0; i < total_count; i++) {
+        totp_token_info_iterator_go_to(iterator_context, i);
+        const TokenInfo* token_info = totp_token_info_iterator_get_current_token(iterator_context);
         TOTP_CLI_PRINTF(
             "| %-3" PRIu16 " | %-25.25s | %-6s | %-2" PRIu8 " | %-3" PRIu8 " |\r\n",
             i + 1,
@@ -49,8 +49,7 @@ void totp_cli_command_list_handle(PluginState* plugin_state, Cli* cli) {
 
     TOTP_CLI_PRINTF("+-----+---------------------------+--------+----+-----+\r\n");
 
-    iterator_context->current_index = original_index;
-    totp_token_info_iterator_load_current_token_info(iterator_context);
+    totp_token_info_iterator_go_to(iterator_context, original_index);
 
     TOTP_CLI_UNLOCK_UI(plugin_state);
 }

@@ -36,10 +36,12 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
         return;
     }
 
+    TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
        (size_t)token_number >
-           plugin_state->config_file_context->token_info_iterator_context->total_count) {
+            totp_token_info_iterator_get_total_count(iterator_context)) {
         totp_cli_print_invalid_arguments();
         return;
     }
@@ -60,12 +62,9 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
 
     TOTP_CLI_LOCK_UI(plugin_state);
 
-    TokenInfoIteratorContext* iterator_context =
-        plugin_state->config_file_context->token_info_iterator_context;
-    size_t original_token_index = iterator_context->current_index;
-    iterator_context->current_index = token_number - 1;
-    totp_token_info_iterator_load_current_token_info(iterator_context);
-    TokenInfo* token_info = iterator_context->current_token;
+    size_t original_token_index = totp_token_info_iterator_get_current_token_index(iterator_context);
+    totp_token_info_iterator_go_to(iterator_context, token_number - 1);
+    const TokenInfo* token_info = totp_token_info_iterator_get_current_token(iterator_context);
     const char* token_info_name = furi_string_get_cstr(token_info->name);
 
     bool confirmed = !confirm_needed;
@@ -91,17 +90,16 @@ void totp_cli_command_delete_handle(PluginState* plugin_state, FuriString* args,
             totp_cli_delete_last_line();
             TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully deleted\r\n", token_info_name);
-            iterator_context->current_index = 0;
+            totp_token_info_iterator_go_to(iterator_context, 0);
         } else {
             totp_cli_delete_last_line();
             totp_cli_print_error_updating_config_file();
-            iterator_context->current_index = original_token_index;
+            totp_token_info_iterator_go_to(iterator_context, original_token_index);
         }
     } else {
         TOTP_CLI_PRINTF_INFO("User has not confirmed\r\n");
-        iterator_context->current_index = original_token_index;
+        totp_token_info_iterator_go_to(iterator_context, original_token_index);
     }
 
-    totp_token_info_iterator_load_current_token_info(iterator_context);
     TOTP_CLI_UNLOCK_UI(plugin_state);
 }

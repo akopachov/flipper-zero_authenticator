@@ -8,6 +8,72 @@
 #include "../../../ui/scene_director.h"
 #include "../../common_command_arguments.h"
 
+struct TotpAddContext {
+    FuriString* args;
+    Cli* cli;
+    uint8_t* iv;
+};
+
+enum TotpIteratorUpdateTokenResultsEx {
+    TotpIteratorUpdateTokenResultInvalidSecret = 1,
+    TotpIteratorUpdateTokenResultCancelled = 2,
+    TotpIteratorUpdateTokenResultInvalidArguments = 3
+};
+
+static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* token_info, void* context) {
+    struct TotpAddContext* context_t = context;
+
+    // Reading token name
+    if(!args_read_probably_quoted_string_and_trim(context_t->args, token_info->name)) {
+        return TotpIteratorUpdateTokenResultInvalidArguments;
+    }
+
+    FuriString* temp_str = furi_string_alloc();
+
+    // Read optional arguments
+    bool mask_user_input = true;
+    PlainTokenSecretEncoding token_secret_encoding = PLAIN_TOKEN_ENCODING_BASE32;
+    while(args_read_string_and_trim(context_t->args, temp_str)) {
+        bool parsed = false;
+        if(!totp_cli_try_read_algo(token_info, temp_str, context_t->args, &parsed) &&
+           !totp_cli_try_read_digits(token_info, temp_str, context_t->args, &parsed) &&
+           !totp_cli_try_read_duration(token_info, temp_str, context_t->args, &parsed) &&
+           !totp_cli_try_read_unsecure_flag(temp_str, &parsed, &mask_user_input) &&
+           !totp_cli_try_read_automation_features(token_info, temp_str, context_t->args, &parsed) &&
+           !totp_cli_try_read_plain_token_secret_encoding(
+               temp_str, context_t->args, &parsed, &token_secret_encoding)) {
+            totp_cli_printf_unknown_argument(temp_str);
+        }
+
+        if(!parsed) {
+            furi_string_free(temp_str);
+            return TotpIteratorUpdateTokenResultInvalidArguments;
+        }
+    }
+
+    // Reading token secret
+    furi_string_reset(temp_str);
+    TOTP_CLI_PRINTF("Enter token secret and confirm with [ENTER]\r\n");
+    if(!totp_cli_read_line(context_t->cli, temp_str, mask_user_input)) {
+        totp_cli_delete_last_line();
+        furi_string_secure_free(temp_str);
+        return TotpIteratorUpdateTokenResultCancelled;
+    }
+
+    totp_cli_delete_last_line();
+
+    bool secret_set = token_info_set_secret(
+        token_info,
+        furi_string_get_cstr(temp_str),
+        furi_string_size(temp_str),
+        token_secret_encoding,
+        context_t->iv);
+
+    furi_string_secure_free(temp_str);
+
+    return secret_set ? TotpIteratorUpdateTokenResultSuccess : TotpIteratorUpdateTokenResultInvalidSecret;
+}
+
 void totp_cli_command_add_docopt_commands() {
     TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_ADD ", " TOTP_CLI_COMMAND_ADD_ALT
                     ", " TOTP_CLI_COMMAND_ADD_ALT2 "     Add new token\r\n");
@@ -78,89 +144,26 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
         return;
     }
 
-    TokenInfoIteratorContext* iterator_context =
-        plugin_state->config_file_context->token_info_iterator_context;
-    TokenInfo* token_info = iterator_context->current_token;
+    TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
 
     TOTP_CLI_LOCK_UI(plugin_state);
 
-    token_info_set_defaults(token_info);
+    struct TotpAddContext add_context = { .args = args, .cli = cli, .iv = &plugin_state->iv[0] };
+    TotpIteratorUpdateTokenResult add_result = totp_token_info_iterator_add_new_token(iterator_context, &add_token_handler, &add_context);
 
-    // Reading token name
-    if(!args_read_probably_quoted_string_and_trim(args, token_info->name)) {
-        totp_cli_print_invalid_arguments();
-        totp_token_info_iterator_load_current_token_info(iterator_context);
-        TOTP_CLI_UNLOCK_UI(plugin_state);
-        return;
-    }
-
-    FuriString* temp_str = furi_string_alloc();
-
-    // Read optional arguments
-    bool mask_user_input = true;
-    PlainTokenSecretEncoding token_secret_encoding = PLAIN_TOKEN_ENCODING_BASE32;
-    while(args_read_string_and_trim(args, temp_str)) {
-        bool parsed = false;
-        if(!totp_cli_try_read_algo(token_info, temp_str, args, &parsed) &&
-           !totp_cli_try_read_digits(token_info, temp_str, args, &parsed) &&
-           !totp_cli_try_read_duration(token_info, temp_str, args, &parsed) &&
-           !totp_cli_try_read_unsecure_flag(temp_str, &parsed, &mask_user_input) &&
-           !totp_cli_try_read_automation_features(token_info, temp_str, args, &parsed) &&
-           !totp_cli_try_read_plain_token_secret_encoding(
-               temp_str, args, &parsed, &token_secret_encoding)) {
-            totp_cli_printf_unknown_argument(temp_str);
-        }
-
-        if(!parsed) {
-            totp_cli_print_invalid_arguments();
-            furi_string_free(temp_str);
-            totp_token_info_iterator_load_current_token_info(iterator_context);
-            TOTP_CLI_UNLOCK_UI(plugin_state);
-            return;
-        }
-    }
-
-    // Reading token secret
-    furi_string_reset(temp_str);
-    TOTP_CLI_PRINTF("Enter token secret and confirm with [ENTER]\r\n");
-    if(!totp_cli_read_line(cli, temp_str, mask_user_input)) {
-        totp_cli_delete_last_line();
-        TOTP_CLI_PRINTF_INFO("Cancelled by user\r\n");
-        furi_string_secure_free(temp_str);
-        totp_token_info_iterator_load_current_token_info(iterator_context);
-        TOTP_CLI_UNLOCK_UI(plugin_state);
-        return;
-    }
-
-    totp_cli_delete_last_line();
-
-    bool secret_set = token_info_set_secret(
-        token_info,
-        furi_string_get_cstr(temp_str),
-        furi_string_size(temp_str),
-        token_secret_encoding,
-        plugin_state->iv);
-
-    furi_string_secure_free(temp_str);
-
-    if(secret_set) {
-        size_t previous_index = iterator_context->current_index;
-        iterator_context->current_index = iterator_context->total_count;
-        totp_cli_print_processing();
-        if(totp_token_info_iterator_save_current_token_info_changes(iterator_context)) {
-            totp_cli_delete_last_line();
-            TOTP_CLI_PRINTF_SUCCESS(
+    if(add_result == TotpIteratorUpdateTokenResultSuccess) {
+        TOTP_CLI_PRINTF_SUCCESS(
                 "Token \"%s\" has been successfully added\r\n",
-                furi_string_get_cstr(token_info->name));
-        } else {
-            totp_cli_delete_last_line();
-            totp_cli_print_error_updating_config_file();
-            iterator_context->current_index = previous_index;
-        }
-    } else {
+                furi_string_get_cstr(totp_token_info_iterator_get_current_token(iterator_context)->name));
+    } else if (add_result == TotpIteratorUpdateTokenResultCancelled) {
+        TOTP_CLI_PRINTF_INFO("Cancelled by user\r\n");
+    } else if (add_result == TotpIteratorUpdateTokenResultInvalidArguments) {
+        totp_cli_print_invalid_arguments();
+    } else if (add_result == TotpIteratorUpdateTokenResultInvalidSecret) {
         TOTP_CLI_PRINTF_ERROR("Token secret seems to be invalid and can not be parsed\r\n");
+    } else if (add_result == TotpIteratorUpdateTokenResultFileUpdateFailed) {
+        totp_cli_print_error_updating_config_file();
     }
 
-    totp_token_info_iterator_load_current_token_info(iterator_context);
     TOTP_CLI_UNLOCK_UI(plugin_state);
 }

@@ -26,6 +26,23 @@
 #define BACKUP_FILE_LIFETIME_DAYS (7)
 #define BACKUP_FILE_LIFETIME (BACKUP_FILE_LIFETIME_DAYS * 86400)
 
+struct ConfigFileContext {
+    /**
+     * @brief Config file reference
+     */
+    FlipperFormat* config_file;
+
+    /**
+     * @brief Storage reference
+     */
+    Storage* storage;
+
+    /**
+     * @brief Token list iterator context 
+     */
+    TokenInfoIteratorContext* token_info_iterator_context;
+};
+
 /**
  * @brief Opens storage record
  * @return Storage record
@@ -57,10 +74,9 @@ static void totp_close_config_file(FlipperFormat* file) {
  * @return backup path if backup successfully taken; \c NULL otherwise
  */
 static char* totp_config_file_backup_i(Storage* storage) {
-    if(!storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
-        if(!storage_simply_mkdir(storage, CONFIG_FILE_BACKUP_DIR)) {
-            return NULL;
-        }
+    if(!storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR) &&
+        !storage_simply_mkdir(storage, CONFIG_FILE_BACKUP_DIR)) {
+        return NULL;
     }
 
     FuriHalRtcDateTime current_datetime;
@@ -190,8 +206,10 @@ char* totp_config_file_backup(const PluginState* plugin_state) {
     totp_open_config_file(
         plugin_state->config_file_context->storage,
         &plugin_state->config_file_context->config_file);
-    plugin_state->config_file_context->token_info_iterator_context->config_file =
-        plugin_state->config_file_context->config_file;
+
+    totp_token_info_iterator_attach_to_config_file(
+        plugin_state->config_file_context->token_info_iterator_context,
+        plugin_state->config_file_context->config_file);
 
     return result;
 }
@@ -515,7 +533,7 @@ bool totp_config_file_update_encryption(
     const uint8_t* new_pin,
     uint8_t new_pin_length) {
     FlipperFormat* config_file =
-        plugin_state->config_file_context->token_info_iterator_context->config_file;
+        plugin_state->config_file_context->config_file;
     Stream* stream = flipper_format_get_raw_stream(config_file);
     size_t original_offset = stream_tell(stream);
     if(!stream_rewind(stream)) {
@@ -556,12 +574,12 @@ bool totp_config_file_update_encryption(
             break;
         }
 
-        if(!stream_seek(stream, -buffer_read_size, StreamOffsetFromCurrent)) {
+        if(!stream_seek(stream, -(int32_t)buffer_read_size, StreamOffsetFromCurrent)) {
             result = false;
             break;
         }
 
-        if(strncmp(buffer, ("\n" TOTP_CONFIG_KEY_TOKEN_SECRET ":"), sizeof(buffer)) == 0) {
+        if(strncmp(buffer, "\n" TOTP_CONFIG_KEY_TOKEN_SECRET ":", sizeof(buffer)) == 0) {
             uint32_t secret_bytes_count;
             if(!flipper_format_get_value_count(
                    config_file, TOTP_CONFIG_KEY_TOKEN_SECRET, &secret_bytes_count)) {
@@ -619,4 +637,8 @@ bool totp_config_file_update_encryption(
     stream_seek(stream, original_offset, StreamOffsetFromStart);
 
     return result;
+}
+
+TokenInfoIteratorContext* totp_config_get_token_iterator_context(const PluginState* plugin_state) {
+    return plugin_state->config_file_context->token_info_iterator_context;
 }
