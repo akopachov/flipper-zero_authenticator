@@ -71,7 +71,11 @@ static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* token_info, vo
 
     furi_string_secure_free(temp_str);
 
-    return secret_set ? TotpIteratorUpdateTokenResultSuccess : TotpIteratorUpdateTokenResultInvalidSecret;
+    if (!secret_set) {
+        return TotpIteratorUpdateTokenResultInvalidSecret;
+    }
+
+    return TotpIteratorUpdateTokenResultSuccess;
 }
 
 void totp_cli_command_add_docopt_commands() {

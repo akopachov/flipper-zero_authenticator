@@ -3,10 +3,8 @@
 #include <string.h>
 #include <flipper_format/flipper_format.h>
 #include <furi_hal_rtc.h>
-#include <toolbox/dir_walk.h>
 #include <flipper_format/flipper_format_i.h>
 #include <flipper_format/flipper_format_stream.h>
-#include <toolbox/stream/string_stream.h>
 #include <memset_s.h>
 #include "../../types/common.h"
 #include "../../types/token_info.h"
@@ -20,10 +18,6 @@
 #define CONFIG_FILE_TEMP_PATH CONFIG_FILE_PATH ".tmp"
 #define CONFIG_FILE_ORIG_PATH CONFIG_FILE_PATH ".orig"
 #define CONFIG_FILE_PATH_PREVIOUS EXT_PATH("apps/Misc") "/totp.conf"
-
-// Backup file lifetime is 7 days
-#define BACKUP_FILE_LIFETIME_DAYS (7)
-#define BACKUP_FILE_LIFETIME (BACKUP_FILE_LIFETIME_DAYS * 86400)
 
 struct ConfigFileContext {
     /**
@@ -197,7 +191,6 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
 char* totp_config_file_backup(const PluginState* plugin_state) {
     if(plugin_state->config_file_context == NULL) return NULL;
 
-    totp_config_file_drop_old_backups(plugin_state);
     totp_close_config_file(plugin_state->config_file_context->config_file);
 
     char* result = totp_config_file_backup_i(plugin_state->config_file_context->storage);
@@ -211,39 +204,6 @@ char* totp_config_file_backup(const PluginState* plugin_state) {
         plugin_state->config_file_context->config_file);
 
     return result;
-}
-
-void totp_config_file_drop_old_backups(const PluginState* plugin_state) {
-    Storage* storage = plugin_state->config_file_context->storage;
-
-    if(storage_dir_exists(storage, CONFIG_FILE_BACKUP_DIR)) {
-        uint32_t current_timestamp = furi_hal_rtc_get_timestamp();
-
-        DirWalk* dir_walk = dir_walk_alloc(storage);
-        if(dir_walk_open(dir_walk, CONFIG_FILE_BACKUP_DIR)) {
-            FileInfo fileinfo;
-            FuriString* filePath = furi_string_alloc();
-            while(dir_walk_read(dir_walk, filePath, &fileinfo) == DirWalkOK) {
-                uint32_t file_ts;
-                if(storage_common_timestamp(storage, furi_string_get_cstr(filePath), &file_ts) ==
-                       FSE_OK &&
-                   current_timestamp - file_ts >= BACKUP_FILE_LIFETIME &&
-                   furi_string_search_str(filePath, "totp.conf") != FURI_STRING_FAILURE) {
-                    storage_common_remove(storage, furi_string_get_cstr(filePath));
-                    FURI_LOG_I(
-                        LOGGING_TAG,
-                        "Backup file %s dropped because it is older than %d days",
-                        furi_string_get_cstr(filePath),
-                        BACKUP_FILE_LIFETIME_DAYS);
-                }
-            }
-
-            furi_string_free(filePath);
-            dir_walk_close(dir_walk);
-        }
-
-        dir_walk_free(dir_walk);
-    }
 }
 
 bool totp_config_file_update_timezone_offset(const PluginState* plugin_state) {
