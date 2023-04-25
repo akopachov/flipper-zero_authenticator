@@ -14,7 +14,6 @@
 #include "../crypto/crypto.h"
 #include "migrations/common_migration.h"
 
-#define CONFIG_FILE_DIRECTORY_PATH EXT_PATH("authenticator")
 #define CONFIG_FILE_PATH CONFIG_FILE_DIRECTORY_PATH "/totp.conf"
 #define CONFIG_FILE_BACKUP_DIR CONFIG_FILE_DIRECTORY_PATH "/backups"
 #define CONFIG_FILE_BACKUP_BASE_PATH CONFIG_FILE_BACKUP_DIR "/totp.conf"
@@ -475,7 +474,9 @@ bool totp_config_file_load(PluginState* const plugin_state) {
         plugin_state->config_file_context->config_file = fff_data_file;
         plugin_state->config_file_context->token_info_iterator_context =
             totp_token_info_iterator_alloc(
-                plugin_state->config_file_context->config_file, plugin_state->iv);
+                storage,
+                plugin_state->config_file_context->config_file, 
+                plugin_state->iv);
         result = true;
     } while(false);
 

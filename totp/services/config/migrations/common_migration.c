@@ -1,6 +1,7 @@
 #include "common_migration.h"
 #include "../constants.h"
 #include "../../../types/token_info.h"
+#include <flipper_format/flipper_format_i.h>
 
 bool totp_config_migrate_to_latest(
     FlipperFormat* fff_data_file,
@@ -126,6 +127,13 @@ bool totp_config_migrate_to_latest(
                     &default_automation_features,
                     1);
             }
+        }
+
+        Stream* stream = flipper_format_get_raw_stream(fff_data_file);
+        size_t current_pos = stream_tell(stream);
+        size_t total_size = stream_size(stream);
+        if (current_pos < total_size) {
+            stream_delete(stream, total_size - current_pos);
         }
 
         result = true;

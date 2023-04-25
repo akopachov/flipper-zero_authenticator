@@ -17,7 +17,7 @@ typedef TotpIteratorUpdateTokenResult (*TOTP_ITERATOR_UPDATE_TOKEN_ACTION)(
 
 typedef struct TokenInfoIteratorContext TokenInfoIteratorContext;
 
-TokenInfoIteratorContext* totp_token_info_iterator_alloc(FlipperFormat* config_file, uint8_t* iv);
+TokenInfoIteratorContext* totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv);
 
 bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t token_index);
 

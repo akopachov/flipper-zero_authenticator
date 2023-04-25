@@ -2,8 +2,11 @@
 
 #include <flipper_format/flipper_format_i.h>
 #include <flipper_format/flipper_format_stream.h>
-#include <toolbox/stream/string_stream.h>
+#include <toolbox/stream/file_stream.h>
 #include "../../types/common.h"
+
+#define CONFIG_FILE_PART_FILE_PATH CONFIG_FILE_DIRECTORY_PATH "/totp.conf.part"
+#define STREAM_COPY_BUFFER_SIZE 128
 
 struct TokenInfoIteratorContext {
     size_t total_count;
@@ -13,6 +16,7 @@ struct TokenInfoIteratorContext {
     TokenInfo* current_token;
     FlipperFormat* config_file;
     uint8_t* iv;
+    Storage* storage;
 };
 
 static bool
@@ -95,7 +99,7 @@ static bool seek_to_token(size_t token_index, TokenInfoIteratorContext* context)
 }
 
 static bool stream_insert_stream(Stream* dst, Stream* src) {
-    uint8_t buffer[8];
+    uint8_t buffer[STREAM_COPY_BUFFER_SIZE];
     size_t buffer_read_size;
     while((buffer_read_size = stream_read(src, buffer, sizeof(buffer))) != 0) {
         if(!stream_insert(dst, buffer, buffer_read_size)) {
@@ -132,7 +136,11 @@ static bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIt
         return false;
     }
 
-    FlipperFormat* temp_ff = flipper_format_string_alloc();
+    FlipperFormat* temp_ff = flipper_format_file_alloc(context->storage);
+    if (!flipper_format_file_open_always(temp_ff, CONFIG_FILE_PART_FILE_PATH)) {
+        flipper_format_free(temp_ff);
+        return false;
+    }
 
     TokenInfo* token_info = context->current_token;
     bool result = false;
@@ -201,6 +209,7 @@ static bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIt
     } while(false);
 
     flipper_format_free(temp_ff);
+    storage_common_remove(context->storage, CONFIG_FILE_PART_FILE_PATH);
 
     stream_seek(stream, offset_start, StreamOffsetFromStart);
     context->last_seek_offset = offset_start;
@@ -209,7 +218,7 @@ static bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIt
     return result;
 }
 
-TokenInfoIteratorContext* totp_token_info_iterator_alloc(FlipperFormat* config_file, uint8_t* iv) {
+TokenInfoIteratorContext* totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv) {
     Stream* stream = flipper_format_get_raw_stream(config_file);
     stream_rewind(stream);
     size_t tokens_count = 0;
@@ -228,6 +237,7 @@ TokenInfoIteratorContext* totp_token_info_iterator_alloc(FlipperFormat* config_f
     context->current_token = token_info_alloc();
     context->config_file = config_file;
     context->iv = iv;
+    context->storage = storage;
     return context;
 }
 
@@ -286,7 +296,12 @@ bool totp_token_info_iterator_move_current_token_info(
         return false;
     }
 
-    Stream* temp_stream = string_stream_alloc();
+    
+    Stream* temp_stream = file_stream_alloc(context->storage);
+    if (!file_stream_open(temp_stream, CONFIG_FILE_PART_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
+        stream_free(temp_stream);
+        return false;
+    }
 
     size_t moving_size = end_offset - begin_offset;
 
@@ -296,7 +311,7 @@ bool totp_token_info_iterator_move_current_token_info(
             break;
         }
 
-        if(!stream_copy(stream, temp_stream, moving_size)) {
+        if(stream_copy(stream, temp_stream, moving_size) < moving_size) {
             break;
         }
 
@@ -326,6 +341,8 @@ bool totp_token_info_iterator_move_current_token_info(
     } while(false);
 
     stream_free(temp_stream);
+    storage_common_remove(context->storage, CONFIG_FILE_PART_FILE_PATH);
+
     context->last_seek_offset = 0;
     context->last_seek_index = 0;
 
