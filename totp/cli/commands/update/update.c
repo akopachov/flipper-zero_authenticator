@@ -48,8 +48,8 @@ static bool totp_cli_try_read_change_secret_flag(const FuriString* arg, bool* pa
     return false;
 }
 
-static TotpIteratorUpdateTokenResult update_token_handler(TokenInfo* token_info, void* context) {
-    struct TotpUpdateContext* context_t = context;
+static TotpIteratorUpdateTokenResult update_token_handler(TokenInfo* token_info, const void* context) {
+    const struct TotpUpdateContext* context_t = context;
 
     // Read optional arguments
     FuriString* temp_str = furi_string_alloc();

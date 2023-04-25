@@ -13,7 +13,7 @@ enum TotpIteratorUpdateTokenResults {
 
 typedef TotpIteratorUpdateTokenResult (*TOTP_ITERATOR_UPDATE_TOKEN_ACTION)(
     TokenInfo* const token_info,
-    void* context);
+    const void* context);
 
 typedef struct TokenInfoIteratorContext TokenInfoIteratorContext;
 
@@ -25,9 +25,9 @@ bool totp_token_info_iterator_move_current_token_info(
     TokenInfoIteratorContext* context,
     size_t new_index);
 
-TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, void* update_context);
+TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, const void* update_context);
 
-TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, void* update_context);
+TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, const void* update_context);
 
 bool totp_token_info_iterator_remove_current_token_info(TokenInfoIteratorContext* context);
 

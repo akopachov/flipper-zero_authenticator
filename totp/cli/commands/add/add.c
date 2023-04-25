@@ -20,8 +20,8 @@ enum TotpIteratorUpdateTokenResultsEx {
     TotpIteratorUpdateTokenResultInvalidArguments = 3
 };
 
-static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* token_info, void* context) {
-    struct TotpAddContext* context_t = context;
+static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* token_info, const void* context) {
+    const struct TotpAddContext* context_t = context;
 
     // Reading token name
     if(!args_read_probably_quoted_string_and_trim(context_t->args, token_info->name)) {

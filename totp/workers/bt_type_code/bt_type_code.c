@@ -225,6 +225,6 @@ void totp_bt_type_code_worker_free(TotpBtTypeCodeWorkerContext* context) {
     free(context);
 }
 
-bool totp_bt_type_code_worker_is_advertising(TotpBtTypeCodeWorkerContext* context) {
+bool totp_bt_type_code_worker_is_advertising(const TotpBtTypeCodeWorkerContext* context) {
     return context->is_advertising;
 }

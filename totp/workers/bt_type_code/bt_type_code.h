@@ -27,4 +27,4 @@ void totp_bt_type_code_worker_notify(
     TotpBtTypeCodeWorkerEvent event,
     uint8_t flags);
 
-bool totp_bt_type_code_worker_is_advertising(TotpBtTypeCodeWorkerContext* context);
+bool totp_bt_type_code_worker_is_advertising(const TotpBtTypeCodeWorkerContext* context);

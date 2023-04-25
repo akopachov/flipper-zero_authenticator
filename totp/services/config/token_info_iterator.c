@@ -349,7 +349,7 @@ bool totp_token_info_iterator_move_current_token_info(
     return result;
 }
 
-TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, void* update_context) {
+TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, const void* update_context) {
     TotpIteratorUpdateTokenResult result = update(context->current_token, update_context);
     if (result == TotpIteratorUpdateTokenResultSuccess) {
         if (!totp_token_info_iterator_save_current_token_info_changes(context)) {
@@ -363,7 +363,7 @@ TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(Toke
     return result;
 }
 
-TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, void* update_context) {
+TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, const void* update_context) {
     size_t previous_index = context->current_index;
     context->current_index = context->total_count;
     token_info_set_defaults(context->current_token);

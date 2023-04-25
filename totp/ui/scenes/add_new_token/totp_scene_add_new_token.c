@@ -72,8 +72,8 @@ static void update_duration_text(SceneState* scene_state) {
     furi_string_printf(scene_state->duration_text, "%d sec.", scene_state->duration);
 }
 
-static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* tokenInfo, void* context) {
-    struct TotpAddContext* context_t = context;
+static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* tokenInfo, const void* context) {
+    const struct TotpAddContext* context_t = context;
     if (!token_info_set_secret(
         tokenInfo,
         context_t->scene_state->token_secret,
