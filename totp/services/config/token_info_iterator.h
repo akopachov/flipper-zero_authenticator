@@ -6,9 +6,8 @@
 
 typedef int TotpIteratorUpdateTokenResult;
 
-typedef TotpIteratorUpdateTokenResult (*TOTP_ITERATOR_UPDATE_TOKEN_ACTION)(
-    TokenInfo* const token_info,
-    const void* context);
+typedef TotpIteratorUpdateTokenResult (
+    *TOTP_ITERATOR_UPDATE_TOKEN_ACTION)(TokenInfo* const token_info, const void* context);
 
 typedef struct TokenInfoIteratorContext TokenInfoIteratorContext;
 
@@ -32,7 +31,8 @@ enum TotpIteratorUpdateTokenResults {
  * @param iv initialization vector (IV) to be used for encryption\decryption
  * @return Token info iterator context
  */
-TokenInfoIteratorContext* totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv);
+TokenInfoIteratorContext*
+    totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv);
 
 /**
  * @brief Navigates iterator to the token with given index
@@ -59,7 +59,10 @@ bool totp_token_info_iterator_move_current_token_info(
  * @param update_context update action context
  * @return \c true if operation succeeded; \c false otherwise
  */
-TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, const void* update_context);
+TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(
+    TokenInfoIteratorContext* context,
+    TOTP_ITERATOR_UPDATE_TOKEN_ACTION update,
+    const void* update_context);
 
 /**
  * @brief Adds new token info to the end of the list using given update action
@@ -68,7 +71,10 @@ TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(Toke
  * @param update_context update action context
  * @return \c true if operation succeeded; \c false otherwise
  */
-TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, const void* update_context);
+TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(
+    TokenInfoIteratorContext* context,
+    TOTP_ITERATOR_UPDATE_TOKEN_ACTION update,
+    const void* update_context);
 
 /**
  * @brief Remvoves current token info
@@ -88,7 +94,8 @@ void totp_token_info_iterator_free(TokenInfoIteratorContext* context);
  * @param context token info iterator context
  * @return current token info
  */
-const TokenInfo* totp_token_info_iterator_get_current_token(const TokenInfoIteratorContext* context);
+const TokenInfo*
+    totp_token_info_iterator_get_current_token(const TokenInfoIteratorContext* context);
 
 /**
  * @brief Gets current token info index
@@ -109,4 +116,6 @@ size_t totp_token_info_iterator_get_total_count(const TokenInfoIteratorContext* 
  * @param context token info iterator context
  * @param config_file config file reference to attach token info iterator to
  */
-void totp_token_info_iterator_attach_to_config_file(TokenInfoIteratorContext* context, FlipperFormat* config_file);
+void totp_token_info_iterator_attach_to_config_file(
+    TokenInfoIteratorContext* context,
+    FlipperFormat* config_file);

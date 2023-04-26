@@ -90,7 +90,7 @@ static bool seek_to_token(size_t token_index, TokenInfoIteratorContext* context)
         context->last_seek_offset = stream_tell(stream);
         context->last_seek_index = token_index;
     } else {
-        if (!stream_seek(stream, context->last_seek_offset, StreamOffsetFromStart)) {
+        if(!stream_seek(stream, context->last_seek_offset, StreamOffsetFromStart)) {
             return false;
         }
     }
@@ -113,31 +113,31 @@ static bool stream_insert_stream(Stream* dst, Stream* src) {
 static bool ensure_stream_ends_with_lf(Stream* stream) {
     uint8_t last_char;
     size_t original_pos = stream_tell(stream);
-    if (!stream_seek(stream, -1, StreamOffsetFromEnd) ||
-        stream_read(stream, &last_char, 1) < 1) {
+    if(!stream_seek(stream, -1, StreamOffsetFromEnd) || stream_read(stream, &last_char, 1) < 1) {
         return false;
     }
 
-    if (last_char != '\n') {
+    if(last_char != '\n') {
         const uint8_t lf = '\n';
-        if (!stream_write(stream, &lf, 1)) {
+        if(!stream_write(stream, &lf, 1)) {
             return false;
         }
     }
 
-    if (!stream_seek(stream, original_pos, StreamOffsetFromStart)) {
+    if(!stream_seek(stream, original_pos, StreamOffsetFromStart)) {
         return false;
     }
 
     return true;
 }
 
-static bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIteratorContext* context) {
+static bool
+    totp_token_info_iterator_save_current_token_info_changes(TokenInfoIteratorContext* context) {
     bool is_new_token = context->current_index >= context->total_count;
     Stream* stream = flipper_format_get_raw_stream(context->config_file);
     if(is_new_token) {
         if(!ensure_stream_ends_with_lf(stream) ||
-            !flipper_format_seek_to_end(context->config_file)) {
+           !flipper_format_seek_to_end(context->config_file)) {
             return false;
         }
     } else {
@@ -160,7 +160,7 @@ static bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIt
     }
 
     FlipperFormat* temp_ff = flipper_format_file_alloc(context->storage);
-    if (!flipper_format_file_open_always(temp_ff, CONFIG_FILE_PART_FILE_PATH)) {
+    if(!flipper_format_file_open_always(temp_ff, CONFIG_FILE_PART_FILE_PATH)) {
         flipper_format_free(temp_ff);
         return false;
     }
@@ -241,7 +241,8 @@ static bool totp_token_info_iterator_save_current_token_info_changes(TokenInfoIt
     return result;
 }
 
-TokenInfoIteratorContext* totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv) {
+TokenInfoIteratorContext*
+    totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv) {
     Stream* stream = flipper_format_get_raw_stream(config_file);
     stream_rewind(stream);
     size_t tokens_count = 0;
@@ -278,7 +279,7 @@ bool totp_token_info_iterator_remove_current_token_info(TokenInfoIteratorContext
     Stream* stream = flipper_format_get_raw_stream(context->config_file);
     size_t begin_offset = stream_tell(stream);
     size_t end_offset;
-    if (!ensure_stream_ends_with_lf(stream)) {
+    if(!ensure_stream_ends_with_lf(stream)) {
         return false;
     }
 
@@ -310,7 +311,7 @@ bool totp_token_info_iterator_move_current_token_info(
 
     Stream* stream = flipper_format_get_raw_stream(context->config_file);
 
-    if (!ensure_stream_ends_with_lf(stream)) {
+    if(!ensure_stream_ends_with_lf(stream)) {
         return false;
     }
 
@@ -328,9 +329,9 @@ bool totp_token_info_iterator_move_current_token_info(
         return false;
     }
 
-    
     Stream* temp_stream = file_stream_alloc(context->storage);
-    if (!file_stream_open(temp_stream, CONFIG_FILE_PART_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
+    if(!file_stream_open(
+           temp_stream, CONFIG_FILE_PART_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
         stream_free(temp_stream);
         return false;
     }
@@ -381,12 +382,15 @@ bool totp_token_info_iterator_move_current_token_info(
     return result;
 }
 
-TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, const void* update_context) {
+TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(
+    TokenInfoIteratorContext* context,
+    TOTP_ITERATOR_UPDATE_TOKEN_ACTION update,
+    const void* update_context) {
     TotpIteratorUpdateTokenResult result = update(context->current_token, update_context);
-    if (result == TotpIteratorUpdateTokenResultSuccess) {
-        if (!totp_token_info_iterator_save_current_token_info_changes(context)) {
+    if(result == TotpIteratorUpdateTokenResultSuccess) {
+        if(!totp_token_info_iterator_save_current_token_info_changes(context)) {
             result = TotpIteratorUpdateTokenResultFileUpdateFailed;
-        } 
+        }
 
         return result;
     }
@@ -395,17 +399,20 @@ TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(Toke
     return result;
 }
 
-TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(TokenInfoIteratorContext* context, TOTP_ITERATOR_UPDATE_TOKEN_ACTION update, const void* update_context) {
+TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(
+    TokenInfoIteratorContext* context,
+    TOTP_ITERATOR_UPDATE_TOKEN_ACTION update,
+    const void* update_context) {
     size_t previous_index = context->current_index;
     context->current_index = context->total_count;
     token_info_set_defaults(context->current_token);
     TotpIteratorUpdateTokenResult result = update(context->current_token, update_context);
-    if (result == TotpIteratorUpdateTokenResultSuccess &&
-        !totp_token_info_iterator_save_current_token_info_changes(context)) {
+    if(result == TotpIteratorUpdateTokenResultSuccess &&
+       !totp_token_info_iterator_save_current_token_info_changes(context)) {
         result = TotpIteratorUpdateTokenResultFileUpdateFailed;
     }
 
-    if (result != TotpIteratorUpdateTokenResultSuccess) {
+    if(result != TotpIteratorUpdateTokenResultSuccess) {
         totp_token_info_iterator_go_to(context, previous_index);
     }
 
@@ -519,15 +526,15 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
 
     stream_seek(stream, original_offset, StreamOffsetFromStart);
 
-    if(token_update_needed &&
-        !totp_token_info_iterator_save_current_token_info_changes(context)) {
+    if(token_update_needed && !totp_token_info_iterator_save_current_token_info_changes(context)) {
         return false;
     }
 
     return true;
 }
 
-const TokenInfo* totp_token_info_iterator_get_current_token(const TokenInfoIteratorContext* context) {
+const TokenInfo*
+    totp_token_info_iterator_get_current_token(const TokenInfoIteratorContext* context) {
     return context->current_token;
 }
 
@@ -539,6 +546,8 @@ size_t totp_token_info_iterator_get_total_count(const TokenInfoIteratorContext* 
     return context->total_count;
 }
 
-void totp_token_info_iterator_attach_to_config_file(TokenInfoIteratorContext* context, FlipperFormat* config_file) {
+void totp_token_info_iterator_attach_to_config_file(
+    TokenInfoIteratorContext* context,
+    FlipperFormat* config_file) {
     context->config_file = config_file;
 }
