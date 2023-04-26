@@ -117,8 +117,8 @@ static bool ensure_stream_ends_with_lf(Stream* stream) {
         return false;
     }
 
-    if(last_char != '\n') {
-        const uint8_t lf = '\n';
+    const uint8_t lf = '\n';
+    if(last_char != lf) {
         if(!stream_write(stream, &lf, 1)) {
             return false;
         }
