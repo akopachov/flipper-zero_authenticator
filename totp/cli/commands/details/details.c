@@ -18,21 +18,21 @@
     } while(false)
 
 static void print_automation_features(const TokenInfo* token_info) {
-    if(token_info->automation_features == TOKEN_AUTOMATION_FEATURE_NONE) {
+    if(token_info->automation_features == TokenAutomationFeatureNone) {
         TOTP_CLI_PRINTF("| %-20s | %-28.28s |\r\n", "Automation features", "None");
         return;
     }
 
     bool header_printed = false;
-    if(token_info->automation_features & TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END) {
+    if(token_info->automation_features & TokenAutomationFeatureEnterAtTheEnd) {
         TOTP_CLI_PRINTF_AUTOMATION_FEATURE("Type <Enter> key at the end", header_printed);
     }
 
-    if(token_info->automation_features & TOKEN_AUTOMATION_FEATURE_TAB_AT_THE_END) {
+    if(token_info->automation_features & TokenAutomationFeatureTabAtTheEnd) {
         TOTP_CLI_PRINTF_AUTOMATION_FEATURE("Type <Tab> key at the end", header_printed);
     }
 
-    if(token_info->automation_features & TOKEN_AUTOMATION_FEATURE_TYPE_SLOWER) {
+    if(token_info->automation_features & TokenAutomationFeatureTypeSlower) {
         TOTP_CLI_PRINTF_AUTOMATION_FEATURE("Type slower", header_printed);
     }
 }

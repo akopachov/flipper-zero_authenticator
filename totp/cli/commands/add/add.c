@@ -32,7 +32,7 @@ static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* token_info, co
 
     // Read optional arguments
     bool mask_user_input = true;
-    PlainTokenSecretEncoding token_secret_encoding = PLAIN_TOKEN_ENCODING_BASE32;
+    PlainTokenSecretEncoding token_secret_encoding = PlainTokenSecretEncodingBase32;
     while(args_read_string_and_trim(context_t->args, temp_str)) {
         bool parsed = false;
         if(!totp_cli_try_read_algo(token_info, temp_str, context_t->args, &parsed) &&

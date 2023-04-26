@@ -12,7 +12,7 @@
 
 char* TOKEN_ALGO_LIST[] = {"SHA1", "SHA256", "SHA512", "Steam"};
 char* TOKEN_DIGITS_TEXT_LIST[] = {"5 digits", "6 digits", "8 digits"};
-TokenDigitsCount TOKEN_DIGITS_VALUE_LIST[] = {TOTP_5_DIGITS, TOTP_6_DIGITS, TOTP_8_DIGITS};
+TokenDigitsCount TOKEN_DIGITS_VALUE_LIST[] = {TotpFiveDigitsCount, TotpSixDigitsCount, TotpEightDigitsCount};
 
 typedef enum {
     TokenNameTextBox,
@@ -78,7 +78,7 @@ static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* tokenInfo, con
         tokenInfo,
         context_t->scene_state->token_secret,
         context_t->scene_state->token_secret_length,
-        PLAIN_TOKEN_ENCODING_BASE32,
+        PlainTokenSecretEncodingBase32,
         context_t->iv)) {
         return TotpIteratorUpdateTokenResultInvalidSecret;
     }

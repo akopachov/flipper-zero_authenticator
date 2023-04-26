@@ -98,7 +98,7 @@ bool totp_config_migrate_to_latest(
                 const uint32_t default_algo = SHA1;
                 flipper_format_write_uint32(
                     fff_data_file, TOTP_CONFIG_KEY_TOKEN_ALGO, &default_algo, 1);
-                const uint32_t default_digits = TOTP_6_DIGITS;
+                const uint32_t default_digits = TotpSixDigitsCount;
                 flipper_format_write_uint32(
                     fff_data_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &default_digits, 1);
             }
@@ -120,7 +120,7 @@ bool totp_config_migrate_to_latest(
                 flipper_format_write_string(
                     fff_data_file, TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES, temp_str);
             } else {
-                const uint32_t default_automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
+                const uint32_t default_automation_features = TokenAutomationFeatureNone;
                 flipper_format_write_uint32(
                     fff_data_file,
                     TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES,

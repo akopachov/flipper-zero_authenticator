@@ -417,7 +417,7 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
                    tokenInfo,
                    furi_string_get_cstr(temp_str),
                    furi_string_size(temp_str),
-                   PLAIN_TOKEN_ENCODING_BASE32,
+                   PlainTokenSecretEncodingBase32,
                    context->iv)) {
                 FURI_LOG_W(
                     LOGGING_TAG,
@@ -469,7 +469,7 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
     if(!flipper_format_read_uint32(
            context->config_file, TOTP_CONFIG_KEY_TOKEN_DIGITS, &temp_data32, 1) ||
        !token_info_set_digits_from_int(tokenInfo, temp_data32)) {
-        tokenInfo->digits = TOTP_6_DIGITS;
+        tokenInfo->digits = TotpSixDigitsCount;
     }
 
     if(!flipper_format_read_uint32(
@@ -482,7 +482,7 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
            context->config_file, TOTP_CONFIG_KEY_TOKEN_AUTOMATION_FEATURES, &temp_data32, 1)) {
         tokenInfo->automation_features = temp_data32;
     } else {
-        tokenInfo->automation_features = TOKEN_AUTOMATION_FEATURE_NONE;
+        tokenInfo->automation_features = TokenAutomationFeatureNone;
     }
 
     stream_seek(stream, original_offset, StreamOffsetFromStart);

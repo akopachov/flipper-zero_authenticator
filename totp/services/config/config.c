@@ -513,12 +513,12 @@ bool totp_config_file_update_encryption(
 
     CryptoSeedIVResult seed_result =
         totp_crypto_seed_iv(plugin_state, new_pin_length > 0 ? new_pin : NULL, new_pin_length);
-    if(seed_result & CRYPTO_SEED_IV_RESULT_FLAG_SUCCESS &&
-       seed_result & CRYPTO_SEED_IV_RESULT_FLAG_NEW_CRYPTO_VERIFY_DATA) {
+    if(seed_result & CryptoSeedIVResultFlagSuccess &&
+       seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
         if(!totp_config_file_update_crypto_signatures(plugin_state)) {
             return false;
         }
-    } else if(seed_result == CRYPTO_SEED_IV_RESULT_FAILED) {
+    } else if(seed_result == CryptoSeedIVResultFailed) {
         return false;
     }
 
