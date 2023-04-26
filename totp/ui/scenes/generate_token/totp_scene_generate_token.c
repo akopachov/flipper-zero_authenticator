@@ -162,8 +162,12 @@ static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin
 
 static void on_new_token_code_generated(bool time_left, void* context) {
     const PluginState* plugin_state = context;
-    SceneState* scene_state = plugin_state->current_scene_state;
     const TokenInfoIteratorContext* iterator_context = totp_config_get_token_iterator_context(plugin_state);
+    if (totp_token_info_iterator_get_total_count(iterator_context) == 0) {
+        return;
+    }
+
+    SceneState* scene_state = plugin_state->current_scene_state;
     const TokenInfo* current_token = totp_token_info_iterator_get_current_token(iterator_context);
 
     uint8_t char_width = modeNine_15ptFontInfo.charInfo[0].width;
