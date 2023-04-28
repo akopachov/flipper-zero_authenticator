@@ -495,11 +495,8 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
     }
 
     uint32_t temp_data32;
-    if(flipper_format_read_uint32(
-           context->config_file, TOTP_CONFIG_KEY_TOKEN_ALGO, &temp_data32, 1) &&
-       temp_data32 <= STEAM) {
-        tokenInfo->algo = (TokenHashAlgo)temp_data32;
-    } else {
+    if(!flipper_format_read_uint32(context->config_file, TOTP_CONFIG_KEY_TOKEN_ALGO, &temp_data32, 1)||
+        !token_info_set_algo_from_int(tokenInfo, temp_data32)) {
         tokenInfo->algo = SHA1;
     }
 

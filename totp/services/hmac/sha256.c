@@ -88,7 +88,7 @@ static void sha256_conclude_ctx(struct sha256_ctx* ctx) {
     set_uint32((char*)&ctx->buffer[size - 2], SWAP((ctx->total[1] << 3) | (ctx->total[0] >> 29)));
     set_uint32((char*)&ctx->buffer[size - 1], SWAP(ctx->total[0] << 3));
 
-    sha_pad_buffer(&((char*)ctx->buffer)[bytes], (size - 2) * 4 - bytes);
+    sha_pad_buffer(&((uint8_t*)ctx->buffer)[bytes], (size - 2) * 4 - bytes);
 
     /* Process last bytes.  */
     sha256_process_block(ctx->buffer, size * 4, ctx);

@@ -87,7 +87,7 @@ static void sha512_conclude_ctx(struct sha512_ctx* ctx) {
         SWAP(u64or(u64shl(ctx->total[1], 3), u64shr(ctx->total[0], 61))));
     set_uint64((char*)&ctx->buffer[size - 1], SWAP(u64shl(ctx->total[0], 3)));
 
-    sha_pad_buffer(&((char*)ctx->buffer)[bytes], (size - 2) * 8 - bytes);
+    sha_pad_buffer(&((uint8_t*)ctx->buffer)[bytes], (size - 2) * 8 - bytes);
 
     /* Process last bytes.  */
     sha512_process_block(ctx->buffer, size * 8, ctx);

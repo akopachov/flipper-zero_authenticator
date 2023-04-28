@@ -201,9 +201,17 @@ bool token_info_set_duration_from_int(TokenInfo* token_info, uint8_t duration);
  * @brief Sets token hashing algorithm from \c str value
  * @param token_info instance whichs token hashing algorithm should be updated
  * @param str desired token algorithm
- * @return \c true if token hahsing algorithm has been updated; \c false otherwise
+ * @return \c true if token hashing algorithm has been updated; \c false otherwise
  */
 bool token_info_set_algo_from_str(TokenInfo* token_info, const FuriString* str);
+
+/**
+ * @brief Sets token hashing algorithm from \c algo_code code
+ * @param token_info instance whichs token hashing algorithm should be updated
+ * @param algo_code desired token algorithm code
+ * @return \c true if token hashing algorithm has been updated; \c false otherwise
+ */
+bool token_info_set_algo_from_int(TokenInfo* token_info, uint8_t algo_code);
 
 /**
  * @brief Gets token hahsing algorithm name as C-string
