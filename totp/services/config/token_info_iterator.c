@@ -68,7 +68,9 @@ static bool seek_to_token(size_t token_index, TokenInfoIteratorContext* context)
         direction = StreamDirectionBackward;
     }
 
-    stream_seek(stream, context->last_seek_offset, StreamOffsetFromStart);
+    if (!stream_seek(stream, context->last_seek_offset, StreamOffsetFromStart)) {
+        return false;
+    }
 
     if(token_index_diff != 0) {
         long i = 0;
@@ -89,10 +91,6 @@ static bool seek_to_token(size_t token_index, TokenInfoIteratorContext* context)
 
         context->last_seek_offset = stream_tell(stream);
         context->last_seek_index = token_index;
-    } else {
-        if(!stream_seek(stream, context->last_seek_offset, StreamOffsetFromStart)) {
-            return false;
-        }
     }
 
     return true;
@@ -450,6 +448,7 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
 
         if(flipper_format_read_string(
                context->config_file, TOTP_CONFIG_KEY_TOKEN_SECRET, temp_str)) {
+            
             if(token_info_set_secret(
                    tokenInfo,
                    furi_string_get_cstr(temp_str),

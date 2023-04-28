@@ -168,7 +168,7 @@ void token_info_free(TokenInfo* token_info);
 /**
  * @brief Encrypts & sets plain token secret to the given instance of \c TokenInfo
  * @param token_info instance where secret should be updated
- * @param base32_token_secret plain token secret in Base32 format
+ * @param plain_token_secret plain token secret
  * @param token_secret_length plain token secret length
  * @param plain_token_secret_encoding plain token secret encoding
  * @param iv initialization vecor (IV) to be used for encryption
