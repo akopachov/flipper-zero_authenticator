@@ -57,7 +57,7 @@ void totp_type_code_worker_execute_automation(
         if(char_index > 35) break;
 
         uint16_t hid_kb_key = hid_number_keys[char_index];
-        if (char_index > 9) {
+        if(char_index > 9) {
             hid_kb_key |= KEY_MOD_LEFT_SHIFT;
         }
 
