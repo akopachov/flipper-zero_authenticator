@@ -381,54 +381,51 @@ bool totp_scene_generate_token_handle_event(
             return true;
         }
 #endif
-    }
+    } else if(event->input.type == InputTypePress || event->input.type == InputTypeRepeat) {
+        switch(event->input.key) {
+        case InputKeyUp:
+            break;
+        case InputKeyDown:
+            break;
+        case InputKeyRight: {
+            const TokenInfoIteratorContext* iterator_context =
+                totp_config_get_token_iterator_context(plugin_state);
+            size_t current_token_index =
+                totp_token_info_iterator_get_current_token_index(iterator_context);
+            totp_roll_value_size_t(
+                &current_token_index,
+                1,
+                0,
+                totp_token_info_iterator_get_total_count(iterator_context) - 1,
+                RollOverflowBehaviorRoll);
 
-    if(event->input.type != InputTypePress && event->input.type != InputTypeRepeat) {
-        return true;
-    }
+            update_totp_params(plugin_state, current_token_index);
+            break;
+        }
+        case InputKeyLeft: {
+            const TokenInfoIteratorContext* iterator_context =
+                totp_config_get_token_iterator_context(plugin_state);
+            size_t current_token_index =
+                totp_token_info_iterator_get_current_token_index(iterator_context);
+            totp_roll_value_size_t(
+                &current_token_index,
+                -1,
+                0,
+                totp_token_info_iterator_get_total_count(iterator_context) - 1,
+                RollOverflowBehaviorRoll);
 
-    switch(event->input.key) {
-    case InputKeyUp:
-        break;
-    case InputKeyDown:
-        break;
-    case InputKeyRight: {
-        const TokenInfoIteratorContext* iterator_context =
-            totp_config_get_token_iterator_context(plugin_state);
-        size_t current_token_index =
-            totp_token_info_iterator_get_current_token_index(iterator_context);
-        totp_roll_value_size_t(
-            &current_token_index,
-            1,
-            0,
-            totp_token_info_iterator_get_total_count(iterator_context) - 1,
-            RollOverflowBehaviorRoll);
-
-        update_totp_params(plugin_state, current_token_index);
-        break;
-    }
-    case InputKeyLeft: {
-        const TokenInfoIteratorContext* iterator_context =
-            totp_config_get_token_iterator_context(plugin_state);
-        size_t current_token_index =
-            totp_token_info_iterator_get_current_token_index(iterator_context);
-        totp_roll_value_size_t(
-            &current_token_index,
-            -1,
-            0,
-            totp_token_info_iterator_get_total_count(iterator_context) - 1,
-            RollOverflowBehaviorRoll);
-
-        update_totp_params(plugin_state, current_token_index);
-        break;
-    }
-    case InputKeyOk:
+            update_totp_params(plugin_state, current_token_index);
+            break;
+        }
+        case InputKeyOk:
+            break;
+        case InputKeyBack:
+            break;
+        default:
+            break;
+        }
+    } else if(event->input.type == InputTypeRelease && event->input.key == InputKeyOk) {
         totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu);
-        break;
-    case InputKeyBack:
-        break;
-    default:
-        break;
     }
 
     return true;
