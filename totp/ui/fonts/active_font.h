@@ -21,4 +21,7 @@
 #elif TOTP_FONT == TOTP_FONT_GRAPH35PIX
 #include "graph35pix/graph35pix.h"
 #define TOTP_CODE_FONT_INFO graph35pix_12ptFontInfo
+#elif TOTP_FONT == TOTP_FONT_KARMAFUTURE
+#include "karma_future/karma_future.h"
+#define TOTP_CODE_FONT_INFO karmaFuture_14ptFontInfo
 #endif
