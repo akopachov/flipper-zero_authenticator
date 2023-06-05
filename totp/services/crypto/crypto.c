@@ -105,7 +105,7 @@ CryptoSeedIVResult
         plugin_state->crypto_verify_data_length = CRYPTO_VERIFY_KEY_LENGTH;
 
         plugin_state->crypto_verify_data = totp_crypto_encrypt(
-            (uint8_t*)CRYPTO_VERIFY_KEY,
+            (const uint8_t*)CRYPTO_VERIFY_KEY,
             CRYPTO_VERIFY_KEY_LENGTH,
             &plugin_state->iv[0],
             &plugin_state->crypto_verify_data_length);
