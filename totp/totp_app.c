@@ -210,7 +210,7 @@ int32_t totp_app() {
 
         if(furi_mutex_acquire(plugin_state->mutex, FuriWaitForever) == FuriStatusOk) {
             if(event_status == FuriStatusOk) {
-                if(event.type == EventTypeKey) {
+                if(event.type == EventTypeKey && plugin_state->idle_timeout_context != NULL) {
                     idle_timeout_report_activity(plugin_state->idle_timeout_context);
                 }
 

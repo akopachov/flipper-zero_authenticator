@@ -3,7 +3,7 @@
 #include <furi/core/timer.h>
 
 #define IDLE_TIMER_CHECK_PERIODICITY_SEC (1)
-#define SEC_TO_TICKS(sec) (sec * 1000)
+#define SEC_TO_TICKS(sec) ((sec) * 1000)
 
 struct IdleTimeoutContext {
     FuriTimer* timer;
@@ -11,21 +11,21 @@ struct IdleTimeoutContext {
     void* on_idle_callback_context;
     IDLE_TIMEOUT_CALLBACK on_idle_callback;
     uint16_t timeout_sec;
-    uint16_t idle_period_length;
-    bool idle_callback_fired;
+    uint16_t idle_period_sec;
+    bool idle_handled;
 };
 
 static void idle_timer_callback(void* context) {
     IdleTimeoutContext* instance = context;
     if (instance->activity_reported) {
-        instance->idle_period_length = 0;
-        instance->idle_callback_fired = false;
+        instance->idle_period_sec = 0;
+        instance->idle_handled = false;
         instance->activity_reported = false;
-    } else if (!instance->idle_callback_fired) {
-        if (instance->idle_period_length >= instance->timeout_sec) {
-            instance->idle_callback_fired = instance->on_idle_callback(instance->on_idle_callback_context);
+    } else if (!instance->idle_handled) {
+        if (instance->idle_period_sec >= instance->timeout_sec) {
+            instance->idle_handled = instance->on_idle_callback(instance->on_idle_callback_context);
         } else {
-            instance->idle_period_length += IDLE_TIMER_CHECK_PERIODICITY_SEC;
+            instance->idle_period_sec += IDLE_TIMER_CHECK_PERIODICITY_SEC;
         }
     }   
 }
