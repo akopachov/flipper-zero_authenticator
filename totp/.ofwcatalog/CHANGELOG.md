@@ -6,7 +6,6 @@
 * Fixed [#158](https://github.com/akopachov/flipper-zero_authenticator/issues/158) 
 * Cosmetic refactoring
 
-[Changes][v2.2.2]
 
 
 <a name="v2.2.1"></a>
@@ -15,7 +14,6 @@
 * Fixed [#155](https://github.com/akopachov/flipper-zero_authenticator/issues/155) 
 * Refactoring
 
-[Changes][v2.2.1]
 
 
 <a name="v2.2.0"></a>
@@ -24,7 +22,6 @@
 * Fixed [#153](https://github.com/akopachov/flipper-zero_authenticator/issues/153) 
 * Updated firmware submodules
 
-[Changes][v2.2.0]
 
 
 <a name="v2.1.1"></a>
@@ -33,7 +30,6 @@
 * Updated firmware submodules
 * Added some new fonts for supporters 
 
-[Changes][v2.1.1]
 
 
 <a name="v2.1.0"></a>
@@ -43,7 +39,6 @@
 * 🧹 Refactoring
 * ** Added nice custom fonts for supporters **
 
-[Changes][v2.1.0]
 
 
 <a name="v2.0.3"></a>
@@ -52,7 +47,6 @@
 * Fixed [#146](https://github.com/akopachov/flipper-zero_authenticator/issues/146) 
 * Updated firmware references
 
-[Changes][v2.0.3]
 
 
 <a name="v2.0.2"></a>
@@ -60,7 +54,6 @@
 
 * Refactoring & minor improvements
 
-[Changes][v2.0.2]
 
 
 <a name="v2.0.1"></a>
@@ -70,7 +63,6 @@
 * Refactoring
 * Updated firmware submodules
 
-[Changes][v2.0.1]
 
 
 <a name="v2.0.0"></a>
@@ -81,7 +73,6 @@
 * Refactoring
 * Updated firmware submodules
 
-[Changes][v2.0.0]
 
 
 <a name="v1.9.2"></a>
@@ -89,7 +80,6 @@
 
 * Updated firmware submodules
 
-[Changes][v1.9.2]
 
 
 <a name="v1.9.1"></a>
@@ -98,7 +88,6 @@
 * Improved TOTP code rendering method
 * Added `--clean` flag to custom FBT
 
-[Changes][v1.9.1]
 
 
 <a name="v1.9.0"></a>
@@ -107,7 +96,6 @@
 * Moved token generation into separate thread
 * Refactoring and code cleanup
 
-[Changes][v1.9.0]
 
 
 <a name="v1.8.8"></a>
@@ -116,7 +104,6 @@
 * Xtreme: fixed BT name length according to latest XFW changes (by [@Willy-JL](https://github.com/Willy-JL))
 * Updated firmware submodules
 
-[Changes][v1.8.8]
 
 
 <a name="v1.8.7"></a>
@@ -125,7 +112,6 @@
 * Backup conf file before running `totp pin set` and `totp pin remove` CLI commands ([#123](https://github.com/akopachov/flipper-zero_authenticator/issues/123))
 * Some refactoring ([#120](https://github.com/akopachov/flipper-zero_authenticator/issues/120))
 
-[Changes][v1.8.7]
 
 
 <a name="v1.8.6"></a>
@@ -133,7 +119,6 @@
 
 * Updated firmware submodules [#118](https://github.com/akopachov/flipper-zero_authenticator/issues/118) 
 
-[Changes][v1.8.6]
 
 
 <a name="v1.8.5"></a>
@@ -141,7 +126,6 @@
 
 * Fixed [#116](https://github.com/akopachov/flipper-zero_authenticator/issues/116) 
 
-[Changes][v1.8.5]
 
 
 <a name="v1.8.4"></a>
@@ -152,7 +136,6 @@
 * Custom font for token
 * Refactoring
 
-[Changes][v1.8.4]
 
 
 <a name="v1.8.3"></a>
@@ -161,7 +144,6 @@
 * Build artifact for [Xtreme](https://github.com/ClaraCrazy/Flipper-Xtreme) firmware ([#113](https://github.com/akopachov/flipper-zero_authenticator/issues/113))
 * Xtreme: custom BT name & MAC which should resolve [#98](https://github.com/akopachov/flipper-zero_authenticator/issues/98)
 
-[Changes][v1.8.3]
 
 
 <a name="v1.8.2"></a>
@@ -169,7 +151,6 @@
 
 * Implemented [#106](https://github.com/akopachov/flipper-zero_authenticator/issues/106) 
 
-[Changes][v1.8.2]
 
 
 <a name="v1.8.1"></a>
@@ -180,7 +161,6 @@
 * Refactoring
 * Minor fixes
 
-[Changes][v1.8.1]
 
 
 <a name="v1.8.0"></a>
@@ -190,7 +170,6 @@
 * New CLI commands `totp update`, `totp lsattr`
 * Refactoring
 
-[Changes][v1.8.0]
 
 
 <a name="v1.7.1"></a>
@@ -198,7 +177,6 @@
 
 * Updated firmware submodules
 
-[Changes][v1.7.1]
 
 
 <a name="v1.7.0"></a>
@@ -207,7 +185,6 @@
 * Implemented [#89](https://github.com/akopachov/flipper-zero_authenticator/issues/89) 
 * Refactoring
 
-[Changes][v1.7.0]
 
 
 <a name="v1.6.5"></a>
@@ -216,7 +193,6 @@
 * Updated firmware references
 * Updated code to make it compatible with latest firmware changes
 
-[Changes][v1.6.5]
 
 
 <a name="v1.6.4"></a>
@@ -224,7 +200,6 @@
 
 * Updated firmware references
 
-[Changes][v1.6.4]
 
 
 <a name="v1.6.3"></a>
@@ -235,7 +210,6 @@
 * Made CLI console output colorful
 * Few refactoring
 
-[Changes][v1.6.3]
 
 
 <a name="v1.6.2"></a>
@@ -244,7 +218,6 @@
 * Updated submodules to make app compatible with latest firmware
 * Cosmetic code changes
 
-[Changes][v1.6.2]
 
 
 <a name="v1.6.1"></a>
@@ -252,7 +225,6 @@
 
 * Implemented [#70](https://github.com/akopachov/flipper-zero_authenticator/issues/70) 
 
-[Changes][v1.6.1]
 
 
 <a name="v1.6.0"></a>
@@ -260,7 +232,6 @@
 
 * Implemented [#65](https://github.com/akopachov/flipper-zero_authenticator/issues/65) 
 
-[Changes][v1.6.0]
 
 
 <a name="v1.5.6"></a>
@@ -268,7 +239,6 @@
 
 * Updated firmwares
 
-[Changes][v1.5.6]
 
 
 <a name="v1.5.5"></a>
@@ -277,7 +247,6 @@
 * Implemented [#58](https://github.com/akopachov/flipper-zero_authenticator/issues/58) 
 * A bit of refactoring
 
-[Changes][v1.5.5]
 
 
 <a name="v1.5.4"></a>
@@ -285,7 +254,6 @@
 
 * Fixed [#53](https://github.com/akopachov/flipper-zero_authenticator/issues/53) 
 
-[Changes][v1.5.4]
 
 
 <a name="v1.5.3"></a>
@@ -293,7 +261,6 @@
 
 * Fixed [#51](https://github.com/akopachov/flipper-zero_authenticator/issues/51) 
 
-[Changes][v1.5.3]
 
 
 <a name="v1.5.2"></a>
@@ -303,7 +270,6 @@
 * Improved the way how config file is getting handled
 * Improved user notification if on error during config file open\read\update
 
-[Changes][v1.5.2]
 
 
 <a name="v1.5.1"></a>
@@ -311,7 +277,6 @@
 
 * Implemented [#44](https://github.com/akopachov/flipper-zero_authenticator/issues/44) to be compatible with latest API changes
 
-[Changes][v1.5.1]
 
 
 <a name="v1.5.0"></a>
@@ -320,7 +285,6 @@
 * Implemented [#36](https://github.com/akopachov/flipper-zero_authenticator/issues/36) 
 * Refactoring
 
-[Changes][v1.5.0]
 
 
 <a name="v1.4.0"></a>
@@ -329,7 +293,6 @@
 * Implemented [#10](https://github.com/akopachov/flipper-zero_authenticator/issues/10) 
 * Refactoring
 
-[Changes][v1.4.0]
 
 
 <a name="v1.3.1"></a>
@@ -338,7 +301,6 @@
 * Implemented [#30](https://github.com/akopachov/flipper-zero_authenticator/issues/30) 
 * Cosmetic improvements
 
-[Changes][v1.3.1]
 
 
 <a name="v1.3.0"></a>
@@ -350,7 +312,6 @@
 * Improved navigation using "long press" event
 * Refactoring
 
-[Changes][v1.3.0]
 
 
 <a name="v1.2.1"></a>
@@ -359,7 +320,6 @@
 * Fixed [#24](https://github.com/akopachov/flipper-zero_authenticator/issues/24)
 * Small improvement to the USB mode restore code
 
-[Changes][v1.2.1]
 
 
 <a name="v1.2.0"></a>
@@ -367,7 +327,6 @@
 
 * Implemented [#21](https://github.com/akopachov/flipper-zero_authenticator/issues/21) 
 
-[Changes][v1.2.0]
 
 
 <a name="v1.1.2"></a>
@@ -379,7 +338,6 @@
 * Dead code eliminated to fix `COMPACT=1 DEBUG=0` build
 * Build artifacts are done with `COMPACT=1 DEBUG=0` build settings
 
-[Changes][v1.1.2]
 
 
 <a name="v1.1.1"></a>
@@ -389,7 +347,6 @@
 * Refactoring
 * Sonar scan issues fixed
 
-[Changes][v1.1.1]
 
 
 <a name="v1.1.0"></a>
@@ -399,7 +356,6 @@
 * Updated firmware submodules to latest
 * Refactoring
 
-[Changes][v1.1.0]
 
 
 <a name="v1.0.1"></a>
@@ -408,7 +364,6 @@
 * Fixed issue [#8](https://github.com/akopachov/flipper-zero_authenticator/issues/8) 
 * Refactoring
 
-[Changes][v1.0.1]
 
 
 <a name="v1.0.0"></a>
@@ -419,7 +374,6 @@
 * Refactoring
 * Few fixes
 
-[Changes][v1.0.0]
 
 
 <a name="v0.0.6"></a>
@@ -429,7 +383,6 @@
 * Removed CLI app POC
 * Minor fixes
 
-[Changes][v0.0.6]
 
 
 <a name="v0.0.5"></a>
@@ -438,7 +391,6 @@
 * Separate builds for Official and Unleashed firmwares
 * Updated code to FuriString
 
-[Changes][v0.0.5]
 
 
 <a name="v0.0.4"></a>
@@ -449,7 +401,6 @@
 * Added SHA1, SHA256 and SHA512 hashing algos
 * Minor improvements
 
-[Changes][v0.0.4]
 
 ## v0.0.2
 
@@ -458,53 +409,3 @@ Ability to add more than one token
 ## v0.0.1
 
 First POC. SHA1 hashing algorithm and one token.
-
-[v2.2.2]: https://github.com/akopachov/flipper-zero_authenticator/compare/v2.2.1...v2.2.2
-[v2.2.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v2.2.0...v2.2.1
-[v2.2.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v2.1.1...v2.2.0
-[v2.1.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v2.1.0...v2.1.1
-[v2.1.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v2.0.3...v2.1.0
-[v2.0.3]: https://github.com/akopachov/flipper-zero_authenticator/compare/v2.0.2...v2.0.3
-[v2.0.2]: https://github.com/akopachov/flipper-zero_authenticator/compare/v2.0.1...v2.0.2
-[v2.0.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v2.0.0...v2.0.1
-[v2.0.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.9.2...v2.0.0
-[v1.9.2]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.9.1...v1.9.2
-[v1.9.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.9.0...v1.9.1
-[v1.9.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.8...v1.9.0
-[v1.8.8]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.7...v1.8.8
-[v1.8.7]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.6...v1.8.7
-[v1.8.6]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.5...v1.8.6
-[v1.8.5]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.4...v1.8.5
-[v1.8.4]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.3...v1.8.4
-[v1.8.3]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.2...v1.8.3
-[v1.8.2]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.1...v1.8.2
-[v1.8.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.8.0...v1.8.1
-[v1.8.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.7.1...v1.8.0
-[v1.7.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.7.0...v1.7.1
-[v1.7.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.6.5...v1.7.0
-[v1.6.5]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.6.4...v1.6.5
-[v1.6.4]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.6.3...v1.6.4
-[v1.6.3]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.6.2...v1.6.3
-[v1.6.2]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.6.1...v1.6.2
-[v1.6.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.6.0...v1.6.1
-[v1.6.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.5.6...v1.6.0
-[v1.5.6]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.5.5...v1.5.6
-[v1.5.5]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.5.4...v1.5.5
-[v1.5.4]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.5.3...v1.5.4
-[v1.5.3]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.5.2...v1.5.3
-[v1.5.2]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.5.1...v1.5.2
-[v1.5.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.5.0...v1.5.1
-[v1.5.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.4.0...v1.5.0
-[v1.4.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.3.1...v1.4.0
-[v1.3.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.3.0...v1.3.1
-[v1.3.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.2.1...v1.3.0
-[v1.2.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.2.0...v1.2.1
-[v1.2.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.1.2...v1.2.0
-[v1.1.2]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.1.1...v1.1.2
-[v1.1.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.1.0...v1.1.1
-[v1.1.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.0.1...v1.1.0
-[v1.0.1]: https://github.com/akopachov/flipper-zero_authenticator/compare/v1.0.0...v1.0.1
-[v1.0.0]: https://github.com/akopachov/flipper-zero_authenticator/compare/v0.0.6...v1.0.0
-[v0.0.6]: https://github.com/akopachov/flipper-zero_authenticator/compare/v0.0.5...v0.0.6
-[v0.0.5]: https://github.com/akopachov/flipper-zero_authenticator/compare/v0.0.4...v0.0.5
-[v0.0.4]: https://github.com/akopachov/flipper-zero_authenticator/tree/v0.0.4
