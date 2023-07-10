@@ -10,4 +10,4 @@ typedef struct {
     bool success;
 } InputTextResult;
 
-void totp_input_text(Gui* gui, char* header_text, InputTextResult* result);
+void totp_input_text(Gui* gui, const char* header_text, InputTextResult* result);

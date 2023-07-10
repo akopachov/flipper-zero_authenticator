@@ -75,7 +75,7 @@ static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* tokenInfo, con
 
 static void ask_user_input(
     const PluginState* plugin_state,
-    char* header,
+    const char* header,
     char** user_input,
     size_t* user_input_length) {
     InputTextResult input_result;
@@ -111,8 +111,8 @@ void totp_scene_add_new_token_activate(PluginState* plugin_state) {
     update_duration_text(scene_state);
 }
 
-void totp_scene_add_new_token_render(Canvas* const canvas, PluginState* plugin_state) {
-    SceneState* scene_state = plugin_state->current_scene_state;
+void totp_scene_add_new_token_render(Canvas* const canvas, const PluginState* plugin_state) {
+    const SceneState* scene_state = plugin_state->current_scene_state;
 
     ui_control_text_box_render(
         canvas,
@@ -176,7 +176,7 @@ void update_screen_y_offset(SceneState* scene_state) {
     }
 }
 
-bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState* plugin_state) {
+bool totp_scene_add_new_token_handle_event(const PluginEvent* const event, PluginState* plugin_state) {
     if(event->type != EventTypeKey) {
         return true;
     }

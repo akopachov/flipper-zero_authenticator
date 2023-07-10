@@ -23,7 +23,7 @@ static bool back_event_callback(void* ctx) {
     return false;
 }
 
-void totp_input_text(Gui* gui, char* header_text, InputTextResult* result) {
+void totp_input_text(Gui* gui, const char* header_text, InputTextResult* result) {
     ViewDispatcher* view_dispatcher = view_dispatcher_alloc();
     TextInput* text_input = text_input_alloc();
     InputTextContext context = {.result = result, .view_dispatcher = view_dispatcher};
