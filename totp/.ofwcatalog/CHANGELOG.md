@@ -75,7 +75,7 @@
 ## [v1.9.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.9.1) - 13 Apr 2023
 
 * Improved TOTP code rendering method
-* Added `--clean` flag to custom FBT
+* Added "--clean" flag to custom FBT
 
 
 
@@ -95,7 +95,7 @@
 
 ## [v1.8.7](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.7) - 07 Apr 2023
 
-* Backup conf file before running `totp pin set` and `totp pin remove` CLI commands ([#123](https://github.com/akopachov/flipper-zero_authenticator/issues/123))
+* Backup conf file before running "totp pin set" and "totp pin remove" CLI commands ([#123](https://github.com/akopachov/flipper-zero_authenticator/issues/123))
 * Some refactoring ([#120](https://github.com/akopachov/flipper-zero_authenticator/issues/120))
 
 
@@ -146,7 +146,7 @@
 ## [v1.8.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.0) - 30 Mar 2023
 
 * Implemented [#95](https://github.com/akopachov/flipper-zero_authenticator/issues/95) 
-* New CLI commands `totp update`, `totp lsattr`
+* New CLI commands "totp update", "totp lsattr"
 * Refactoring
 
 
@@ -232,7 +232,7 @@
 
 ## [v1.5.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.5.2) - 21 Dec 2022
 
-* Config file moved to `/ext/authenticator/totp.conf`
+* Config file moved to "/ext/authenticator/totp.conf"
 * Improved the way how config file is getting handled
 * Improved user notification if on error during config file open\read\update
 
@@ -293,8 +293,8 @@
 * Integrated PVS Studio scanner and fixed all its complains
 * Updated firmwares
 * Refactoring
-* Dead code eliminated to fix `COMPACT=1 DEBUG=0` build
-* Build artifacts are done with `COMPACT=1 DEBUG=0` build settings
+* Dead code eliminated to fix "COMPACT=1 DEBUG=0" build
+* Build artifacts are done with "COMPACT=1 DEBUG=0" build settings
 
 
 
