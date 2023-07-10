@@ -73,15 +73,19 @@ static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* tokenInfo, con
     return TotpIteratorUpdateTokenResultSuccess;
 }
 
-static void ask_user_input(const PluginState* plugin_state, char* header, char** user_input, size_t* user_input_length) {
+static void ask_user_input(
+    const PluginState* plugin_state,
+    char* header,
+    char** user_input,
+    size_t* user_input_length) {
     InputTextResult input_result;
-    if (*user_input != NULL) {
+    if(*user_input != NULL) {
         strlcpy(input_result.user_input, *user_input, INPUT_BUFFER_SIZE);
     }
 
     totp_input_text(plugin_state->gui, header, &input_result);
-    if (input_result.success) {
-        if (*user_input != NULL) {
+    if(input_result.success) {
+        if(*user_input != NULL) {
             free(*user_input);
         }
         *user_input = strdup(input_result.user_input);
@@ -236,10 +240,18 @@ bool totp_scene_add_new_token_handle_event(PluginEvent* const event, PluginState
     } else if(event->input.type == InputTypeRelease && event->input.key == InputKeyOk) {
         switch(scene_state->selected_control) {
         case TokenNameTextBox:
-            ask_user_input(plugin_state, "Token name", &scene_state->token_name, &scene_state->token_name_length);
+            ask_user_input(
+                plugin_state,
+                "Token name",
+                &scene_state->token_name,
+                &scene_state->token_name_length);
             break;
         case TokenSecretTextBox:
-            ask_user_input(plugin_state, "Token secret", &scene_state->token_secret, &scene_state->token_secret_length);
+            ask_user_input(
+                plugin_state,
+                "Token secret",
+                &scene_state->token_secret,
+                &scene_state->token_secret_length);
             break;
         case TokenAlgoSelect:
             break;
