@@ -1,6 +1,5 @@
 # Changelog
 
-<a name="v2.2.2"></a>
 ## [v2.2.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.2.2) - 19 Jun 2023
 
 * Fixed [#158](https://github.com/akopachov/flipper-zero_authenticator/issues/158) 
@@ -8,7 +7,6 @@
 
 
 
-<a name="v2.2.1"></a>
 ## [v2.2.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.2.1) - 06 Jun 2023
 
 * Fixed [#155](https://github.com/akopachov/flipper-zero_authenticator/issues/155) 
@@ -16,7 +14,6 @@
 
 
 
-<a name="v2.2.0"></a>
 ## [v2.2.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.2.0) - 05 Jun 2023
 
 * Fixed [#153](https://github.com/akopachov/flipper-zero_authenticator/issues/153) 
@@ -24,7 +21,6 @@
 
 
 
-<a name="v2.1.1"></a>
 ## [v2.1.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.1.1) - 30 May 2023
 
 * Updated firmware submodules
@@ -32,7 +28,6 @@
 
 
 
-<a name="v2.1.0"></a>
 ## [v2.1.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.1.0) - 24 May 2023
 
 * Implemented [#148](https://github.com/akopachov/flipper-zero_authenticator/issues/148) 
@@ -41,7 +36,6 @@
 
 
 
-<a name="v2.0.3"></a>
 ## [v2.0.3](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.0.3) - 29 Apr 2023
 
 * Fixed [#146](https://github.com/akopachov/flipper-zero_authenticator/issues/146) 
@@ -49,14 +43,12 @@
 
 
 
-<a name="v2.0.2"></a>
 ## [v2.0.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.0.2) - 28 Apr 2023
 
 * Refactoring & minor improvements
 
 
 
-<a name="v2.0.1"></a>
 ## [v2.0.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.0.1) - 26 Apr 2023
 
 * Fixed few bugs I found during day 1 of v2.0.0
@@ -65,7 +57,6 @@
 
 
 
-<a name="v2.0.0"></a>
 ## [v2.0.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.0.0) - 25 Apr 2023
 
 * Reworked token list to make app work smooth with bigger lists of tokens. So right now you can add as much tokens as you need.
@@ -75,14 +66,12 @@
 
 
 
-<a name="v1.9.2"></a>
 ## [v1.9.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.9.2) - 13 Apr 2023
 
 * Updated firmware submodules
 
 
 
-<a name="v1.9.1"></a>
 ## [v1.9.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.9.1) - 13 Apr 2023
 
 * Improved TOTP code rendering method
@@ -90,7 +79,6 @@
 
 
 
-<a name="v1.9.0"></a>
 ## [v1.9.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.9.0) - 12 Apr 2023
 
 * Moved token generation into separate thread
@@ -98,7 +86,6 @@
 
 
 
-<a name="v1.8.8"></a>
 ## [v1.8.8](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.8) - 11 Apr 2023
 
 * Xtreme: fixed BT name length according to latest XFW changes (by [@Willy-JL](https://github.com/Willy-JL))
@@ -106,7 +93,6 @@
 
 
 
-<a name="v1.8.7"></a>
 ## [v1.8.7](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.7) - 07 Apr 2023
 
 * Backup conf file before running `totp pin set` and `totp pin remove` CLI commands ([#123](https://github.com/akopachov/flipper-zero_authenticator/issues/123))
@@ -114,21 +100,18 @@
 
 
 
-<a name="v1.8.6"></a>
 ## [v1.8.6](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.6) - 06 Apr 2023
 
 * Updated firmware submodules [#118](https://github.com/akopachov/flipper-zero_authenticator/issues/118) 
 
 
 
-<a name="v1.8.5"></a>
 ## [v1.8.5](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.5) - 05 Apr 2023
 
 * Fixed [#116](https://github.com/akopachov/flipper-zero_authenticator/issues/116) 
 
 
 
-<a name="v1.8.4"></a>
 ## [v1.8.4](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.4) - 05 Apr 2023
 
 * Added Steam guard token support ([#111](https://github.com/akopachov/flipper-zero_authenticator/issues/111))
@@ -138,7 +121,6 @@
 
 
 
-<a name="v1.8.3"></a>
 ## [v1.8.3](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.3) - 03 Apr 2023
 
 * Build artifact for [Xtreme](https://github.com/ClaraCrazy/Flipper-Xtreme) firmware ([#113](https://github.com/akopachov/flipper-zero_authenticator/issues/113))
@@ -146,14 +128,12 @@
 
 
 
-<a name="v1.8.2"></a>
 ## [v1.8.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.2) - 31 Mar 2023
 
 * Implemented [#106](https://github.com/akopachov/flipper-zero_authenticator/issues/106) 
 
 
 
-<a name="v1.8.1"></a>
 ## [v1.8.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.1) - 31 Mar 2023
 
 * Implemented [#102](https://github.com/akopachov/flipper-zero_authenticator/issues/102) 
@@ -163,7 +143,6 @@
 
 
 
-<a name="v1.8.0"></a>
 ## [v1.8.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.8.0) - 30 Mar 2023
 
 * Implemented [#95](https://github.com/akopachov/flipper-zero_authenticator/issues/95) 
@@ -172,14 +151,12 @@
 
 
 
-<a name="v1.7.1"></a>
 ## [v1.7.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.7.1) - 22 Mar 2023
 
 * Updated firmware submodules
 
 
 
-<a name="v1.7.0"></a>
 ## [v1.7.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.7.0) - 21 Mar 2023
 
 * Implemented [#89](https://github.com/akopachov/flipper-zero_authenticator/issues/89) 
@@ -187,7 +164,6 @@
 
 
 
-<a name="v1.6.5"></a>
 ## [v1.6.5](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.6.5) - 09 Mar 2023
 
 * Updated firmware references
@@ -195,14 +171,12 @@
 
 
 
-<a name="v1.6.4"></a>
 ## [v1.6.4](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.6.4) - 01 Mar 2023
 
 * Updated firmware references
 
 
 
-<a name="v1.6.3"></a>
 ## [v1.6.3](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.6.3) - 16 Feb 2023
 
 * Fixed [#76](https://github.com/akopachov/flipper-zero_authenticator/issues/76) 
@@ -212,7 +186,6 @@
 
 
 
-<a name="v1.6.2"></a>
 ## [v1.6.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.6.2) - 13 Feb 2023
 
 * Updated submodules to make app compatible with latest firmware
@@ -220,28 +193,24 @@
 
 
 
-<a name="v1.6.1"></a>
 ## [v1.6.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.6.1) - 07 Feb 2023
 
 * Implemented [#70](https://github.com/akopachov/flipper-zero_authenticator/issues/70) 
 
 
 
-<a name="v1.6.0"></a>
 ## [v1.6.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.6.0) - 18 Jan 2023
 
 * Implemented [#65](https://github.com/akopachov/flipper-zero_authenticator/issues/65) 
 
 
 
-<a name="v1.5.6"></a>
 ## [v1.5.6](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.5.6) - 09 Jan 2023
 
 * Updated firmwares
 
 
 
-<a name="v1.5.5"></a>
 ## [v1.5.5](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.5.5) - 04 Jan 2023
 
 * Implemented [#58](https://github.com/akopachov/flipper-zero_authenticator/issues/58) 
@@ -249,21 +218,18 @@
 
 
 
-<a name="v1.5.4"></a>
 ## [v1.5.4](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.5.4) - 02 Jan 2023
 
 * Fixed [#53](https://github.com/akopachov/flipper-zero_authenticator/issues/53) 
 
 
 
-<a name="v1.5.3"></a>
 ## [v1.5.3](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.5.3) - 30 Dec 2022
 
 * Fixed [#51](https://github.com/akopachov/flipper-zero_authenticator/issues/51) 
 
 
 
-<a name="v1.5.2"></a>
 ## [v1.5.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.5.2) - 21 Dec 2022
 
 * Config file moved to `/ext/authenticator/totp.conf`
@@ -272,14 +238,12 @@
 
 
 
-<a name="v1.5.1"></a>
 ## [v1.5.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.5.1) - 01 Dec 2022
 
 * Implemented [#44](https://github.com/akopachov/flipper-zero_authenticator/issues/44) to be compatible with latest API changes
 
 
 
-<a name="v1.5.0"></a>
 ## [v1.5.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.5.0) - 23 Nov 2022
 
 * Implemented [#36](https://github.com/akopachov/flipper-zero_authenticator/issues/36) 
@@ -287,7 +251,6 @@
 
 
 
-<a name="v1.4.0"></a>
 ## [v1.4.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.4.0) - 21 Nov 2022
 
 * Implemented [#10](https://github.com/akopachov/flipper-zero_authenticator/issues/10) 
@@ -295,7 +258,6 @@
 
 
 
-<a name="v1.3.1"></a>
 ## [v1.3.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.3.1) - 18 Nov 2022
 
 * Implemented [#30](https://github.com/akopachov/flipper-zero_authenticator/issues/30) 
@@ -303,7 +265,6 @@
 
 
 
-<a name="v1.3.0"></a>
 ## [v1.3.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.3.0) - 17 Nov 2022
 
 * Implemented [#26](https://github.com/akopachov/flipper-zero_authenticator/issues/26) 
@@ -314,7 +275,6 @@
 
 
 
-<a name="v1.2.1"></a>
 ## [v1.2.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.2.1) - 10 Nov 2022
 
 * Fixed [#24](https://github.com/akopachov/flipper-zero_authenticator/issues/24)
@@ -322,14 +282,12 @@
 
 
 
-<a name="v1.2.0"></a>
 ## [v1.2.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.2.0) - 10 Nov 2022
 
 * Implemented [#21](https://github.com/akopachov/flipper-zero_authenticator/issues/21) 
 
 
 
-<a name="v1.1.2"></a>
 ## [v1.1.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.1.2) - 07 Nov 2022
 
 * Integrated PVS Studio scanner and fixed all its complains
@@ -340,7 +298,6 @@
 
 
 
-<a name="v1.1.1"></a>
 ## [v1.1.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.1.1) - 02 Nov 2022
 
 * Latest firmwares
@@ -349,7 +306,6 @@
 
 
 
-<a name="v1.1.0"></a>
 ## [v1.1.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.1.0) - 26 Oct 2022
 
 * CLI added (thanks to [@br0ziliy](https://github.com/br0ziliy)). [#11](https://github.com/akopachov/flipper-zero_authenticator/issues/11) 
@@ -358,7 +314,6 @@
 
 
 
-<a name="v1.0.1"></a>
 ## [v1.0.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.0.1) - 21 Oct 2022
 
 * Fixed issue [#8](https://github.com/akopachov/flipper-zero_authenticator/issues/8) 
@@ -366,7 +321,6 @@
 
 
 
-<a name="v1.0.0"></a>
 ## [v1.0.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v1.0.0) - 17 Oct 2022
 
 * Made PIN optional
@@ -376,7 +330,6 @@
 
 
 
-<a name="v0.0.6"></a>
 ## [v0.0.6](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v0.0.6) - 13 Oct 2022
 
 * Added timezone configuration UI
@@ -385,7 +338,6 @@
 
 
 
-<a name="v0.0.5"></a>
 ## [v0.0.5](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v0.0.5) - 10 Oct 2022
 
 * Separate builds for Official and Unleashed firmwares
@@ -393,7 +345,6 @@
 
 
 
-<a name="v0.0.4"></a>
 ## [v0.0.4](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v0.0.4) - 05 Oct 2022
 
 * Moved TOTP app to separate folder to segregate it from flipper_firmware code and make it clearer
