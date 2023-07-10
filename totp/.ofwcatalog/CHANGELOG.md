@@ -3,8 +3,8 @@
 <a name="v2.2.2"></a>
 ## [v2.2.2](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.2.2) - 19 Jun 2023
 
-* 🪲 Fixed [#158](https://github.com/akopachov/flipper-zero_authenticator/issues/158) 
-* 🔝 Cosmetic refactoring
+* Fixed [#158](https://github.com/akopachov/flipper-zero_authenticator/issues/158) 
+* Cosmetic refactoring
 
 [Changes][v2.2.2]
 
@@ -12,8 +12,8 @@
 <a name="v2.2.1"></a>
 ## [v2.2.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.2.1) - 06 Jun 2023
 
-* 🪲 Fixed [#155](https://github.com/akopachov/flipper-zero_authenticator/issues/155) 
-* 🔝 Refactoring
+* Fixed [#155](https://github.com/akopachov/flipper-zero_authenticator/issues/155) 
+* Refactoring
 
 [Changes][v2.2.1]
 
@@ -21,8 +21,8 @@
 <a name="v2.2.0"></a>
 ## [v2.2.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.2.0) - 05 Jun 2023
 
-* 🪲 Fixed [#153](https://github.com/akopachov/flipper-zero_authenticator/issues/153) 
-* 🔝 Updated firmware submodules
+* Fixed [#153](https://github.com/akopachov/flipper-zero_authenticator/issues/153) 
+* Updated firmware submodules
 
 [Changes][v2.2.0]
 
@@ -30,8 +30,8 @@
 <a name="v2.1.1"></a>
 ## [v2.1.1](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.1.1) - 30 May 2023
 
-* 🔝 Updated firmware submodules
-* 🆕 Added some new fonts for supporters 
+* Updated firmware submodules
+* Added some new fonts for supporters 
 
 [Changes][v2.1.1]
 
@@ -39,9 +39,9 @@
 <a name="v2.1.0"></a>
 ## [v2.1.0](https://github.com/akopachov/flipper-zero_authenticator/releases/tag/v2.1.0) - 24 May 2023
 
-* 🆕 Implemented [#148](https://github.com/akopachov/flipper-zero_authenticator/issues/148) 
+* Implemented [#148](https://github.com/akopachov/flipper-zero_authenticator/issues/148) 
 * 🧹 Refactoring
-* **🔥🔥🔥 Added nice custom fonts for supporters 🔥🔥🔥**
+* ** Added nice custom fonts for supporters **
 
 [Changes][v2.1.0]
 
