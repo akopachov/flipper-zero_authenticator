@@ -2,7 +2,7 @@ name: Auto CLang format
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, edited]
     branches: ['master']
 
 jobs:
