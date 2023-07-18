@@ -4,7 +4,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches: ['master']
-    paths: ['**.c', '**.h']
 
 jobs:
   clang-format:
@@ -19,9 +18,9 @@ jobs:
         ref: ${{ github.head_ref }}
         submodules: 'recursive'
 
-    - name: CLang format
-      run: ./clang-format-all.ps1
-      shell: pwsh
+    - uses: purduesigbots/clang-format-action@1
+      with:
+        style: file
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:

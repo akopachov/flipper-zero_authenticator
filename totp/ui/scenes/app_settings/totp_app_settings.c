@@ -222,7 +222,7 @@ bool totp_scene_app_settings_handle_event(
                 HoursInput,
                 ConfirmButton,
                 RollOverflowBehaviorStop);
-            if(scene_state->selected_control > VibroSwitch) {
+if(scene_state->selected_control > VibroSwitch) {
                 scene_state->y_offset = SCREEN_HEIGHT * 3;
             } else if(scene_state->selected_control > FontSelect) {
                 scene_state->y_offset = SCREEN_HEIGHT * 2;
