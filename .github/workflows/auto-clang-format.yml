@@ -19,7 +19,7 @@ jobs:
         ref: ${{ github.head_ref }}
 
     - name: Get last commit on ${{ github.base_ref }} branch
-      run: echo "BASE_HEAD_REF=$(git rev-parse ${{ github.base_ref }})" >> $GITHUB_ENV
+      run: echo "BASE_HEAD_REF=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
 
     - uses: akopachov/clang-format-action@main
       with:
