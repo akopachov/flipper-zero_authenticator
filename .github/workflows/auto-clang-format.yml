@@ -2,7 +2,7 @@ name: Auto CLang format
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, edited]
+    types: [opened, synchronize, reopened]
     branches: ['master']
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       with:
         ref: ${{ github.head_ref }}
 
-    - uses: akopachov/clang-format-action
+    - uses: akopachov/clang-format-action@main
       with:
         style: file
 
