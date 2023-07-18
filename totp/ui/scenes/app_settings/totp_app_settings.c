@@ -162,7 +162,7 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
         YES_NO_LIST[scene_state->notification_vibro],
         scene_state->selected_control == VibroSwitch);
 
-    canvas_draw_icon(
+canvas_draw_icon(
         canvas, SCREEN_WIDTH_CENTER - 5, 187 - scene_state->y_offset, &I_totp_arrow_bottom_10x5);
 
     canvas_set_font(canvas, FontPrimary);
