@@ -142,7 +142,6 @@ static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin
     const TokenInfoIteratorContext* iterator_context =
         totp_config_get_token_iterator_context(plugin_state);
     uint8_t code_length = totp_token_info_iterator_get_current_token(iterator_context)->digits;
-    const FONT_INFO* const font = scene_state->active_font;
 
     canvas_draw_str_ex(
         canvas,
@@ -150,7 +149,7 @@ static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin
         scene_state->ui_precalculated_dimensions.code_offset_y,
         scene_state->last_code,
         code_length,
-        font);
+        scene_state->active_font);
 }
 
 static void on_new_token_code_generated(bool time_left, void* context) {
