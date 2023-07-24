@@ -157,6 +157,9 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
         tmp_uint32 = 0;
         flipper_format_write_uint32(fff_data_file, TOTP_CONFIG_KEY_FONT, &tmp_uint32, 1);
 
+        tmp_uint32 = DEFAULT_CRYPTO_KEY_SLOT;
+        flipper_format_write_uint32(fff_data_file, TOTP_CONFIG_KEY_CRYPTO_KEY_SLOT, &tmp_uint32, 1);
+
         if(!flipper_format_rewind(fff_data_file)) {
             totp_close_config_file(fff_data_file);
             FURI_LOG_E(LOGGING_TAG, "Rewind error");
@@ -492,6 +495,7 @@ void totp_config_file_reset(PluginState* const plugin_state) {
 
 bool totp_config_file_update_encryption(
     PluginState* plugin_state,
+    uint8_t new_crypto_key_slot,
     const uint8_t* new_pin,
     uint8_t new_pin_length) {
     FlipperFormat* config_file = plugin_state->config_file_context->config_file;
@@ -504,12 +508,16 @@ bool totp_config_file_update_encryption(
     uint8_t old_iv[CRYPTO_IV_LENGTH];
     memcpy(&old_iv[0], &plugin_state->iv[0], CRYPTO_IV_LENGTH);
 
+    uint8_t old_crypto_key_slot = plugin_state->crypto_key_slot;
+
     memset(&plugin_state->iv[0], 0, CRYPTO_IV_LENGTH);
     memset(&plugin_state->base_iv[0], 0, CRYPTO_IV_LENGTH);
     if(plugin_state->crypto_verify_data != NULL) {
         free(plugin_state->crypto_verify_data);
         plugin_state->crypto_verify_data = NULL;
     }
+
+    plugin_state->crypto_key_slot = new_crypto_key_slot;
 
     CryptoSeedIVResult seed_result =
         totp_crypto_seed_iv(plugin_state, new_pin_length > 0 ? new_pin : NULL, new_pin_length);
@@ -564,7 +572,7 @@ bool totp_config_file_update_encryption(
 
                 size_t plain_token_length;
                 uint8_t* plain_token = totp_crypto_decrypt(
-                    encrypted_token, secret_bytes_count, &old_iv[0], plugin_state->crypto_key_slot, &plain_token_length);
+                    encrypted_token, secret_bytes_count, &old_iv[0], old_crypto_key_slot, &plain_token_length);
 
                 free(encrypted_token);
                 size_t encrypted_token_length;

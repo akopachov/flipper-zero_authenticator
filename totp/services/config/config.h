@@ -73,12 +73,14 @@ void totp_config_file_close(PluginState* const plugin_state);
 /**
  * @brief Updates config file encryption by re-encrypting it using new user's PIN and new randomly generated IV
  * @param plugin_state application state
+ * @param new_crypto_key_slot new crypto key slot to be used
  * @param new_pin new user's PIN
  * @param new_pin_length new user's PIN length
  * @return \c true if config file encryption successfully updated; \c false otherwise
  */
 bool totp_config_file_update_encryption(
     PluginState* plugin_state,
+    uint8_t new_crypto_key_slot,
     const uint8_t* new_pin,
     uint8_t new_pin_length);
 

@@ -27,6 +27,10 @@ static uint8_t get_crypto_verify_key_length() {
 bool totp_crypto_check_key_slot(uint8_t key_slot) {
     uint8_t iv[CRYPTO_IV_LENGTH];
     furi_hal_random_fill_buf(&iv[0], CRYPTO_IV_LENGTH);
+    if (key_slot < ACCEPTABLE_CRYPTO_KEY_SLOT_START || key_slot > ACCEPTABLE_CRYPTO_KEY_SLOT_END) {
+        return false;
+    }
+
     return furi_hal_crypto_store_load_key(key_slot, iv) && furi_hal_crypto_store_unload_key(key_slot);
 }
 
@@ -96,6 +100,10 @@ CryptoSeedIVResult
 
     memcpy(&plugin_state->iv[0], &plugin_state->base_iv[0], CRYPTO_IV_LENGTH);
 
+    FURI_LOG_I(LOGGING_TAG, "Base IV: %d %d %d %d %d %d %d %d", plugin_state->base_iv[0], plugin_state->base_iv[1], 
+        plugin_state->base_iv[2], plugin_state->base_iv[3], plugin_state->base_iv[4], 
+        plugin_state->base_iv[5], plugin_state->base_iv[6], plugin_state->base_iv[7]);
+
     const uint8_t* device_uid = get_device_uid();
     uint8_t device_uid_length = get_device_uid_length();
 
@@ -115,6 +123,10 @@ CryptoSeedIVResult
             plugin_state->iv[i] = plugin_state->iv[i] ^ (uint8_t)(pin[i] * factor);
         }
     }
+
+    FURI_LOG_I(LOGGING_TAG, "Final IV: %d %d %d %d %d %d %d %d", plugin_state->iv[0], plugin_state->iv[1], 
+        plugin_state->iv[2], plugin_state->iv[3], plugin_state->iv[4], 
+        plugin_state->iv[5], plugin_state->iv[6], plugin_state->iv[7]);
 
     result = CryptoSeedIVResultFlagSuccess;
     if(plugin_state->crypto_verify_data == NULL) {

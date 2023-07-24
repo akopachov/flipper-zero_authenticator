@@ -68,6 +68,8 @@ static bool totp_activate_initial_scene(PluginState* const plugin_state) {
     } else if(plugin_state->pin_set) {
         totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication);
     } else {
+        // TODO: Check & migrate crypto to v2
+        
         CryptoSeedIVResult seed_result = totp_crypto_seed_iv(plugin_state, NULL, 0);
         if(seed_result & CryptoSeedIVResultFlagSuccess &&
            seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
@@ -207,24 +209,22 @@ int32_t totp_app() {
     PluginEvent event;
     bool processing = true;
     while(processing) {
-        FuriStatus event_status = furi_message_queue_get(event_queue, &event, FuriWaitForever);
-
-        if(furi_mutex_acquire(plugin_state->mutex, FuriWaitForever) == FuriStatusOk) {
-            if(event_status == FuriStatusOk) {
-                if(event.type == EventTypeKey && plugin_state->idle_timeout_context != NULL) {
-                    idle_timeout_report_activity(plugin_state->idle_timeout_context);
-                }
-
-                if(event.type == EventForceCloseApp) {
-                    processing = false;
-                } else {
-                    processing = totp_scene_director_handle_event(&event, plugin_state);
-                }
+        if(furi_message_queue_get(event_queue, &event, 500) == FuriStatusOk &&
+            furi_mutex_acquire(plugin_state->mutex, FuriWaitForever) == FuriStatusOk) {
+            if(event.type == EventTypeKey && plugin_state->idle_timeout_context != NULL) {
+                idle_timeout_report_activity(plugin_state->idle_timeout_context);
             }
 
-            view_port_update(view_port);
+            if(event.type == EventForceCloseApp) {
+                processing = false;
+            } else {
+                processing = totp_scene_director_handle_event(&event, plugin_state);
+            }
+
             furi_mutex_release(plugin_state->mutex);
         }
+
+        view_port_update(view_port);
     }
 
     totp_cli_unregister_command_handler(cli_context);

@@ -122,6 +122,8 @@ bool totp_scene_authenticate_handle_event(
             break;
         }
     } else if(event->input.type == InputTypeRelease && event->input.key == InputKeyOk) {
+        // TODO: Check & migrate crypto to v2
+        
         CryptoSeedIVResult seed_result = totp_crypto_seed_iv(
             plugin_state, &scene_state->code_input[0], scene_state->code_length);
 
