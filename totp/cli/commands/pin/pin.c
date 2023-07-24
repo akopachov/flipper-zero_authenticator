@@ -28,7 +28,7 @@ void totp_cli_command_pin_docopt_usage() {
 
 void totp_cli_command_pin_docopt_options() {
     TOTP_CLI_PRINTF("  " DOCOPT_OPTION(TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT))
-                    "     New crypto key slot. Must be between " ACCEPTABLE_CRYPTO_KEY_SLOT_START " and " ACCEPTABLE_CRYPTO_KEY_SLOT_END "\r\n");
+                    "     New crypto key slot. Must be between %d and %d\r\n", ACCEPTABLE_CRYPTO_KEY_SLOT_START, ACCEPTABLE_CRYPTO_KEY_SLOT_END);
 }
 
 static inline uint8_t totp_cli_key_to_pin_code(uint8_t key) {
@@ -102,7 +102,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
     bool arguments_parsed = false;
     do {
-        while(args_read_string_and_trim(context_t->args, temp_str)) {
+        while(args_read_string_and_trim(args, temp_str)) {
             if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_PIN_COMMAND_SET) == 0) {
                 do_change = true;
             } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_PIN_COMMAND_REMOVE) == 0) {
