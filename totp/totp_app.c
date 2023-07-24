@@ -15,7 +15,7 @@
 #include "ui/scene_director.h"
 #include "ui/constants.h"
 #include "ui/common_dialogs.h"
-#include "services/crypto/crypto.h"
+#include "services/crypto/crypto_v2.h"
 #include "cli/cli.h"
 
 static void render_callback(Canvas* const canvas, void* ctx) {
@@ -119,7 +119,7 @@ static bool totp_plugin_state_init(PluginState* const plugin_state) {
     plugin_state->gui = furi_record_open(RECORD_GUI);
     plugin_state->notification_app = furi_record_open(RECORD_NOTIFICATION);
     plugin_state->dialogs_app = furi_record_open(RECORD_DIALOGS);
-    memset(&plugin_state->iv[0], 0, TOTP_IV_SIZE);
+    memset(&plugin_state->iv[0], 0, CRYPTO_IV_LENGTH);
 
     if(!totp_config_file_load(plugin_state)) {
         totp_dialogs_config_loading_error(plugin_state);

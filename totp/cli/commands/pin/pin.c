@@ -7,7 +7,7 @@
 #include "../../../services/config/config.h"
 #include "../../cli_helpers.h"
 #include <memset_s.h>
-#include "../../../services/crypto/crypto.h"
+#include "../../../services/crypto/crypto_v2.h"
 #include "../../../ui/scene_director.h"
 
 #define TOTP_CLI_COMMAND_PIN_COMMAND_SET "set"
@@ -105,19 +105,19 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
     if((do_change || do_remove) && totp_cli_ensure_authenticated(plugin_state, cli)) {
         TOTP_CLI_LOCK_UI(plugin_state);
         do {
-            uint8_t old_iv[TOTP_IV_SIZE];
-            memcpy(&old_iv[0], &plugin_state->iv[0], TOTP_IV_SIZE);
-            uint8_t new_pin[TOTP_IV_SIZE];
-            memset(&new_pin[0], 0, TOTP_IV_SIZE);
+            uint8_t old_iv[CRYPTO_IV_LENGTH];
+            memcpy(&old_iv[0], &plugin_state->iv[0], CRYPTO_IV_LENGTH);
+            uint8_t new_pin[CRYPTO_IV_LENGTH];
+            memset(&new_pin[0], 0, CRYPTO_IV_LENGTH);
             uint8_t new_pin_length = 0;
             if(do_change) {
                 if(!totp_cli_read_pin(cli, &new_pin[0], &new_pin_length)) {
-                    memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
+                    memset_s(&new_pin[0], CRYPTO_IV_LENGTH, 0, CRYPTO_IV_LENGTH);
                     break;
                 }
             } else if(do_remove) {
                 new_pin_length = 0;
-                memset(&new_pin[0], 0, TOTP_IV_SIZE);
+                memset(&new_pin[0], 0, CRYPTO_IV_LENGTH);
             }
 
             char* backup_path = totp_config_file_backup(plugin_state);
@@ -127,7 +127,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
                     "Once you make sure everything is fine and works as expected, please delete this backup file\r\n");
                 free(backup_path);
             } else {
-                memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
+                memset_s(&new_pin[0], CRYPTO_IV_LENGTH, 0, CRYPTO_IV_LENGTH);
                 TOTP_CLI_PRINTF_ERROR(
                     "An error has occurred during taking backup of config file\r\n");
                 break;
@@ -138,7 +138,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
             bool update_result =
                 totp_config_file_update_encryption(plugin_state, new_pin, new_pin_length);
 
-            memset_s(&new_pin[0], TOTP_IV_SIZE, 0, TOTP_IV_SIZE);
+            memset_s(&new_pin[0], CRYPTO_IV_LENGTH, 0, CRYPTO_IV_LENGTH);
 
             totp_cli_delete_last_line();
 

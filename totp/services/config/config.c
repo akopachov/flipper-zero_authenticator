@@ -9,7 +9,7 @@
 #include "../../types/common.h"
 #include "../../types/token_info.h"
 #include "../../features_config.h"
-#include "../crypto/crypto.h"
+#include "../crypto/crypto_v2.h"
 #include "migrations/common_migration.h"
 
 #define CONFIG_FILE_PATH CONFIG_FILE_DIRECTORY_PATH "/totp.conf"
@@ -345,7 +345,7 @@ bool totp_config_file_load(PluginState* const plugin_state) {
         }
 
         if(!flipper_format_read_hex(
-               fff_data_file, TOTP_CONFIG_KEY_BASE_IV, &plugin_state->base_iv[0], TOTP_IV_SIZE)) {
+               fff_data_file, TOTP_CONFIG_KEY_BASE_IV, &plugin_state->base_iv[0], CRYPTO_IV_LENGTH)) {
             FURI_LOG_D(LOGGING_TAG, "Missing base IV");
         }
 
@@ -419,13 +419,19 @@ bool totp_config_file_load(PluginState* const plugin_state) {
 
         plugin_state->active_font_index = tmp_uint32;
 
+        if(!flipper_format_read_uint32(fff_data_file, TOTP_CONFIG_KEY_CRYPTO_KEY_SLOT, &tmp_uint32, 1)) {
+            tmp_uint32 = DEFAULT_CRYPTO_KEY_SLOT;
+        }
+
+        plugin_state->crypto_key_slot = tmp_uint32;
+
         plugin_state->config_file_context = malloc(sizeof(ConfigFileContext));
         furi_check(plugin_state->config_file_context != NULL);
         plugin_state->config_file_context->storage = storage;
         plugin_state->config_file_context->config_file = fff_data_file;
         plugin_state->config_file_context->token_info_iterator_context =
             totp_token_info_iterator_alloc(
-                storage, plugin_state->config_file_context->config_file, plugin_state->iv);
+                storage, plugin_state->config_file_context->config_file, plugin_state->iv, plugin_state->crypto_key_slot);
         result = true;
     } while(false);
 
@@ -439,7 +445,7 @@ bool totp_config_file_update_crypto_signatures(const PluginState* plugin_state) 
     bool update_result = false;
     do {
         if(!flipper_format_insert_or_update_hex(
-               config_file, TOTP_CONFIG_KEY_BASE_IV, plugin_state->base_iv, TOTP_IV_SIZE)) {
+               config_file, TOTP_CONFIG_KEY_BASE_IV, plugin_state->base_iv, CRYPTO_IV_LENGTH)) {
             break;
         }
 
@@ -453,6 +459,12 @@ bool totp_config_file_update_crypto_signatures(const PluginState* plugin_state) 
 
         if(!flipper_format_insert_or_update_bool(
                config_file, TOTP_CONFIG_KEY_PINSET, &plugin_state->pin_set, 1)) {
+            break;
+        }
+
+        uint32_t tmp_uint32 = plugin_state->crypto_key_slot;
+        if(!flipper_format_insert_or_update_uint32(
+               config_file, TOTP_CONFIG_KEY_CRYPTO_KEY_SLOT, &tmp_uint32, 1)) {
             break;
         }
 
@@ -489,11 +501,11 @@ bool totp_config_file_update_encryption(
         return false;
     }
 
-    uint8_t old_iv[TOTP_IV_SIZE];
-    memcpy(&old_iv[0], &plugin_state->iv[0], TOTP_IV_SIZE);
+    uint8_t old_iv[CRYPTO_IV_LENGTH];
+    memcpy(&old_iv[0], &plugin_state->iv[0], CRYPTO_IV_LENGTH);
 
-    memset(&plugin_state->iv[0], 0, TOTP_IV_SIZE);
-    memset(&plugin_state->base_iv[0], 0, TOTP_IV_SIZE);
+    memset(&plugin_state->iv[0], 0, CRYPTO_IV_LENGTH);
+    memset(&plugin_state->base_iv[0], 0, CRYPTO_IV_LENGTH);
     if(plugin_state->crypto_verify_data != NULL) {
         free(plugin_state->crypto_verify_data);
         plugin_state->crypto_verify_data = NULL;
@@ -552,12 +564,12 @@ bool totp_config_file_update_encryption(
 
                 size_t plain_token_length;
                 uint8_t* plain_token = totp_crypto_decrypt(
-                    encrypted_token, secret_bytes_count, &old_iv[0], &plain_token_length);
+                    encrypted_token, secret_bytes_count, &old_iv[0], plugin_state->crypto_key_slot, &plain_token_length);
 
                 free(encrypted_token);
                 size_t encrypted_token_length;
                 encrypted_token = totp_crypto_encrypt(
-                    plain_token, plain_token_length, &plugin_state->iv[0], &encrypted_token_length);
+                    plain_token, plain_token_length, &plugin_state->iv[0], plugin_state->crypto_key_slot, &encrypted_token_length);
 
                 memset_s(plain_token, plain_token_length, 0, plain_token_length);
                 free(plain_token);
