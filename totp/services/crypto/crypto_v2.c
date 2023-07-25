@@ -109,33 +109,37 @@ CryptoSeedIVResult
     }
 
     uint8_t hmac[HMAC_SHA512_RESULT_SIZE] = {0};
-    hmac_sha512(hmac_key, hmac_key_length, &plugin_state->base_iv[0], CRYPTO_IV_LENGTH, &hmac[0]);
+    int hmac_result_code = hmac_sha512(hmac_key, hmac_key_length, &plugin_state->base_iv[0], CRYPTO_IV_LENGTH, &hmac[0]);
 
     memset_s(hmac_key, hmac_key_length, 0, hmac_key_length);
     free(hmac_key);
 
-    uint8_t offset = hmac[HMAC_SHA512_RESULT_SIZE - 1] & 0xF;
-    memcpy(&plugin_state->iv[0], &hmac[offset], CRYPTO_IV_LENGTH);
+    if (hmac_result_code == 0) {
+        uint8_t offset = hmac[HMAC_SHA512_RESULT_SIZE - 1] & 0xF;
+        memcpy(&plugin_state->iv[0], &hmac[offset], CRYPTO_IV_LENGTH);
 
-    result = CryptoSeedIVResultFlagSuccess;
-    if(plugin_state->crypto_verify_data == NULL) {
-        const uint8_t* crypto_vkey = get_crypto_verify_key();
-        uint8_t crypto_vkey_length = get_crypto_verify_key_length();
-        FURI_LOG_I(LOGGING_TAG, "Generating crypto verify data");
-        plugin_state->crypto_verify_data = malloc(crypto_vkey_length);
-        furi_check(plugin_state->crypto_verify_data != NULL);
-        plugin_state->crypto_verify_data_length = crypto_vkey_length;
+        result = CryptoSeedIVResultFlagSuccess;
+        if(plugin_state->crypto_verify_data == NULL) {
+            const uint8_t* crypto_vkey = get_crypto_verify_key();
+            uint8_t crypto_vkey_length = get_crypto_verify_key_length();
+            FURI_LOG_I(LOGGING_TAG, "Generating crypto verify data");
+            plugin_state->crypto_verify_data = malloc(crypto_vkey_length);
+            furi_check(plugin_state->crypto_verify_data != NULL);
+            plugin_state->crypto_verify_data_length = crypto_vkey_length;
 
-        plugin_state->crypto_verify_data = totp_crypto_encrypt_v2(
-            crypto_vkey,
-            crypto_vkey_length,
-            &plugin_state->iv[0],
-            plugin_state->crypto_key_slot,
-            &plugin_state->crypto_verify_data_length);
+            plugin_state->crypto_verify_data = totp_crypto_encrypt_v2(
+                crypto_vkey,
+                crypto_vkey_length,
+                &plugin_state->iv[0],
+                plugin_state->crypto_key_slot,
+                &plugin_state->crypto_verify_data_length);
 
-        plugin_state->pin_set = pin != NULL && pin_length > 0;
+            plugin_state->pin_set = pin != NULL && pin_length > 0;
 
-        result |= CryptoSeedIVResultFlagNewCryptoVerifyData;
+            result |= CryptoSeedIVResultFlagNewCryptoVerifyData;
+        }
+    } else {
+        result = CryptoSeedIVResultFailed;
     }
 
     return result;
