@@ -1,19 +1,18 @@
 #include "crypto_facade.h"
 #include <furi_hal_crypto.h>
-#include <furi_hal_random.h>
 #include "crypto_v1.h"
 #include "crypto_v2.h"
 #include "constants.h"
 
 bool totp_crypto_check_key_slot(uint8_t key_slot) {
-    uint8_t iv[CRYPTO_IV_LENGTH];
-    furi_hal_random_fill_buf(&iv[0], CRYPTO_IV_LENGTH);
+    uint8_t empty_iv[CRYPTO_IV_LENGTH] = {0};
     if(key_slot < ACCEPTABLE_CRYPTO_KEY_SLOT_START || key_slot > ACCEPTABLE_CRYPTO_KEY_SLOT_END) {
         return false;
     }
 
-    return furi_hal_crypto_store_load_key(key_slot, iv) &&
-           furi_hal_crypto_store_unload_key(key_slot);
+    return furi_hal_crypto_verify_key(key_slot) &&
+        furi_hal_crypto_store_load_key(key_slot, empty_iv) &&
+        furi_hal_crypto_store_unload_key(key_slot);
 }
 
 uint8_t* totp_crypto_encrypt(

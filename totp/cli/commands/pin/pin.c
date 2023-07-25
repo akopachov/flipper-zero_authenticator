@@ -118,11 +118,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
             0) {
             if(!args_read_uint8_and_trim(args, &crypto_key_slot) ||
                !totp_crypto_check_key_slot(crypto_key_slot)) {
-                TOTP_CLI_PRINTF_ERROR(
-                    "\"%" PRIu8
-                    "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX
-                    "\"\r\n",
-                    crypto_key_slot);
+                TOTP_CLI_PRINTF_ERROR("Slot \"%" PRIu8 "\" can not be used\r\n", crypto_key_slot);
                 arguments_parsed = false;
                 break;
             }
