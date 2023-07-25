@@ -126,13 +126,14 @@ bool totp_scene_authenticate_handle_event(
             plugin_state, &scene_state->code_input[0], scene_state->code_length);
 
         if(seed_result & CryptoSeedIVResultFlagSuccess &&
-            seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
+           seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
             totp_config_file_update_crypto_signatures(plugin_state);
         }
 
         if(totp_crypto_verify_key(plugin_state)) {
             FURI_LOG_D(LOGGING_TAG, "PIN is valid");
-            totp_config_file_ensure_latest_encryption(plugin_state, &scene_state->code_input[0], scene_state->code_length);
+            totp_config_file_ensure_latest_encryption(
+                plugin_state, &scene_state->code_input[0], scene_state->code_length);
             totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         } else {
             FURI_LOG_D(LOGGING_TAG, "PIN is NOT valid");

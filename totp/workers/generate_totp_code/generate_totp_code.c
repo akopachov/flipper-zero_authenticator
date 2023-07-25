@@ -71,7 +71,12 @@ static void generate_totp_code(
     if(token_info->token != NULL && token_info->token_length > 0) {
         size_t key_length;
         uint8_t* key = totp_crypto_decrypt(
-            token_info->token, token_info->token_length, context->iv, context->crypto_version, context->crypto_key_slot, &key_length);
+            token_info->token,
+            token_info->token_length,
+            context->iv,
+            context->crypto_version,
+            context->crypto_key_slot,
+            &key_length);
 
         int_token_to_str(
             totp_at(
@@ -160,7 +165,7 @@ TotpGenerateCodeWorkerContext* totp_generate_code_worker_start(
     context->timezone_offset = timezone_offset;
     context->iv = iv;
     context->crypto_version = crypto_version;
-    context->crypto_key_slot = crypto_key_slot; 
+    context->crypto_key_slot = crypto_key_slot;
     context->thread = furi_thread_alloc();
     furi_thread_set_name(context->thread, "TOTPGenerateWorker");
     furi_thread_set_stack_size(context->thread, 2048);

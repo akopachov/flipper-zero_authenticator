@@ -20,15 +20,22 @@ void totp_cli_command_pin_docopt_commands() {
 }
 
 void totp_cli_command_pin_docopt_usage() {
-    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_NAME " " TOTP_CLI_COMMAND_PIN " " DOCOPT_REQUIRED(
-        TOTP_CLI_COMMAND_PIN_COMMAND_SET " | " TOTP_CLI_COMMAND_PIN_COMMAND_REMOVE) 
-        " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT)))
-        "\r\n");
+    TOTP_CLI_PRINTF(
+        "  " TOTP_CLI_COMMAND_NAME " " TOTP_CLI_COMMAND_PIN
+        " " DOCOPT_REQUIRED(TOTP_CLI_COMMAND_PIN_COMMAND_SET " | " TOTP_CLI_COMMAND_PIN_COMMAND_REMOVE) " " DOCOPT_OPTIONAL(
+            DOCOPT_OPTION(
+                TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX,
+                DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT))) "\r\n");
 }
 
 void totp_cli_command_pin_docopt_options() {
-    TOTP_CLI_PRINTF("  " DOCOPT_OPTION(TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT))
-                    "      New crypto key slot. Must be between %d and %d\r\n", ACCEPTABLE_CRYPTO_KEY_SLOT_START, ACCEPTABLE_CRYPTO_KEY_SLOT_END);
+    TOTP_CLI_PRINTF(
+        "  " DOCOPT_OPTION(
+            TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX,
+            DOCOPT_ARGUMENT(
+                TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT)) "      New crypto key slot. Must be between %d and %d\r\n",
+        ACCEPTABLE_CRYPTO_KEY_SLOT_START,
+        ACCEPTABLE_CRYPTO_KEY_SLOT_END);
 }
 
 static inline uint8_t totp_cli_key_to_pin_code(uint8_t key) {
@@ -106,9 +113,11 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
             do_change = true;
         } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_PIN_COMMAND_REMOVE) == 0) {
             do_remove = true;
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX) == 0) {
-            if (!args_read_uint8_and_trim(args, &crypto_key_slot) ||
-                !totp_crypto_check_key_slot(crypto_key_slot)) {
+        } else if(
+            furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX) ==
+            0) {
+            if(!args_read_uint8_and_trim(args, &crypto_key_slot) ||
+               !totp_crypto_check_key_slot(crypto_key_slot)) {
                 TOTP_CLI_PRINTF_ERROR(
                     "\"%" PRIu8
                     "\" is incorrect value for argument \"" TOTP_CLI_COMMAND_PIN_ARG_NEW_CRYPTO_KEY_SLOT_PREFIX
@@ -124,7 +133,7 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
         }
     }
 
-    if (!(do_change || do_remove) || (do_change && do_remove)) {
+    if(!(do_change || do_remove) || (do_change && do_remove)) {
         totp_cli_print_invalid_arguments();
         arguments_parsed = false;
     }
@@ -160,8 +169,8 @@ void totp_cli_command_pin_handle(PluginState* plugin_state, FuriString* args, Cl
 
             TOTP_CLI_PRINTF("Encrypting...\r\n");
 
-            bool update_result =
-                totp_config_file_update_encryption(plugin_state, crypto_key_slot, new_pin, new_pin_length);
+            bool update_result = totp_config_file_update_encryption(
+                plugin_state, crypto_key_slot, new_pin, new_pin_length);
 
             memset_s(&new_pin[0], CRYPTO_IV_LENGTH, 0, CRYPTO_IV_LENGTH);
 

@@ -56,8 +56,13 @@ bool token_info_set_secret(
             free(token_info->token);
         }
 
-        token_info->token =
-            totp_crypto_encrypt(plain_secret, plain_secret_length, iv, crypto_version, crypto_key_slot, &token_info->token_length);
+        token_info->token = totp_crypto_encrypt(
+            plain_secret,
+            plain_secret_length,
+            iv,
+            crypto_version,
+            crypto_key_slot,
+            &token_info->token_length);
         result = true;
     } else {
         result = false;
