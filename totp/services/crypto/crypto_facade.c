@@ -11,8 +11,8 @@ bool totp_crypto_check_key_slot(uint8_t key_slot) {
     }
 
     return furi_hal_crypto_verify_key(key_slot) &&
-        furi_hal_crypto_store_load_key(key_slot, empty_iv) &&
-        furi_hal_crypto_store_unload_key(key_slot);
+           furi_hal_crypto_store_load_key(key_slot, empty_iv) &&
+           furi_hal_crypto_store_unload_key(key_slot);
 }
 
 uint8_t* totp_crypto_encrypt(
