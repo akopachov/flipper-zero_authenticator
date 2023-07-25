@@ -653,15 +653,18 @@ bool totp_config_file_ensure_latest_encryption(
     if (plugin_state->crypto_version < CRYPTO_LATEST_VERSION) {
         FURI_LOG_I(LOGGING_TAG, "Migration to crypto v%d is needed", CRYPTO_LATEST_VERSION);
         char* backup_path = totp_config_file_backup(plugin_state);
-        FURI_LOG_I(LOGGING_TAG, "Took config file backup to %s", backup_path);
-        free(backup_path);
-        uint8_t crypto_key_slot = plugin_state->crypto_key_slot;
-        if (!totp_crypto_check_key_slot(crypto_key_slot)) {
-            crypto_key_slot = DEFAULT_CRYPTO_KEY_SLOT;
-        }
+        if (backup_path != NULL) {
+            free(backup_path);
+            uint8_t crypto_key_slot = plugin_state->crypto_key_slot;
+            if (!totp_crypto_check_key_slot(crypto_key_slot)) {
+                crypto_key_slot = DEFAULT_CRYPTO_KEY_SLOT;
+            }
 
-        result = totp_config_file_update_encryption(plugin_state, crypto_key_slot, pin, pin_length);
-        FURI_LOG_I(LOGGING_TAG, "Migration to crypto v%d is done. Result: %d", CRYPTO_LATEST_VERSION, result);
+            result = totp_config_file_update_encryption(plugin_state, crypto_key_slot, pin, pin_length);
+            FURI_LOG_I(LOGGING_TAG, "Migration to crypto v%d is done. Result: %d", CRYPTO_LATEST_VERSION, result);
+        } else {
+            result = false;
+        }
     }
 
     return result;
