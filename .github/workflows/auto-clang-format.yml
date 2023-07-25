@@ -26,7 +26,8 @@ jobs:
         style: file
         commit: ${{ env.BASE_HEAD_REF }}
 
-    - run: chown -R root:root .
+    - name: Update Permissions
+      run: sudo chown --recursive $USER .
 
     - uses: stefanzweifel/git-auto-commit-action@v4.16.0
       with:
