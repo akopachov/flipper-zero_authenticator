@@ -209,7 +209,7 @@ int32_t totp_app() {
     bool processing = true;
     while(processing) {
         if(furi_message_queue_get(event_queue, &event, 500) == FuriStatusOk &&
-            furi_mutex_acquire(plugin_state->mutex, FuriWaitForever) == FuriStatusOk) {
+           furi_mutex_acquire(plugin_state->mutex, FuriWaitForever) == FuriStatusOk) {
             if(event.type == EventTypeKey && plugin_state->idle_timeout_context != NULL) {
                 idle_timeout_report_activity(plugin_state->idle_timeout_context);
             }

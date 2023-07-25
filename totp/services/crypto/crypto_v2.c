@@ -13,7 +13,7 @@ static const uint8_t* get_device_uid() {
     return (const uint8_t*)UID64_BASE; //-V566
 }
 
-static uint8_t get_device_uid_length() { 
+static uint8_t get_device_uid_length() {
     return furi_hal_version_uid_size();
 }
 
@@ -46,8 +46,10 @@ uint8_t* totp_crypto_encrypt_v2(
 
         furi_check(
             furi_hal_crypto_store_load_key(key_slot, iv) &&
-            furi_hal_crypto_encrypt(plain_data_aligned, encrypted_data, plain_data_aligned_length) &&
-            furi_hal_crypto_store_unload_key(key_slot), "Encryption failed");
+                furi_hal_crypto_encrypt(
+                    plain_data_aligned, encrypted_data, plain_data_aligned_length) &&
+                furi_hal_crypto_store_unload_key(key_slot),
+            "Encryption failed");
 
         memset_s(plain_data_aligned, plain_data_aligned_length, 0, plain_data_aligned_length);
         free(plain_data_aligned);
@@ -58,8 +60,9 @@ uint8_t* totp_crypto_encrypt_v2(
 
         furi_check(
             furi_hal_crypto_store_load_key(key_slot, iv) &&
-            furi_hal_crypto_encrypt(plain_data, encrypted_data, plain_data_length) &&
-            furi_hal_crypto_store_unload_key(key_slot), "Encryption failed");
+                furi_hal_crypto_encrypt(plain_data, encrypted_data, plain_data_length) &&
+                furi_hal_crypto_store_unload_key(key_slot),
+            "Encryption failed");
     }
 
     return encrypted_data;
@@ -76,8 +79,9 @@ uint8_t* totp_crypto_decrypt_v2(
     furi_check(decrypted_data != NULL);
     furi_check(
         furi_hal_crypto_store_load_key(key_slot, iv) &&
-        furi_hal_crypto_decrypt(encrypted_data, decrypted_data, encrypted_data_length) &&
-        furi_hal_crypto_store_unload_key(key_slot), "Decryption failed");
+            furi_hal_crypto_decrypt(encrypted_data, decrypted_data, encrypted_data_length) &&
+            furi_hal_crypto_store_unload_key(key_slot),
+        "Decryption failed");
     return decrypted_data;
 }
 
@@ -95,7 +99,7 @@ CryptoSeedIVResult
     uint8_t device_uid_length = get_device_uid_length();
 
     uint8_t hmac_key_length = device_uid_length;
-    if (pin != NULL && pin_length > 0) {
+    if(pin != NULL && pin_length > 0) {
         hmac_key_length += pin_length;
     }
 
@@ -104,17 +108,18 @@ CryptoSeedIVResult
 
     memcpy(hmac_key, device_uid, device_uid_length);
 
-    if (pin != NULL && pin_length > 0) {
+    if(pin != NULL && pin_length > 0) {
         memcpy(hmac_key + device_uid_length, pin, pin_length);
     }
 
     uint8_t hmac[HMAC_SHA512_RESULT_SIZE] = {0};
-    int hmac_result_code = hmac_sha512(hmac_key, hmac_key_length, &plugin_state->base_iv[0], CRYPTO_IV_LENGTH, &hmac[0]);
+    int hmac_result_code = hmac_sha512(
+        hmac_key, hmac_key_length, &plugin_state->base_iv[0], CRYPTO_IV_LENGTH, &hmac[0]);
 
     memset_s(hmac_key, hmac_key_length, 0, hmac_key_length);
     free(hmac_key);
 
-    if (hmac_result_code == 0) {
+    if(hmac_result_code == 0) {
         uint8_t offset = hmac[HMAC_SHA512_RESULT_SIZE - 1] & 0xF;
         memcpy(&plugin_state->iv[0], &hmac[offset], CRYPTO_IV_LENGTH);
 

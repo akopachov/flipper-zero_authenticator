@@ -239,8 +239,12 @@ static bool
     return result;
 }
 
-TokenInfoIteratorContext*
-    totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv, uint8_t crypto_version, uint8_t crypto_key_slot) {
+TokenInfoIteratorContext* totp_token_info_iterator_alloc(
+    Storage* storage,
+    FlipperFormat* config_file,
+    uint8_t* iv,
+    uint8_t crypto_version,
+    uint8_t crypto_key_slot) {
     Stream* stream = flipper_format_get_raw_stream(config_file);
     stream_rewind(stream);
     size_t tokens_count = 0;
