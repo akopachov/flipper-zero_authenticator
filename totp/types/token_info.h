@@ -201,6 +201,7 @@ void token_info_free(TokenInfo* token_info);
  * @param token_secret_length plain token secret length
  * @param plain_token_secret_encoding plain token secret encoding
  * @param iv initialization vecor (IV) to be used for encryption
+ * @param crypto_version crypto algorithm version to be used
  * @param crypto_key_slot crypto key slot to be used
  * @return \c true if token successfully set; \c false otherwise
  */
@@ -210,6 +211,7 @@ bool token_info_set_secret(
     size_t token_secret_length,
     PlainTokenSecretEncoding plain_token_secret_encoding,
     const uint8_t* iv,
+    uint8_t crypto_version,
     uint8_t crypto_key_slot);
 
 /**

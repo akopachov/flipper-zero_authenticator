@@ -16,6 +16,7 @@ struct TokenInfoIteratorContext {
     TokenInfo* current_token;
     FlipperFormat* config_file;
     uint8_t* iv;
+    uint8_t crypto_version;
     uint8_t crypto_key_slot;
     Storage* storage;
 };
@@ -239,7 +240,7 @@ static bool
 }
 
 TokenInfoIteratorContext*
-    totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv, uint8_t crypto_key_slot) {
+    totp_token_info_iterator_alloc(Storage* storage, FlipperFormat* config_file, uint8_t* iv, uint8_t crypto_version, uint8_t crypto_key_slot) {
     Stream* stream = flipper_format_get_raw_stream(config_file);
     stream_rewind(stream);
     size_t tokens_count = 0;
@@ -258,6 +259,7 @@ TokenInfoIteratorContext*
     context->current_token = token_info_alloc();
     context->config_file = config_file;
     context->iv = iv;
+    context->crypto_version = crypto_version;
     context->crypto_key_slot = crypto_key_slot;
     context->storage = storage;
     return context;
@@ -456,6 +458,7 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
                    furi_string_size(temp_str),
                    PlainTokenSecretEncodingBase32,
                    context->iv,
+                   context->crypto_version,
                    context->crypto_key_slot)) {
                 FURI_LOG_W(
                     LOGGING_TAG,

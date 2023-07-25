@@ -226,6 +226,7 @@ void totp_scene_generate_token_activate(PluginState* plugin_state) {
         scene_state->last_code_update_sync,
         plugin_state->timezone_offset,
         plugin_state->iv,
+        plugin_state->crypto_version,
         plugin_state->crypto_key_slot);
 
     totp_generate_code_worker_set_code_generated_handler(

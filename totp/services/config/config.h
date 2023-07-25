@@ -85,6 +85,18 @@ bool totp_config_file_update_encryption(
     uint8_t new_pin_length);
 
 /**
+ * @brief Ensures application config file uses latest encryption and upgrades encryption if needed
+ * @param plugin_state application state
+ * @param pin user's PIN
+ * @param pin_length user's PIN length
+ * @return \c true if operation succeeded; \c false otherwise
+ */
+bool totp_config_file_ensure_latest_encryption(
+    PluginState* plugin_state,
+    const uint8_t* pin,
+    uint8_t pin_length);
+
+/**
  * @brief Gets token info iterator context
  * @param plugin_state application state
  * @return token info iterator context

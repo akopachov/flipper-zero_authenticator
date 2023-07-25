@@ -12,7 +12,7 @@
 #ifdef TOTP_BADBT_TYPE_ENABLED
 #include "../workers/bt_type_code/bt_type_code.h"
 #endif
-#include "../services/crypto/crypto_constants_v2.h"
+#include "../services/crypto/constants.h"
 
 /**
  * @brief Application state structure
@@ -110,5 +110,13 @@ typedef struct {
      */
     uint8_t active_font_index;
 
+    /**
+     * @brief Crypto key slot to be used
+     */
     uint8_t crypto_key_slot;
+
+    /**
+     * @brief Crypto algorithms version to be used
+     */
+    uint8_t crypto_version;
 } PluginState;

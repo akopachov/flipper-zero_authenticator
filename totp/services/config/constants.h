@@ -19,4 +19,5 @@
 #define TOTP_CONFIG_KEY_NOTIFICATION_METHOD "NotificationMethod"
 #define TOTP_CONFIG_KEY_AUTOMATION_METHOD "AutomationMethod"
 #define TOTP_CONFIG_KEY_FONT "Font"
+#define TOTP_CONFIG_KEY_CRYPTO_VERSION "CryptoVersion"
 #define TOTP_CONFIG_KEY_CRYPTO_KEY_SLOT "CryptoKeySlot"

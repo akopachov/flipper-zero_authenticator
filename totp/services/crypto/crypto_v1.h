@@ -1,26 +1,7 @@
 #pragma once
 
 #include "../../types/plugin_state.h"
-
-typedef uint8_t CryptoSeedIVResult_v1;
-
-enum CryptoSeedIVResults_v1 {
-
-    /**
-     * @brief IV seeding operation failed
-     */
-    CryptoSeedIVResultFailed_v1 = 0b00,
-
-    /**
-     * @brief IV seeding operation succeeded
-     */
-    CryptoSeedIVResultFlagSuccess_v1 = 0b01,
-
-    /**
-     * @brief As a part of IV seeding operation new crypto verify data has been generated
-     */
-    CryptoSeedIVResultFlagNewCryptoVerifyData_v1 = 0b10
-};
+#include "common_types.h"
 
 /**
  * @brief Encrypts plain data using built-in certificate and given initialization vector (IV)
@@ -57,7 +38,7 @@ uint8_t* totp_crypto_decrypt_v1(
  * @param pin_length user's PIN length
  * @return Results of seeding IV
  */
-CryptoSeedIVResult_v1
+CryptoSeedIVResult
     totp_crypto_seed_iv_v1(PluginState* plugin_state, const uint8_t* pin, uint8_t pin_length);
 
 /**

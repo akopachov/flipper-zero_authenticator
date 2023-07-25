@@ -15,7 +15,7 @@
 #include "ui/scene_director.h"
 #include "ui/constants.h"
 #include "ui/common_dialogs.h"
-#include "services/crypto/crypto_v2.h"
+#include "services/crypto/crypto_facade.h"
 #include "cli/cli.h"
 
 static void render_callback(Canvas* const canvas, void* ctx) {
@@ -68,8 +68,6 @@ static bool totp_activate_initial_scene(PluginState* const plugin_state) {
     } else if(plugin_state->pin_set) {
         totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication);
     } else {
-        // TODO: Check & migrate crypto to v2
-        
         CryptoSeedIVResult seed_result = totp_crypto_seed_iv(plugin_state, NULL, 0);
         if(seed_result & CryptoSeedIVResultFlagSuccess &&
            seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
@@ -83,6 +81,7 @@ static bool totp_activate_initial_scene(PluginState* const plugin_state) {
         }
 
         if(totp_crypto_verify_key(plugin_state)) {
+            totp_config_file_ensure_latest_encryption(plugin_state, NULL, 0);
             totp_scene_director_activate_scene(plugin_state, TotpSceneGenerateToken);
         } else {
             FURI_LOG_E(

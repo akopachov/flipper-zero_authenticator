@@ -3,8 +3,9 @@
 #include <furi_hal_random.h>
 #include <furi_hal_version.h>
 #include "../../types/common.h"
+#include "../hmac/hmac_sha512.h"
 #include "memset_s.h"
-#include "crypto_constants_v2.h"
+#include "constants.h"
 
 #define CRYPTO_ALIGNMENT_FACTOR (16)
 
@@ -24,17 +25,7 @@ static uint8_t get_crypto_verify_key_length() {
     return get_device_uid_length();
 }
 
-bool totp_crypto_check_key_slot(uint8_t key_slot) {
-    uint8_t iv[CRYPTO_IV_LENGTH];
-    furi_hal_random_fill_buf(&iv[0], CRYPTO_IV_LENGTH);
-    if (key_slot < ACCEPTABLE_CRYPTO_KEY_SLOT_START || key_slot > ACCEPTABLE_CRYPTO_KEY_SLOT_END) {
-        return false;
-    }
-
-    return furi_hal_crypto_store_load_key(key_slot, iv) && furi_hal_crypto_store_unload_key(key_slot);
-}
-
-uint8_t* totp_crypto_encrypt(
+uint8_t* totp_crypto_encrypt_v2(
     const uint8_t* plain_data,
     const size_t plain_data_length,
     const uint8_t* iv,
@@ -74,7 +65,7 @@ uint8_t* totp_crypto_encrypt(
     return encrypted_data;
 }
 
-uint8_t* totp_crypto_decrypt(
+uint8_t* totp_crypto_decrypt_v2(
     const uint8_t* encrypted_data,
     const size_t encrypted_data_length,
     const uint8_t* iv,
@@ -91,7 +82,7 @@ uint8_t* totp_crypto_decrypt(
 }
 
 CryptoSeedIVResult
-    totp_crypto_seed_iv(PluginState* plugin_state, const uint8_t* pin, uint8_t pin_length) {
+    totp_crypto_seed_iv_v2(PluginState* plugin_state, const uint8_t* pin, uint8_t pin_length) {
     CryptoSeedIVResult result;
     if(plugin_state->crypto_verify_data == NULL) {
         FURI_LOG_I(LOGGING_TAG, "Generating new IV");
@@ -100,33 +91,31 @@ CryptoSeedIVResult
 
     memcpy(&plugin_state->iv[0], &plugin_state->base_iv[0], CRYPTO_IV_LENGTH);
 
-    FURI_LOG_I(LOGGING_TAG, "Base IV: %d %d %d %d %d %d %d %d", plugin_state->base_iv[0], plugin_state->base_iv[1], 
-        plugin_state->base_iv[2], plugin_state->base_iv[3], plugin_state->base_iv[4], 
-        plugin_state->base_iv[5], plugin_state->base_iv[6], plugin_state->base_iv[7]);
-
     const uint8_t* device_uid = get_device_uid();
     uint8_t device_uid_length = get_device_uid_length();
 
-    for(uint8_t i = 0; i < CRYPTO_IV_LENGTH && i < device_uid_length; i++) {
-        plugin_state->iv[i] = plugin_state->iv[i] ^ device_uid[i];
+    uint8_t hmac_key_length = device_uid_length;
+    if (pin != NULL && pin_length > 0) {
+        hmac_key_length += pin_length;
     }
 
-    if(pin != NULL && pin_length > 0) {
-        for(uint8_t i = 0; i < pin_length && i < CRYPTO_IV_LENGTH; i++) {
-            uint8_t factor;
-            if (i < device_uid_length) {
-                factor = device_uid[device_uid_length - i - 1];
-            } else {
-                factor = i + 1;
-            }
+    uint8_t* hmac_key = malloc(hmac_key_length);
+    furi_check(hmac_key != NULL);
 
-            plugin_state->iv[i] = plugin_state->iv[i] ^ (uint8_t)(pin[i] * factor);
-        }
+    memcpy(hmac_key, device_uid, device_uid_length);
+
+    if (pin != NULL && pin_length > 0) {
+        memcpy(hmac_key + device_uid_length, pin, pin_length);
     }
 
-    FURI_LOG_I(LOGGING_TAG, "Final IV: %d %d %d %d %d %d %d %d", plugin_state->iv[0], plugin_state->iv[1], 
-        plugin_state->iv[2], plugin_state->iv[3], plugin_state->iv[4], 
-        plugin_state->iv[5], plugin_state->iv[6], plugin_state->iv[7]);
+    uint8_t hmac[HMAC_SHA512_RESULT_SIZE] = {0};
+    hmac_sha512(hmac_key, hmac_key_length, &plugin_state->base_iv[0], CRYPTO_IV_LENGTH, &hmac[0]);
+
+    memset_s(hmac_key, hmac_key_length, 0, hmac_key_length);
+    free(hmac_key);
+
+    uint8_t offset = hmac[HMAC_SHA512_RESULT_SIZE - 1] & 0xF;
+    memcpy(&plugin_state->iv[0], &hmac[offset], CRYPTO_IV_LENGTH);
 
     result = CryptoSeedIVResultFlagSuccess;
     if(plugin_state->crypto_verify_data == NULL) {
@@ -137,7 +126,7 @@ CryptoSeedIVResult
         furi_check(plugin_state->crypto_verify_data != NULL);
         plugin_state->crypto_verify_data_length = crypto_vkey_length;
 
-        plugin_state->crypto_verify_data = totp_crypto_encrypt(
+        plugin_state->crypto_verify_data = totp_crypto_encrypt_v2(
             crypto_vkey,
             crypto_vkey_length,
             &plugin_state->iv[0],
@@ -152,9 +141,9 @@ CryptoSeedIVResult
     return result;
 }
 
-bool totp_crypto_verify_key(const PluginState* plugin_state) {
+bool totp_crypto_verify_key_v2(const PluginState* plugin_state) {
     size_t decrypted_key_length;
-    uint8_t* decrypted_key = totp_crypto_decrypt(
+    uint8_t* decrypted_key = totp_crypto_decrypt_v2(
         plugin_state->crypto_verify_data,
         plugin_state->crypto_verify_data_length,
         &plugin_state->iv[0],

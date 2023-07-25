@@ -63,9 +63,9 @@ uint8_t* totp_crypto_decrypt_v1(
     return decrypted_data;
 }
 
-CryptoSeedIVResult_v1
+CryptoSeedIVResult
     totp_crypto_seed_iv_v1(PluginState* plugin_state, const uint8_t* pin, uint8_t pin_length) {
-    CryptoSeedIVResult_v1 result;
+    CryptoSeedIVResult result;
     if(plugin_state->crypto_verify_data == NULL) {
         FURI_LOG_I(LOGGING_TAG, "Generating new IV");
         furi_hal_random_fill_buf(&plugin_state->base_iv[0], TOTP_IV_SIZE);
@@ -98,7 +98,7 @@ CryptoSeedIVResult_v1
         }
     }
 
-    result = CryptoSeedIVResultFlagSuccess_v1;
+    result = CryptoSeedIVResultFlagSuccess;
     if(plugin_state->crypto_verify_data == NULL) {
         FURI_LOG_I(LOGGING_TAG, "Generating crypto verify data");
         plugin_state->crypto_verify_data = malloc(CRYPTO_VERIFY_KEY_LENGTH);
@@ -113,7 +113,7 @@ CryptoSeedIVResult_v1
 
         plugin_state->pin_set = pin != NULL && pin_length > 0;
 
-        result |= CryptoSeedIVResultFlagNewCryptoVerifyData_v1;
+        result |= CryptoSeedIVResultFlagNewCryptoVerifyData;
     }
 
     return result;

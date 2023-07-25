@@ -48,6 +48,7 @@ TotpGenerateCodeWorkerContext* totp_generate_code_worker_start(
     FuriMutex* code_buffer_sync,
     float timezone_offset,
     uint8_t* iv,
+    uint8_t crypto_version,
     uint8_t crypto_key_slot);
 
 /**

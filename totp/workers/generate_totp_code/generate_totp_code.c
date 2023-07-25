@@ -1,6 +1,6 @@
 #include "generate_totp_code.h"
 #include <furi/core/thread.h>
-#include "../../services/crypto/crypto_v2.h"
+#include "../../services/crypto/crypto_facade.h"
 #include "../../services/totp/totp.h"
 #include "../../services/convert/convert.h"
 #include <furi_hal_rtc.h>
@@ -15,6 +15,7 @@ struct TotpGenerateCodeWorkerContext {
     const TokenInfo* token_info;
     float timezone_offset;
     uint8_t* iv;
+    uint8_t crypto_version;
     uint8_t crypto_key_slot;
     TOTP_NEW_CODE_GENERATED_HANDLER on_new_code_generated_handler;
     void* on_new_code_generated_handler_context;
@@ -70,7 +71,7 @@ static void generate_totp_code(
     if(token_info->token != NULL && token_info->token_length > 0) {
         size_t key_length;
         uint8_t* key = totp_crypto_decrypt(
-            token_info->token, token_info->token_length, context->iv, context->crypto_key_slot, &key_length);
+            token_info->token, token_info->token_length, context->iv, context->crypto_version, context->crypto_key_slot, &key_length);
 
         int_token_to_str(
             totp_at(
@@ -149,6 +150,7 @@ TotpGenerateCodeWorkerContext* totp_generate_code_worker_start(
     FuriMutex* code_buffer_sync,
     float timezone_offset,
     uint8_t* iv,
+    uint8_t crypto_version,
     uint8_t crypto_key_slot) {
     TotpGenerateCodeWorkerContext* context = malloc(sizeof(TotpGenerateCodeWorkerContext));
     furi_check(context != NULL);
@@ -157,6 +159,7 @@ TotpGenerateCodeWorkerContext* totp_generate_code_worker_start(
     context->code_buffer_sync = code_buffer_sync;
     context->timezone_offset = timezone_offset;
     context->iv = iv;
+    context->crypto_version = crypto_version;
     context->crypto_key_slot = crypto_key_slot; 
     context->thread = furi_thread_alloc();
     furi_thread_set_name(context->thread, "TOTPGenerateWorker");
