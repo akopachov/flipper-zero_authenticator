@@ -77,8 +77,7 @@ static void totp_cli_handler(Cli* cli, FuriString* args, void* context) {
     furi_string_free(cmd);
 }
 
-TotpCliContext*
-    totp_cli_register_command_handler(PluginState* plugin_state) {
+TotpCliContext* totp_cli_register_command_handler(PluginState* plugin_state) {
     Cli* cli = furi_record_open(RECORD_CLI);
     TotpCliContext* context = malloc(sizeof(TotpCliContext));
     furi_check(context != NULL);

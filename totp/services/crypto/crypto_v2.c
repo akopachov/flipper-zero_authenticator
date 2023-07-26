@@ -120,7 +120,8 @@ CryptoSeedIVResult
     free(hmac_key);
 
     if(hmac_result_code == 0) {
-        uint8_t offset = hmac[HMAC_SHA512_RESULT_SIZE - 1] % (HMAC_SHA512_RESULT_SIZE - CRYPTO_IV_LENGTH - 1);
+        uint8_t offset =
+            hmac[HMAC_SHA512_RESULT_SIZE - 1] % (HMAC_SHA512_RESULT_SIZE - CRYPTO_IV_LENGTH - 1);
         memcpy(&plugin_state->iv[0], &hmac[offset], CRYPTO_IV_LENGTH);
 
         result = CryptoSeedIVResultFlagSuccess;

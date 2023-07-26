@@ -209,12 +209,13 @@ int32_t totp_app() {
     PluginEvent event;
     bool processing = true;
     while(processing) {
-        if(furi_message_queue_get(plugin_state->event_queue, &event, FuriWaitForever) == FuriStatusOk) {
+        if(furi_message_queue_get(plugin_state->event_queue, &event, FuriWaitForever) ==
+           FuriStatusOk) {
             if(event.type == EventForceCloseApp) {
                 processing = false;
-            } else if (event.type == EventForceRedraw) {
+            } else if(event.type == EventForceRedraw) {
                 processing = true;
-            } else if (furi_mutex_acquire(plugin_state->mutex, FuriWaitForever) == FuriStatusOk) {
+            } else if(furi_mutex_acquire(plugin_state->mutex, FuriWaitForever) == FuriStatusOk) {
                 if(event.type == EventTypeKey && plugin_state->idle_timeout_context != NULL) {
                     idle_timeout_report_activity(plugin_state->idle_timeout_context);
                 }

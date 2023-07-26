@@ -7,6 +7,5 @@ typedef struct {
     PluginState* plugin_state;
 } TotpCliContext;
 
-TotpCliContext*
-    totp_cli_register_command_handler(PluginState* plugin_state);
+TotpCliContext* totp_cli_register_command_handler(PluginState* plugin_state);
 void totp_cli_unregister_command_handler(TotpCliContext* context);

@@ -17,9 +17,7 @@ void totp_cli_command_reset_docopt_usage() {
     TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_NAME " " TOTP_CLI_COMMAND_RESET "\r\n");
 }
 
-void totp_cli_command_reset_handle(
-    PluginState* plugin_state,
-    Cli* cli) {
+void totp_cli_command_reset_handle(PluginState* plugin_state, Cli* cli) {
     TOTP_CLI_LOCK_UI(plugin_state);
     TOTP_CLI_PRINTF_WARNING(
         "As a result of reset all the settings and tokens will be permanently lost.\r\n");
