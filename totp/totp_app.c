@@ -219,7 +219,7 @@ int32_t totp_app() {
             if(event.type == EventForceCloseApp) {
                 processing = false;
             } else if(event.type == EventForceRedraw) {
-                processing = true;
+                processing = true; //-V1048
             } else if(furi_mutex_acquire(main_loop_mutex, FuriWaitForever) == FuriStatusOk) {
                 if(event.type == EventTypeKey && plugin_state->idle_timeout_context != NULL) {
                     idle_timeout_report_activity(plugin_state->idle_timeout_context);
