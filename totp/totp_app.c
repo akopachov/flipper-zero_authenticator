@@ -23,7 +23,7 @@ struct TotpRenderCallbackContext {
     PluginState* plugin_state;
 };
 
-static void render_callback(Canvas* const canvas, void* ctx) {
+static void render_callback(Canvas* const canvas, void* const ctx) {
     furi_assert(ctx);
     const struct TotpRenderCallbackContext* context = ctx;
     if(furi_mutex_acquire(context->mutex, 25) == FuriStatusOk) {
@@ -32,7 +32,7 @@ static void render_callback(Canvas* const canvas, void* ctx) {
     }
 }
 
-static void input_callback(InputEvent* input_event, void* ctx) {
+static void input_callback(InputEvent* const input_event, void* const ctx) {
     furi_assert(ctx);
     FuriMessageQueue* event_queue = ctx;
     PluginEvent event = {.type = EventTypeKey, .input = *input_event};
