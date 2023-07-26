@@ -39,6 +39,7 @@ typedef struct {
     TotpGenerateCodeWorkerContext* generate_code_worker_context;
     UiPrecalculatedDimensions ui_precalculated_dimensions;
     const FONT_INFO* active_font;
+    NotificationApp* notification_app;
 } SceneState;
 
 static const NotificationSequence*
@@ -174,7 +175,7 @@ static void on_new_token_code_generated(bool time_left, void* context) {
 
     if(time_left) {
         notification_message(
-            plugin_state->notification_app,
+            scene_state->notification_app,
             get_notification_sequence_new_token(plugin_state, scene_state));
     }
 
@@ -208,6 +209,7 @@ void totp_scene_generate_token_activate(PluginState* plugin_state) {
     }
 
     scene_state->active_font = available_fonts[plugin_state->active_font_index];
+    scene_state->notification_app = furi_record_open(RECORD_NOTIFICATION);
 
 #ifdef TOTP_BADBT_TYPE_ENABLED
 
@@ -356,7 +358,7 @@ bool totp_scene_generate_token_handle_event(
                 TotpUsbTypeCodeWorkerEventType,
                 totp_token_info_iterator_get_current_token(iterator_context)->automation_features);
             notification_message(
-                plugin_state->notification_app,
+                scene_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));
             return true;
         }
@@ -372,7 +374,7 @@ bool totp_scene_generate_token_handle_event(
                 TotpBtTypeCodeWorkerEventType,
                 totp_token_info_iterator_get_current_token(iterator_context)->automation_features);
             notification_message(
-                plugin_state->notification_app,
+                scene_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));
             return true;
         }
@@ -432,6 +434,8 @@ void totp_scene_generate_token_deactivate(PluginState* plugin_state) {
     SceneState* scene_state = (SceneState*)plugin_state->current_scene_state;
 
     totp_generate_code_worker_stop(scene_state->generate_code_worker_context);
+
+    furi_record_close(RECORD_NOTIFICATION);
 
     if(plugin_state->automation_method & AutomationMethodBadUsb) {
         totp_usb_type_code_worker_stop(scene_state->usb_type_code_worker_context);

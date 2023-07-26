@@ -29,11 +29,6 @@ typedef struct {
     void* current_scene_state;
 
     /**
-     * @brief Reference to the firmware notification subsystem
-     */
-    NotificationApp* notification_app;
-
-    /**
      * @brief Reference to the firmware dialogs subsystem 
      */
     DialogsApp* dialogs_app;
@@ -82,11 +77,6 @@ typedef struct {
      * @brief Notification method
      */
     NotificationMethod notification_method;
-
-    /**
-     * @brief Main rendering loop mutex
-     */
-    FuriMutex* mutex;
 
     /**
      * @brief Automation method

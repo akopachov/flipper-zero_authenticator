@@ -18,20 +18,25 @@
 #include "services/crypto/crypto_facade.h"
 #include "cli/cli.h"
 
+struct TotpRenderCallbackContext {
+    FuriMutex* mutex;
+    PluginState* plugin_state;
+};
+
 static void render_callback(Canvas* const canvas, void* ctx) {
     furi_assert(ctx);
-    PluginState* plugin_state = ctx;
-    if(furi_mutex_acquire(plugin_state->mutex, 25) == FuriStatusOk) {
-        totp_scene_director_render(canvas, plugin_state);
-        furi_mutex_release(plugin_state->mutex);
+    const struct TotpRenderCallbackContext* context = ctx;
+    if(furi_mutex_acquire(context->mutex, 25) == FuriStatusOk) {
+        totp_scene_director_render(canvas, context->plugin_state);
+        furi_mutex_release(context->mutex);
     }
 }
 
 static void input_callback(InputEvent* input_event, void* ctx) {
     furi_assert(ctx);
-    PluginState* plugin_state = ctx;
+    FuriMessageQueue* event_queue = ctx;
     PluginEvent event = {.type = EventTypeKey, .input = *input_event};
-    furi_message_queue_put(plugin_state->event_queue, &event, FuriWaitForever);
+    furi_message_queue_put(event_queue, &event, FuriWaitForever);
 }
 
 static bool totp_activate_initial_scene(PluginState* const plugin_state) {
@@ -118,7 +123,6 @@ static bool on_user_idle(void* context) {
 
 static bool totp_plugin_state_init(PluginState* const plugin_state) {
     plugin_state->gui = furi_record_open(RECORD_GUI);
-    plugin_state->notification_app = furi_record_open(RECORD_NOTIFICATION);
     plugin_state->dialogs_app = furi_record_open(RECORD_DIALOGS);
     memset(&plugin_state->iv[0], 0, CRYPTO_IV_LENGTH);
 
@@ -127,7 +131,6 @@ static bool totp_plugin_state_init(PluginState* const plugin_state) {
         return false;
     }
 
-    plugin_state->mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     plugin_state->event_queue = furi_message_queue_alloc(8, sizeof(PluginEvent));
 
 #ifdef TOTP_BADBT_TYPE_ENABLED
@@ -156,7 +159,6 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
     }
 
     furi_record_close(RECORD_GUI);
-    furi_record_close(RECORD_NOTIFICATION);
     furi_record_close(RECORD_DIALOGS);
 
     totp_config_file_close(plugin_state);
@@ -173,7 +175,6 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
 #endif
 
     furi_message_queue_free(plugin_state->event_queue);
-    furi_mutex_free(plugin_state->mutex);
     free(plugin_state);
 }
 
@@ -198,10 +199,13 @@ int32_t totp_app() {
     // Affecting dolphin level
     dolphin_deed(DolphinDeedPluginStart);
 
+    FuriMutex* main_loop_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
+    struct TotpRenderCallbackContext render_context = { .plugin_state = plugin_state, .mutex = main_loop_mutex };
+
     // Set system callbacks
     ViewPort* view_port = view_port_alloc();
-    view_port_draw_callback_set(view_port, render_callback, plugin_state);
-    view_port_input_callback_set(view_port, input_callback, plugin_state);
+    view_port_draw_callback_set(view_port, render_callback, &render_context);
+    view_port_input_callback_set(view_port, input_callback, plugin_state->event_queue);
 
     // Open GUI and register view_port
     gui_add_view_port(plugin_state->gui, view_port, GuiLayerFullscreen);
@@ -215,14 +219,14 @@ int32_t totp_app() {
                 processing = false;
             } else if(event.type == EventForceRedraw) {
                 processing = true;
-            } else if(furi_mutex_acquire(plugin_state->mutex, FuriWaitForever) == FuriStatusOk) {
+            } else if(furi_mutex_acquire(main_loop_mutex, FuriWaitForever) == FuriStatusOk) {
                 if(event.type == EventTypeKey && plugin_state->idle_timeout_context != NULL) {
                     idle_timeout_report_activity(plugin_state->idle_timeout_context);
                 }
 
                 processing = totp_scene_director_handle_event(&event, plugin_state);
 
-                furi_mutex_release(plugin_state->mutex);
+                furi_mutex_release(main_loop_mutex);
             }
         }
 
@@ -235,6 +239,7 @@ int32_t totp_app() {
     view_port_enabled_set(view_port, false);
     gui_remove_view_port(plugin_state->gui, view_port);
     view_port_free(view_port);
+    furi_mutex_free(main_loop_mutex);
     totp_plugin_state_free(plugin_state);
     return 0;
 }
