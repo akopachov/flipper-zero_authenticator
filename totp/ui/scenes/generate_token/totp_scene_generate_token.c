@@ -153,7 +153,7 @@ static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin
 }
 
 static void on_new_token_code_generated(bool time_left, void* context) {
-    const PluginState* plugin_state = context;
+    PluginState* const plugin_state = context;
     const TokenInfoIteratorContext* iterator_context =
         totp_config_get_token_iterator_context(plugin_state);
     if(totp_token_info_iterator_get_total_count(iterator_context) == 0) {
@@ -175,12 +175,15 @@ static void on_new_token_code_generated(bool time_left, void* context) {
     if(time_left) {
         notification_message(
             plugin_state->notification_app,
-            get_notification_sequence_new_token(plugin_state, plugin_state->current_scene_state));
+            get_notification_sequence_new_token(plugin_state, scene_state));
     }
+
+    totp_scene_director_force_redraw(plugin_state);
 }
 
 static void on_code_lifetime_updated_generated(float code_lifetime_percent, void* context) {
-    SceneState* scene_state = context;
+    PluginState* const plugin_state = context;
+    SceneState* scene_state = plugin_state->current_scene_state;
     scene_state->ui_precalculated_dimensions.progress_bar_width =
         (uint8_t)((float)(SCREEN_WIDTH - (PROGRESS_BAR_MARGIN << 1)) * code_lifetime_percent);
     scene_state->ui_precalculated_dimensions.progress_bar_x =
@@ -188,6 +191,7 @@ static void on_code_lifetime_updated_generated(float code_lifetime_percent, void
           scene_state->ui_precalculated_dimensions.progress_bar_width) >>
          1) +
         PROGRESS_BAR_MARGIN;
+    totp_scene_director_force_redraw(plugin_state);
 }
 
 void totp_scene_generate_token_activate(PluginState* plugin_state) {
@@ -235,7 +239,7 @@ void totp_scene_generate_token_activate(PluginState* plugin_state) {
     totp_generate_code_worker_set_lifetime_changed_handler(
         scene_state->generate_code_worker_context,
         &on_code_lifetime_updated_generated,
-        scene_state);
+        plugin_state);
 
     update_totp_params(
         plugin_state, totp_token_info_iterator_get_current_token_index(iterator_context));

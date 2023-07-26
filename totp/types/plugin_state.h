@@ -54,12 +54,12 @@ typedef struct {
     ConfigFileContext* config_file_context;
 
     /**
-     * @brief Encrypted well-known string data
+     * @brief Encrypted well-known data
      */
     uint8_t* crypto_verify_data;
 
     /**
-     * @brief Encrypted well-known string data length
+     * @brief Encrypted well-known data length
      */
     size_t crypto_verify_data_length;
 
@@ -119,4 +119,9 @@ typedef struct {
      * @brief Crypto algorithms version to be used
      */
     uint8_t crypto_version;
+
+    /**
+     * @brief Application even queue
+     */
+    FuriMessageQueue* event_queue;
 } PluginState;
