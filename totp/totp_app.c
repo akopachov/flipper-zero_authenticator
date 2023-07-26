@@ -200,7 +200,8 @@ int32_t totp_app() {
     dolphin_deed(DolphinDeedPluginStart);
 
     FuriMutex* main_loop_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
-    struct TotpRenderCallbackContext render_context = { .plugin_state = plugin_state, .mutex = main_loop_mutex };
+    struct TotpRenderCallbackContext render_context = {
+        .plugin_state = plugin_state, .mutex = main_loop_mutex};
 
     // Set system callbacks
     ViewPort* view_port = view_port_alloc();
