@@ -35,10 +35,12 @@ extern const char* TOTP_CLI_COLOR_INFO;
 
 #define TOTP_CLI_LOCK_UI(plugin_state)                    \
     Scene __previous_scene = plugin_state->current_scene; \
-    totp_scene_director_activate_scene(plugin_state, TotpSceneStandby)
+    totp_scene_director_activate_scene(plugin_state, TotpSceneStandby); \
+    totp_scene_director_force_redraw(plugin_state)
 
 #define TOTP_CLI_UNLOCK_UI(plugin_state) \
-    totp_scene_director_activate_scene(plugin_state, __previous_scene)
+    totp_scene_director_activate_scene(plugin_state, __previous_scene); \
+    totp_scene_director_force_redraw(plugin_state)
 
 /**
  * @brief Checks whether user is authenticated and entered correct PIN.
