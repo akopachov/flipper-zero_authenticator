@@ -3,11 +3,13 @@
 #include "../types/token_info.h"
 
 typedef bool (*TOTP_AUTOMATION_KEY_HANDLER)(uint16_t key);
+typedef uint8_t (*TOTP_AUTOMATION_LED_STATE_HANDLER)();
 
 /**
  * @brief Executes token input automation using given key press\release handlers
  * @param key_press_fn key press handler
  * @param key_release_fn key release handler
+ * @param led_state_fn led state handler
  * @param code_buffer code buffer to be typed
  * @param code_buffer_size code buffer size
  * @param features automation features
@@ -15,6 +17,7 @@ typedef bool (*TOTP_AUTOMATION_KEY_HANDLER)(uint16_t key);
 void totp_type_code_worker_execute_automation(
     TOTP_AUTOMATION_KEY_HANDLER key_press_fn,
     TOTP_AUTOMATION_KEY_HANDLER key_release_fn,
+    TOTP_AUTOMATION_LED_STATE_HANDLER led_state_fn,
     const char* code_buffer,
     uint8_t code_buffer_size,
     TokenAutomationFeature features);

@@ -71,6 +71,11 @@ static void totp_type_code_worker_type_code(TotpBtTypeCodeWorkerContext* context
         totp_type_code_worker_execute_automation(
             &furi_hal_bt_hid_kb_press,
             &furi_hal_bt_hid_kb_release,
+            #if TOTP_TARGET_FIRMWARE == TOTP_FIRMWARE_XTREME_UL
+            &furi_hal_bt_hid_get_led_state,
+            #else
+            NULL, // OFW doesn't have furi_hal_bt_hid_get_led_state
+            #endif
             context->code_buffer,
             context->code_buffer_size,
             context->flags);
