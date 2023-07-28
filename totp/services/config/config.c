@@ -551,7 +551,7 @@ bool totp_config_file_update_encryption(
         return false;
     }
 
-    if (!totp_crypto_check_key_slot(new_crypto_key_slot)) {
+    if(!totp_crypto_check_key_slot(new_crypto_key_slot)) {
         return false;
     }
 

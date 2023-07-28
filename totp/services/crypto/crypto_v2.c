@@ -44,9 +44,13 @@ uint8_t* totp_crypto_encrypt_v2(
         furi_check(encrypted_data != NULL);
         *encrypted_data_length = plain_data_aligned_length;
 
-        furi_check(furi_hal_crypto_store_load_key(key_slot, iv), "Encryption failed: store_load_key");
-        furi_check(furi_hal_crypto_encrypt(plain_data_aligned, encrypted_data, plain_data_aligned_length), "Encryption failed: encrypt");
-        furi_check(furi_hal_crypto_store_unload_key(key_slot), "Encryption failed: store_unload_key");
+        furi_check(
+            furi_hal_crypto_store_load_key(key_slot, iv), "Encryption failed: store_load_key");
+        furi_check(
+            furi_hal_crypto_encrypt(plain_data_aligned, encrypted_data, plain_data_aligned_length),
+            "Encryption failed: encrypt");
+        furi_check(
+            furi_hal_crypto_store_unload_key(key_slot), "Encryption failed: store_unload_key");
 
         memset_s(plain_data_aligned, plain_data_aligned_length, 0, plain_data_aligned_length);
         free(plain_data_aligned);
@@ -55,9 +59,13 @@ uint8_t* totp_crypto_encrypt_v2(
         furi_check(encrypted_data != NULL);
         *encrypted_data_length = plain_data_length;
 
-        furi_check(furi_hal_crypto_store_load_key(key_slot, iv), "Encryption failed: store_load_key");
-        furi_check(furi_hal_crypto_encrypt(plain_data, encrypted_data, plain_data_length), "Encryption failed: encrypt");
-        furi_check(furi_hal_crypto_store_unload_key(key_slot), "Encryption failed: store_unload_key");
+        furi_check(
+            furi_hal_crypto_store_load_key(key_slot, iv), "Encryption failed: store_load_key");
+        furi_check(
+            furi_hal_crypto_encrypt(plain_data, encrypted_data, plain_data_length),
+            "Encryption failed: encrypt");
+        furi_check(
+            furi_hal_crypto_store_unload_key(key_slot), "Encryption failed: store_unload_key");
     }
 
     return encrypted_data;
@@ -73,7 +81,9 @@ uint8_t* totp_crypto_decrypt_v2(
     uint8_t* decrypted_data = malloc(*decrypted_data_length);
     furi_check(decrypted_data != NULL);
     furi_check(furi_hal_crypto_store_load_key(key_slot, iv), "Decryption failed: store_load_key");
-    furi_check(furi_hal_crypto_decrypt(encrypted_data, decrypted_data, encrypted_data_length), "Decryption failed: decrypt");
+    furi_check(
+        furi_hal_crypto_decrypt(encrypted_data, decrypted_data, encrypted_data_length),
+        "Decryption failed: decrypt");
     furi_check(furi_hal_crypto_store_unload_key(key_slot), "Decryption failed: store_unload_key");
     return decrypted_data;
 }
