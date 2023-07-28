@@ -43,7 +43,6 @@ static void totp_type_code_worker_type_code(TotpUsbTypeCodeWorkerContext* contex
         totp_type_code_worker_execute_automation(
             &furi_hal_hid_kb_press,
             &furi_hal_hid_kb_release,
-            &furi_hal_hid_get_led_state,
             context->code_buffer,
             context->code_buffer_size,
             context->flags);

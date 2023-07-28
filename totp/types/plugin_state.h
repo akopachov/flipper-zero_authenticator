@@ -83,6 +83,11 @@ typedef struct {
      */
     AutomationMethod automation_method;
 
+    /**
+     * @brief Automation keyboard layout to be used
+     */
+    AutomationKeyboardLayout automation_kb_layout;
+
 #ifdef TOTP_BADBT_TYPE_ENABLED
     /**
      * @brief Bad-Bluetooth worker context
