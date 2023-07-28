@@ -1,7 +1,7 @@
 #include "common_migration.h"
 #include "../constants.h"
 #include "../../../types/token_info.h"
-#include "../../../types/automation_method.h"
+#include "../../../types/automation_kb_layout.h"
 #include <flipper_format/flipper_format_i.h>
 
 bool totp_config_migrate_to_latest(
