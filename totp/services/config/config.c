@@ -284,7 +284,8 @@ bool totp_config_file_update_user_settings(const PluginState* plugin_state) {
         }
 
         tmp_uint32 = plugin_state->automation_kb_layout;
-        if(!flipper_format_insert_or_update_uint32(file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &tmp_uint32, 1)) {
+        if(!flipper_format_insert_or_update_uint32(
+               file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &tmp_uint32, 1)) {
             break;
         }
 

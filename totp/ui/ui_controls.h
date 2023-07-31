@@ -63,4 +63,10 @@ void ui_control_select_render(
  * @param position current position
  * @param max_position maximal position
  */
-void ui_control_vscroll_render(Canvas* const canvas, uint8_t x, uint8_t y, uint8_t height, uint8_t position, uint8_t max_position);
+void ui_control_vscroll_render(
+    Canvas* const canvas,
+    uint8_t x,
+    uint8_t y,
+    uint8_t height,
+    uint8_t position,
+    uint8_t max_position);
