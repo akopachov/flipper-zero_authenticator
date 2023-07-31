@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.0 - 31 Jul 2023
+
+* Fixed [#171](https://github.com/akopachov/flipper-zero_authenticator/issues/171)
+
 ## v3.0.2 - 28 Jul 2023
 
 * Fixed [#169](https://github.com/akopachov/flipper-zero_authenticator/issues/169)
