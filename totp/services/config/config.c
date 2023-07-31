@@ -113,7 +113,7 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
 
     bool conf_file_exists = storage_common_stat(storage, CONFIG_FILE_PATH, NULL) == FSE_OK;
     if (!conf_file_exists) {
-        FURI_LOG_I("Application catalog needs to be migrated");
+        FURI_LOG_I(LOGGING_TAG, "Application catalog needs to be migrated");
         FS_Error migration_result = storage_common_migrate(storage, EXT_PATH("authenticator"), CONFIG_FILE_DIRECTORY_PATH);
         FURI_LOG_I(LOGGING_TAG, "Migrated catalog. Result code: %d", (int)migration_result);
         conf_file_exists = storage_common_stat(storage, CONFIG_FILE_PATH, NULL) == FSE_OK;
