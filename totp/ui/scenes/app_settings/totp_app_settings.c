@@ -21,7 +21,8 @@ static const char* AUTOMATION_LIST[] = {
     "None",
     "USB"
 #ifdef TOTP_BADBT_TYPE_ENABLED
-    ,"Bluetooth",
+    ,
+    "Bluetooth",
     "BT and USB"
 #endif
 };
@@ -72,7 +73,7 @@ void totp_scene_app_settings_activate(PluginState* plugin_state) {
     scene_state->notification_vibro = plugin_state->notification_method & NotificationMethodVibro;
     scene_state->automation_method = plugin_state->automation_method;
     scene_state->automation_kb_layout = plugin_state->automation_kb_layout;
-    
+
     scene_state->active_font = plugin_state->active_font_index;
 }
 
@@ -92,7 +93,7 @@ static void two_digit_to_str(int8_t num, char* str) {
 
 void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plugin_state) {
     const SceneState* scene_state = plugin_state->current_scene_state;
-    if (scene_state->selected_control < FontSelect) {
+    if(scene_state->selected_control < FontSelect) {
         canvas_set_font(canvas, FontPrimary);
         canvas_draw_str_aligned(
             canvas, 0, 0 - scene_state->y_offset, AlignLeft, AlignTop, "Timezone offset");
@@ -100,7 +101,8 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
 
         char tmp_str[4];
         two_digit_to_str(scene_state->tz_offset_hours, &tmp_str[0]);
-        canvas_draw_str_aligned(canvas, 0, 17 - scene_state->y_offset, AlignLeft, AlignTop, "Hours:");
+        canvas_draw_str_aligned(
+            canvas, 0, 17 - scene_state->y_offset, AlignLeft, AlignTop, "Hours:");
         ui_control_select_render(
             canvas,
             36,
@@ -120,9 +122,10 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
             &tmp_str[0],
             scene_state->selected_control == MinutesInput);
 
-    } else if (scene_state->selected_control < SoundSwitch) {
+    } else if(scene_state->selected_control < SoundSwitch) {
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(canvas, 0, 64 - scene_state->y_offset, AlignLeft, AlignTop, "Font");
+        canvas_draw_str_aligned(
+            canvas, 0, 64 - scene_state->y_offset, AlignLeft, AlignTop, "Font");
         canvas_set_font(canvas, FontSecondary);
 
         const FONT_INFO* const font = available_fonts[scene_state->active_font];
@@ -141,13 +144,14 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
         canvas_draw_str_ex(
             canvas, font_x_offset, font_y_offset, FONT_TEST_STR, FONT_TEST_STR_LENGTH, font);
 
-    } else if (scene_state->selected_control < AutomationSwitch) {
+    } else if(scene_state->selected_control < AutomationSwitch) {
         canvas_set_font(canvas, FontPrimary);
         canvas_draw_str_aligned(
             canvas, 0, 128 - scene_state->y_offset, AlignLeft, AlignTop, "Notifications");
         canvas_set_font(canvas, FontSecondary);
 
-        canvas_draw_str_aligned(canvas, 0, 145 - scene_state->y_offset, AlignLeft, AlignTop, "Sound:");
+        canvas_draw_str_aligned(
+            canvas, 0, 145 - scene_state->y_offset, AlignLeft, AlignTop, "Sound:");
         ui_control_select_render(
             canvas,
             36,
@@ -156,7 +160,8 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
             YES_NO_LIST[scene_state->notification_sound],
             scene_state->selected_control == SoundSwitch);
 
-        canvas_draw_str_aligned(canvas, 0, 163 - scene_state->y_offset, AlignLeft, AlignTop, "Vibro:");
+        canvas_draw_str_aligned(
+            canvas, 0, 163 - scene_state->y_offset, AlignLeft, AlignTop, "Vibro:");
         ui_control_select_render(
             canvas,
             36,
@@ -181,12 +186,7 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
             scene_state->selected_control == AutomationSwitch);
 
         canvas_draw_str_aligned(
-            canvas,
-            0,
-            227 - scene_state->y_offset,
-            AlignLeft,
-            AlignTop,
-            "Layout:");
+            canvas, 0, 227 - scene_state->y_offset, AlignLeft, AlignTop, "Layout:");
 
         ui_control_select_render(
             canvas,
@@ -206,7 +206,8 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
             scene_state->selected_control == ConfirmButton);
     }
 
-    ui_control_vscroll_render(canvas, SCREEN_WIDTH - 3, 0, SCREEN_HEIGHT, scene_state->selected_control, ConfirmButton);
+    ui_control_vscroll_render(
+        canvas, SCREEN_WIDTH - 3, 0, SCREEN_HEIGHT, scene_state->selected_control, ConfirmButton);
 }
 
 bool totp_scene_app_settings_handle_event(
@@ -278,8 +279,7 @@ bool totp_scene_app_settings_handle_event(
                     0,
                     AUTOMATION_LIST_MAX_INDEX,
                     RollOverflowBehaviorRoll);
-            }
-            else if(scene_state->selected_control == BadKeyboardLayoutSelect) {
+            } else if(scene_state->selected_control == BadKeyboardLayoutSelect) {
                 totp_roll_value_uint8_t(
                     &scene_state->automation_kb_layout, 1, 0, 1, RollOverflowBehaviorRoll);
             }
@@ -309,8 +309,7 @@ bool totp_scene_app_settings_handle_event(
                     0,
                     AUTOMATION_LIST_MAX_INDEX,
                     RollOverflowBehaviorRoll);
-            }
-            else if(scene_state->selected_control == BadKeyboardLayoutSelect) {
+            } else if(scene_state->selected_control == BadKeyboardLayoutSelect) {
                 totp_roll_value_uint8_t(
                     &scene_state->automation_kb_layout, -1, 0, 1, RollOverflowBehaviorRoll);
             }
@@ -344,8 +343,8 @@ bool totp_scene_app_settings_handle_event(
         }
 
 #ifdef TOTP_BADBT_TYPE_ENABLED
-        if((scene_state->automation_method & AutomationMethodBadBt) == 0 && 
-            plugin_state->bt_type_code_worker_context != NULL) {
+        if((scene_state->automation_method & AutomationMethodBadBt) == 0 &&
+           plugin_state->bt_type_code_worker_context != NULL) {
             totp_bt_type_code_worker_free(plugin_state->bt_type_code_worker_context);
             plugin_state->bt_type_code_worker_context = NULL;
         }

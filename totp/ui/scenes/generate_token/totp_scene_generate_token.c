@@ -205,7 +205,9 @@ void totp_scene_generate_token_activate(PluginState* plugin_state) {
     scene_state->last_code_update_sync = furi_mutex_alloc(FuriMutexTypeNormal);
     if(plugin_state->automation_method & AutomationMethodBadUsb) {
         scene_state->usb_type_code_worker_context = totp_usb_type_code_worker_start(
-            scene_state->last_code, TokenDigitsCountMax + 1, scene_state->last_code_update_sync,
+            scene_state->last_code,
+            TokenDigitsCountMax + 1,
+            scene_state->last_code_update_sync,
             plugin_state->automation_kb_layout);
     }
 

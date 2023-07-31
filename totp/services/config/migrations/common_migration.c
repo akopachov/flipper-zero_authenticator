@@ -91,12 +91,17 @@ bool totp_config_migrate_to_latest(
 
         flipper_format_rewind(fff_backup_data_file);
 
-        if(flipper_format_read_string(fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str)) {
-            flipper_format_write_string(fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str);
+        if(flipper_format_read_string(
+               fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str)) {
+            flipper_format_write_string(
+                fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str);
         } else {
             uint32_t default_automation_kb_layout = AutomationKeyboardLayoutQWERTY;
             flipper_format_write_uint32(
-                fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &default_automation_kb_layout, 1);
+                fff_data_file,
+                TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT,
+                &default_automation_kb_layout,
+                1);
         }
 
         flipper_format_rewind(fff_backup_data_file);

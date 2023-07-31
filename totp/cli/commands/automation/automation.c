@@ -4,7 +4,6 @@
 #include "../../../ui/scene_director.h"
 #include "../../cli_helpers.h"
 
-
 #define TOTP_CLI_COMMAND_AUTOMATION_ARG_METHOD "automation"
 #define TOTP_CLI_COMMAND_AUTOMATION_METHOD_NONE "none"
 #define TOTP_CLI_COMMAND_AUTOMATION_METHOD_USB "usb"
@@ -21,10 +20,10 @@ void totp_cli_command_automation_docopt_commands() {
 }
 
 void totp_cli_command_automation_docopt_usage() {
-    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_NAME " " TOTP_CLI_COMMAND_AUTOMATION 
-        " " DOCOPT_OPTIONAL(DOCOPT_OPTION(TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT_PREFIX, DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT))) 
-        " " DOCOPT_OPTIONAL(
-        DOCOPT_MULTIPLE(DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_AUTOMATION_ARG_METHOD))) "\r\n");
+    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_NAME " " TOTP_CLI_COMMAND_AUTOMATION " " DOCOPT_OPTIONAL(DOCOPT_OPTION(
+        TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT_PREFIX,
+        DOCOPT_ARGUMENT(
+            TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT))) " " DOCOPT_OPTIONAL(DOCOPT_MULTIPLE(DOCOPT_ARGUMENT(TOTP_CLI_COMMAND_AUTOMATION_ARG_METHOD))) "\r\n");
 }
 
 void totp_cli_command_automation_docopt_arguments() {
@@ -43,7 +42,8 @@ void totp_cli_command_automation_docopt_options() {
         TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT_PREFIX,
         DOCOPT_ARGUMENT(
             TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT)) "    Automation keyboard layout. Must be one of: " TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_QWERTY
-                                        ", " TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_AZERTY "\r\n");
+                                                        ", " TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_AZERTY
+                                                        "\r\n");
 }
 
 static void print_method(AutomationMethod method, const char* color) {
@@ -74,16 +74,16 @@ static void print_method(AutomationMethod method, const char* color) {
 
 static void print_kb_layout(AutomationKeyboardLayout layout, const char* color) {
     char* layoutToPrint;
-    switch (layout) {
-        case AutomationKeyboardLayoutQWERTY:
-            layoutToPrint = TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_QWERTY;
-            break;
-        case AutomationKeyboardLayoutAZERTY:
-            layoutToPrint = TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_AZERTY;
-            break;
-        default:
-            furi_crash("Unknown automation keyboard layout");
-            break;
+    switch(layout) {
+    case AutomationKeyboardLayoutQWERTY:
+        layoutToPrint = TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_QWERTY;
+        break;
+    case AutomationKeyboardLayoutAZERTY:
+        layoutToPrint = TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_AZERTY;
+        break;
+    default:
+        furi_crash("Unknown automation keyboard layout");
+        break;
     }
 
     TOTP_CLI_PRINTF_COLORFUL(color, "%s", layoutToPrint);
@@ -91,9 +91,9 @@ static void print_kb_layout(AutomationKeyboardLayout layout, const char* color) 
 
 static bool parse_automation_keyboard_layout(FuriString* str, AutomationKeyboardLayout* out) {
     bool result = true;
-    if (furi_string_cmpi_str(str, TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_QWERTY) == 0) {
+    if(furi_string_cmpi_str(str, TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_QWERTY) == 0) {
         *out = AutomationKeyboardLayoutQWERTY;
-    } else if (furi_string_cmpi_str(str, TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_AZERTY) == 0) {
+    } else if(furi_string_cmpi_str(str, TOTP_CLI_COMMAND_AUTOMATION_LAYOUT_AZERTY) == 0) {
         *out = AutomationKeyboardLayoutAZERTY;
     } else {
         result = false;
@@ -126,14 +126,13 @@ void totp_cli_command_automation_handle(PluginState* plugin_state, FuriString* a
             new_method |= AutomationMethodBadBt;
         }
 #endif
-        else if (furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT_PREFIX) == 0) {
-            if (!args_read_string_and_trim(args, temp_str) ||
-                !parse_automation_keyboard_layout(temp_str, &new_kb_layout)) {
+        else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT_PREFIX) == 0) {
+            if(!args_read_string_and_trim(args, temp_str) ||
+               !parse_automation_keyboard_layout(temp_str, &new_kb_layout)) {
                 args_valid = false;
                 break;
             }
-        }
-        else {
+        } else {
             args_valid = false;
             break;
         }
@@ -172,8 +171,7 @@ void totp_cli_command_automation_handle(PluginState* plugin_state, FuriString* a
             TOTP_CLI_UNLOCK_UI(plugin_state);
         } else {
             TOTP_CLI_PRINTF_INFO("Current automation method is ");
-            print_method(
-                plugin_state->automation_method, TOTP_CLI_COLOR_INFO);
+            print_method(plugin_state->automation_method, TOTP_CLI_COLOR_INFO);
             TOTP_CLI_PRINTF_INFO(" (");
             print_kb_layout(plugin_state->automation_kb_layout, TOTP_CLI_COLOR_INFO);
             TOTP_CLI_PRINTF_INFO(")");
