@@ -166,7 +166,7 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
         flipper_format_write_uint32(
             fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &tmp_uint32, 1);
 
-        tmp_uint32 = 0;
+        tmp_uint32 = 0; //-V1048
         flipper_format_write_uint32(fff_data_file, TOTP_CONFIG_KEY_FONT, &tmp_uint32, 1);
 
         if(!flipper_format_rewind(fff_data_file)) {
