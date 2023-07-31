@@ -3,7 +3,9 @@
 #include <furi/core/kernel.h>
 #include "../../services/convert/convert.h"
 
-static const uint8_t hid_qwerty_keys[] = {
+#define HID_KEYS_MAP_LENGTH (36)
+
+static const uint8_t hid_qwerty_keys_map[HID_KEYS_MAP_LENGTH] = {
     HID_KEYBOARD_0, HID_KEYBOARD_1, HID_KEYBOARD_2, HID_KEYBOARD_3, HID_KEYBOARD_4,
     HID_KEYBOARD_5, HID_KEYBOARD_6, HID_KEYBOARD_7, HID_KEYBOARD_8, HID_KEYBOARD_9,
     HID_KEYBOARD_A, HID_KEYBOARD_B, HID_KEYBOARD_C, HID_KEYBOARD_D, HID_KEYBOARD_E,
@@ -13,7 +15,7 @@ static const uint8_t hid_qwerty_keys[] = {
     HID_KEYBOARD_U, HID_KEYBOARD_V, HID_KEYBOARD_W, HID_KEYBOARD_X, HID_KEYBOARD_Y,
     HID_KEYBOARD_Z};
 
-static const uint8_t hid_azerty_keys[] = {
+static const uint8_t hid_azerty_keys_map[HID_KEYS_MAP_LENGTH] = {
     HID_KEYBOARD_0, HID_KEYBOARD_1, HID_KEYBOARD_2, HID_KEYBOARD_3, HID_KEYBOARD_4,
     HID_KEYBOARD_5, HID_KEYBOARD_6, HID_KEYBOARD_7, HID_KEYBOARD_8, HID_KEYBOARD_9,
     HID_KEYBOARD_Q, HID_KEYBOARD_B, HID_KEYBOARD_C, HID_KEYBOARD_D, HID_KEYBOARD_E,
@@ -64,10 +66,10 @@ void totp_type_code_worker_execute_automation(
     switch (keyboard_layout)
     {
         case AutomationKeyboardLayoutQWERTY:
-            keyboard_layout_dict = &hid_qwerty_keys[0];
+            keyboard_layout_dict = &hid_qwerty_keys_map[0];
             break;
         case AutomationKeyboardLayoutAZERTY:
-            keyboard_layout_dict = &hid_azerty_keys[0];
+            keyboard_layout_dict = &hid_azerty_keys_map[0];
             break;
     
         default:
@@ -80,7 +82,7 @@ void totp_type_code_worker_execute_automation(
             char_index = cb_char - 'A' + 10;
         }
 
-        if(char_index >= sizeof(hid_qwerty_keys)) break;
+        if(char_index >= HID_KEYS_MAP_LENGTH) break;
 
         uint16_t hid_kb_key = keyboard_layout_dict[char_index];
 
