@@ -175,7 +175,7 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
     }
 #endif
 
-    if (plugin_state->event_queue != NULL) {
+    if(plugin_state->event_queue != NULL) {
         furi_message_queue_free(plugin_state->event_queue);
     }
 

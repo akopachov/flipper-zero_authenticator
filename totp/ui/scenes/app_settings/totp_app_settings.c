@@ -71,8 +71,10 @@ void totp_scene_app_settings_activate(PluginState* plugin_state) {
     scene_state->tz_offset_minutes = 60.0f * off_dec;
     scene_state->notification_sound = plugin_state->notification_method & NotificationMethodSound;
     scene_state->notification_vibro = plugin_state->notification_method & NotificationMethodVibro;
-    scene_state->automation_method = MIN(plugin_state->automation_method, AUTOMATION_LIST_MAX_INDEX);
-    scene_state->automation_kb_layout = MIN(plugin_state->automation_kb_layout, BAD_KB_LAYOUT_LIST_MAX_INDEX);
+    scene_state->automation_method =
+        MIN(plugin_state->automation_method, AUTOMATION_LIST_MAX_INDEX);
+    scene_state->automation_kb_layout =
+        MIN(plugin_state->automation_kb_layout, BAD_KB_LAYOUT_LIST_MAX_INDEX);
 
     scene_state->active_font = plugin_state->active_font_index;
 }
@@ -281,7 +283,11 @@ bool totp_scene_app_settings_handle_event(
                     RollOverflowBehaviorRoll);
             } else if(scene_state->selected_control == BadKeyboardLayoutSelect) {
                 totp_roll_value_uint8_t(
-                    &scene_state->automation_kb_layout, 1, 0, BAD_KB_LAYOUT_LIST_MAX_INDEX, RollOverflowBehaviorRoll);
+                    &scene_state->automation_kb_layout,
+                    1,
+                    0,
+                    BAD_KB_LAYOUT_LIST_MAX_INDEX,
+                    RollOverflowBehaviorRoll);
             }
             break;
         case InputKeyLeft:
@@ -311,7 +317,11 @@ bool totp_scene_app_settings_handle_event(
                     RollOverflowBehaviorRoll);
             } else if(scene_state->selected_control == BadKeyboardLayoutSelect) {
                 totp_roll_value_uint8_t(
-                    &scene_state->automation_kb_layout, -1, 0, BAD_KB_LAYOUT_LIST_MAX_INDEX, RollOverflowBehaviorRoll);
+                    &scene_state->automation_kb_layout,
+                    -1,
+                    0,
+                    BAD_KB_LAYOUT_LIST_MAX_INDEX,
+                    RollOverflowBehaviorRoll);
             }
             break;
         case InputKeyOk:
