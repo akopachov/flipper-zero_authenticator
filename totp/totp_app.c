@@ -53,7 +53,7 @@ static bool totp_activate_initial_scene(PluginState* const plugin_state) {
         DialogMessageButton dialog_result =
             dialog_message_show(plugin_state->dialogs_app, message);
         dialog_message_free(message);
-        if (!totp_crypto_check_key_slot(plugin_state->crypto_key_slot)) {
+        if(!totp_crypto_check_key_slot(plugin_state->crypto_key_slot)) {
             totp_dialogs_config_loading_error(plugin_state);
             return false;
         }
