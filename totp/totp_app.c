@@ -17,6 +17,7 @@
 #include "ui/common_dialogs.h"
 #include "services/crypto/crypto_facade.h"
 #include "cli/cli.h"
+#include "version.h"
 
 struct TotpRenderCallbackContext {
     FuriMutex* mutex;
@@ -211,6 +212,7 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
 }
 
 int32_t totp_app() {
+    FURI_LOG_I(LOGGING_TAG, "App version: %" PRIu8 ".%" PRIu8 ".%" PRIu8, TOTP_APP_VERSION_MAJOR, TOTP_APP_VERSION_MINOR, TOTP_APP_VERSION_PATCH);
     PluginState* plugin_state = malloc(sizeof(PluginState));
     furi_check(plugin_state != NULL);
 

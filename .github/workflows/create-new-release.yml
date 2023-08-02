@@ -15,19 +15,28 @@ on:
         type: string
 
 jobs:
-  test-new-version:
+  set-new-version:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Verify new version format
+      - name: Set new version format
         run: |
           if [[ "${{ inputs.new_version }}" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; 
           then 
             echo "New version looks okay";
+            sed -r -i 's/TOTP_APP_VERSION_MAJOR\s+\([0-9]+\)/TOTP_APP_VERSION_MAJOR (${BASH_REMATCH[1]})/g' totp/version.h
+            sed -r -i 's/TOTP_APP_VERSION_MINOR\s+\([0-9]+\)/TOTP_APP_VERSION_MINOR (${BASH_REMATCH[2]})/g' totp/version.h
+            sed -r -i 's/TOTP_APP_VERSION_PATCH\s+\([0-9]+\)/TOTP_APP_VERSION_PATCH (${BASH_REMATCH[3]})/g' totp/version.h
+            sed -r -i 's/fap_version="[0-9]+\.[0-9]+"/fap_version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}${BASH_REMATCH[3]}"/g' totp/application.fam
           else 
             echo "Invalid version format";
             exit 1
           fi
+
+      - uses: stefanzweifel/git-auto-commit-action@v4.16.0
+        with:
+          commit_message: Updated version
+          branch: ${{ github.head_ref }}
 
   build:
     runs-on: ubuntu-latest
