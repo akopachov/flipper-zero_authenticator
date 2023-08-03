@@ -22,11 +22,13 @@ uint8_t* totp_crypto_encrypt(
     const CryptoSettings* crypto_settings,
     size_t* encrypted_data_length) {
     if(crypto_settings->crypto_version == 1) {
-        return totp_crypto_encrypt_v1(plain_data, plain_data_length, crypto_settings, encrypted_data_length);
+        return totp_crypto_encrypt_v1(
+            plain_data, plain_data_length, crypto_settings, encrypted_data_length);
     }
 
     if(crypto_settings->crypto_version == 2) {
-        return totp_crypto_encrypt_v2(plain_data, plain_data_length, crypto_settings, encrypted_data_length);
+        return totp_crypto_encrypt_v2(
+            plain_data, plain_data_length, crypto_settings, encrypted_data_length);
     }
 
     furi_crash("Unsupported crypto version");

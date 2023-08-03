@@ -50,8 +50,7 @@ static bool first_run_init(PluginState* const plugin_state) {
         SCREEN_HEIGHT_CENTER,
         AlignCenter,
         AlignCenter);
-    DialogMessageButton dialog_result =
-        dialog_message_show(plugin_state->dialogs_app, message);
+    DialogMessageButton dialog_result = dialog_message_show(plugin_state->dialogs_app, message);
     dialog_message_free(message);
     if(!totp_crypto_check_key_slot(plugin_state->crypto_settings.crypto_key_slot)) {
         totp_dialogs_config_loading_error(plugin_state);
@@ -61,9 +60,10 @@ static bool first_run_init(PluginState* const plugin_state) {
     if(dialog_result == DialogMessageButtonRight) {
         totp_scene_director_activate_scene(plugin_state, TotpSceneAuthentication);
     } else {
-        CryptoSeedIVResult seed_result = totp_crypto_seed_iv(&plugin_state->crypto_settings, NULL, 0);
+        CryptoSeedIVResult seed_result =
+            totp_crypto_seed_iv(&plugin_state->crypto_settings, NULL, 0);
         if(seed_result & CryptoSeedIVResultFlagSuccess &&
-            seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
+           seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
             if(!totp_config_file_update_crypto_signatures(plugin_state)) {
                 totp_dialogs_config_loading_error(plugin_state);
                 return false;
@@ -82,7 +82,7 @@ static bool first_run_init(PluginState* const plugin_state) {
 static bool pinless_activation(PluginState* const plugin_state) {
     CryptoSeedIVResult seed_result = totp_crypto_seed_iv(&plugin_state->crypto_settings, NULL, 0);
     if(seed_result & CryptoSeedIVResultFlagSuccess &&
-        seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
+       seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
         if(!totp_config_file_update_crypto_signatures(plugin_state)) {
             totp_dialogs_config_loading_error(plugin_state);
             return false;
@@ -123,15 +123,15 @@ static bool pin_activation(PluginState* const plugin_state) {
 
 static bool totp_activate_initial_scene(PluginState* const plugin_state) {
     if(plugin_state->crypto_settings.crypto_verify_data == NULL) {
-        if (!first_run_init(plugin_state)) {
+        if(!first_run_init(plugin_state)) {
             return false;
         }
     } else if(plugin_state->crypto_settings.pin_required) {
-        if (!pin_activation(plugin_state)) {
+        if(!pin_activation(plugin_state)) {
             return false;
         }
     } else {
-        if (!pinless_activation(plugin_state)) {
+        if(!pinless_activation(plugin_state)) {
             return false;
         }
     }
@@ -212,7 +212,12 @@ static void totp_plugin_state_free(PluginState* plugin_state) {
 }
 
 int32_t totp_app() {
-    FURI_LOG_I(LOGGING_TAG, "App version: %" PRIu8 ".%" PRIu8 ".%" PRIu8, TOTP_APP_VERSION_MAJOR, TOTP_APP_VERSION_MINOR, TOTP_APP_VERSION_PATCH);
+    FURI_LOG_I(
+        LOGGING_TAG,
+        "App version: %" PRIu8 ".%" PRIu8 ".%" PRIu8,
+        TOTP_APP_VERSION_MAJOR,
+        TOTP_APP_VERSION_MINOR,
+        TOTP_APP_VERSION_PATCH);
     PluginState* plugin_state = malloc(sizeof(PluginState));
     furi_check(plugin_state != NULL);
 

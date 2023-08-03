@@ -65,8 +65,10 @@ uint8_t* totp_crypto_decrypt_v1(
     return decrypted_data;
 }
 
-CryptoSeedIVResult
-    totp_crypto_seed_iv_v1(CryptoSettings* crypto_settings, const uint8_t* pin, uint8_t pin_length) {
+CryptoSeedIVResult totp_crypto_seed_iv_v1(
+    CryptoSettings* crypto_settings,
+    const uint8_t* pin,
+    uint8_t pin_length) {
     CryptoSeedIVResult result;
     if(crypto_settings->crypto_verify_data == NULL) {
         FURI_LOG_I(LOGGING_TAG, "Generating new IV");

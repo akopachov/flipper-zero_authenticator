@@ -151,9 +151,7 @@ void totp_cli_command_update_handle(PluginState* plugin_state, FuriString* args,
     totp_token_info_iterator_go_to(iterator_context, token_number - 1);
 
     struct TotpUpdateContext update_context = {
-        .args = args,
-        .cli = cli,
-        .crypto_settings = &plugin_state->crypto_settings};
+        .args = args, .cli = cli, .crypto_settings = &plugin_state->crypto_settings};
     TotpIteratorUpdateTokenResult update_result = totp_token_info_iterator_update_current_token(
         iterator_context, &update_token_handler, &update_context);
 

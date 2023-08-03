@@ -70,10 +70,7 @@ static void generate_totp_code(
     if(token_info->token != NULL && token_info->token_length > 0) {
         size_t key_length;
         uint8_t* key = totp_crypto_decrypt(
-            token_info->token,
-            token_info->token_length,
-            context->crypto_settings,
-            &key_length);
+            token_info->token, token_info->token_length, context->crypto_settings, &key_length);
 
         int_token_to_str(
             totp_at(

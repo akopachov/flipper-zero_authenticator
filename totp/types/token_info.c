@@ -56,10 +56,7 @@ bool token_info_set_secret(
         }
 
         token_info->token = totp_crypto_encrypt(
-            plain_secret,
-            plain_secret_length,
-            crypto_settings,
-            &token_info->token_length);
+            plain_secret, plain_secret_length, crypto_settings, &token_info->token_length);
         result = true;
     } else {
         result = false;

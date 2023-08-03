@@ -167,9 +167,7 @@ void totp_cli_command_add_handle(PluginState* plugin_state, FuriString* args, Cl
     TOTP_CLI_LOCK_UI(plugin_state);
 
     struct TotpAddContext add_context = {
-        .args = args,
-        .cli = cli,
-        .crypto_settings = &plugin_state->crypto_settings};
+        .args = args, .cli = cli, .crypto_settings = &plugin_state->crypto_settings};
     TotpIteratorUpdateTokenResult add_result =
         totp_token_info_iterator_add_new_token(iterator_context, &add_token_handler, &add_context);
 

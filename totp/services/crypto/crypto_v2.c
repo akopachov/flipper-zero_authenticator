@@ -46,12 +46,14 @@ uint8_t* totp_crypto_encrypt_v2(
         *encrypted_data_length = plain_data_aligned_length;
 
         furi_check(
-            furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv), "Encryption failed: store_load_key");
+            furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
+            "Encryption failed: store_load_key");
         furi_check(
             furi_hal_crypto_encrypt(plain_data_aligned, encrypted_data, plain_data_aligned_length),
             "Encryption failed: encrypt");
         furi_check(
-            furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot), "Encryption failed: store_unload_key");
+            furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot),
+            "Encryption failed: store_unload_key");
 
         memset_s(plain_data_aligned, plain_data_aligned_length, 0, plain_data_aligned_length);
         free(plain_data_aligned);
@@ -61,12 +63,14 @@ uint8_t* totp_crypto_encrypt_v2(
         *encrypted_data_length = plain_data_length;
 
         furi_check(
-            furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv), "Encryption failed: store_load_key");
+            furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
+            "Encryption failed: store_load_key");
         furi_check(
             furi_hal_crypto_encrypt(plain_data, encrypted_data, plain_data_length),
             "Encryption failed: encrypt");
         furi_check(
-            furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot), "Encryption failed: store_unload_key");
+            furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot),
+            "Encryption failed: store_unload_key");
     }
 
     return encrypted_data;
@@ -80,16 +84,22 @@ uint8_t* totp_crypto_decrypt_v2(
     *decrypted_data_length = encrypted_data_length;
     uint8_t* decrypted_data = malloc(*decrypted_data_length);
     furi_check(decrypted_data != NULL);
-    furi_check(furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv), "Decryption failed: store_load_key");
+    furi_check(
+        furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
+        "Decryption failed: store_load_key");
     furi_check(
         furi_hal_crypto_decrypt(encrypted_data, decrypted_data, encrypted_data_length),
         "Decryption failed: decrypt");
-    furi_check(furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot), "Decryption failed: store_unload_key");
+    furi_check(
+        furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot),
+        "Decryption failed: store_unload_key");
     return decrypted_data;
 }
 
-CryptoSeedIVResult
-    totp_crypto_seed_iv_v2(CryptoSettings* crypto_settings, const uint8_t* pin, uint8_t pin_length) {
+CryptoSeedIVResult totp_crypto_seed_iv_v2(
+    CryptoSettings* crypto_settings,
+    const uint8_t* pin,
+    uint8_t pin_length) {
     CryptoSeedIVResult result;
     if(crypto_settings->crypto_verify_data == NULL) {
         FURI_LOG_I(LOGGING_TAG, "Generating new IV");
