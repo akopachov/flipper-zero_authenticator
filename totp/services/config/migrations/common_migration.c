@@ -46,7 +46,8 @@ bool totp_config_migrate_to_latest(
             flipper_format_write_string(fff_data_file, TOTP_CONFIG_KEY_SALT, temp_str);
         } else if(
             flipper_format_rewind(fff_backup_data_file) &&
-            flipper_format_read_string(fff_backup_data_file, TOTP_OLD_CONFIG_KEY_BASE_IV, temp_str)) {
+            flipper_format_read_string(
+                fff_backup_data_file, TOTP_OLD_CONFIG_KEY_BASE_IV, temp_str)) {
             flipper_format_write_string(fff_data_file, TOTP_CONFIG_KEY_SALT, temp_str);
         }
 

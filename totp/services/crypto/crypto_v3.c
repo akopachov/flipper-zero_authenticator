@@ -127,15 +127,23 @@ CryptoSeedIVResult totp_crypto_seed_iv_v3(
     }
 
     uint8_t pbkdf_output[WC_SHA512_DIGEST_SIZE] = {0};
-    
-    int pbkdf_result_code = wc_PBKDF2(&pbkdf_output[0], pbkdf_key, pbkdf_key_length, &crypto_settings->salt[0], CRYPTO_SALT_LENGTH, PBKDF2_ITERATIONS_COUNT, WC_SHA512_DIGEST_SIZE, WC_SHA512);
+
+    int pbkdf_result_code = wc_PBKDF2(
+        &pbkdf_output[0],
+        pbkdf_key,
+        pbkdf_key_length,
+        &crypto_settings->salt[0],
+        CRYPTO_SALT_LENGTH,
+        PBKDF2_ITERATIONS_COUNT,
+        WC_SHA512_DIGEST_SIZE,
+        WC_SHA512);
 
     memset_s(pbkdf_key, pbkdf_key_length, 0, pbkdf_key_length);
     free(pbkdf_key);
 
     if(pbkdf_result_code == 0) {
-        uint8_t offset =
-            pbkdf_output[WC_SHA512_DIGEST_SIZE - 1] % (WC_SHA512_DIGEST_SIZE - CRYPTO_IV_LENGTH - 1);
+        uint8_t offset = pbkdf_output[WC_SHA512_DIGEST_SIZE - 1] %
+                         (WC_SHA512_DIGEST_SIZE - CRYPTO_IV_LENGTH - 1);
         memcpy(&crypto_settings->iv[0], &pbkdf_output[offset], CRYPTO_IV_LENGTH);
         result = CryptoSeedIVResultFlagSuccess;
         if(crypto_settings->crypto_verify_data == NULL) {

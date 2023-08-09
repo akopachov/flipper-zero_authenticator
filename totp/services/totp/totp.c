@@ -81,11 +81,11 @@ static int totp_algo_common(
     uint8_t* output) {
     Hmac hmac;
     int ret = wc_HmacSetKey(&hmac, type, key, key_length);
-    if (ret == 0) {
+    if(ret == 0) {
         ret = wc_HmacUpdate(&hmac, input, input_length);
     }
 
-    if (ret == 0) {
+    if(ret == 0) {
         ret = wc_HmacFinal(&hmac, output);
     }
 
