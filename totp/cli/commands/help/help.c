@@ -70,6 +70,7 @@ void totp_cli_command_help_handle() {
     totp_cli_command_pin_docopt_options();
     totp_cli_command_automation_docopt_options();
 #else
-    TOTP_CLI_PRINTF("All the TOTP CLI commands, their arguments, options and usage can be found here https://t.ly/_6pJG");
+    TOTP_CLI_PRINTF(
+        "All the TOTP CLI commands, their arguments, options and usage can be found here https://t.ly/_6pJG");
 #endif
 }
