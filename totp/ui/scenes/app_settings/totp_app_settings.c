@@ -6,7 +6,6 @@
 #include "../../ui_controls.h"
 #include "../../common_dialogs.h"
 #include "../../scene_director.h"
-#include "../token_menu/totp_scene_token_menu.h"
 #include "../../constants.h"
 #include "../../../services/config/config.h"
 #include "../../../services/convert/convert.h"

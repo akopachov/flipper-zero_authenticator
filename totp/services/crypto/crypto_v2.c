@@ -1,4 +1,5 @@
 #include "crypto_v2.h"
+#ifdef TOTP_OBSOLETE_CRYPTO_V2_COMPATIBILITY_ENABLED
 #include <stdlib.h>
 #include <furi.h>
 #include <furi_hal_crypto.h>
@@ -185,3 +186,4 @@ bool totp_crypto_verify_key_v2(const CryptoSettings* crypto_settings) {
 
     return key_valid;
 }
+#endif
