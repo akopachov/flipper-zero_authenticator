@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../features_config.h"
+#include "../../config/app/config.h"
 #ifdef TOTP_OBSOLETE_CRYPTO_V1_COMPATIBILITY_ENABLED
 #include <stdint.h>
 #include <stdbool.h>

@@ -7,7 +7,7 @@
 #include "../../scene_director.h"
 #include "../../../services/config/config.h"
 #include "../../../types/token_info.h"
-#include "../../../features_config.h"
+#include "../../../config/app/config.h"
 #include <roll_value.h>
 
 #define SCREEN_HEIGHT_THIRD (SCREEN_HEIGHT / 3)

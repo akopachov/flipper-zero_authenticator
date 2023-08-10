@@ -6,10 +6,11 @@
 #include <furi_hal_random.h>
 #include <furi_hal_version.h>
 #include "../../types/common.h"
-#include "../../wolfssl_config.h"
+#include "../../config/wolfssl/config.h"
 #include <wolfssl/wolfcrypt/hmac.h>
 #include "memset_s.h"
 #include "constants.h"
+#include "polyfills.h"
 
 #define CRYPTO_ALIGNMENT_FACTOR (16)
 
@@ -48,14 +49,14 @@ uint8_t* totp_crypto_encrypt_v2(
         *encrypted_data_length = plain_data_aligned_length;
 
         furi_check(
-            furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
-            "Encryption failed: store_load_key");
+            furi_hal_crypto_enclave_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
+            "Encryption failed: enclave_load_key");
         furi_check(
             furi_hal_crypto_encrypt(plain_data_aligned, encrypted_data, plain_data_aligned_length),
             "Encryption failed: encrypt");
         furi_check(
-            furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot),
-            "Encryption failed: store_unload_key");
+            furi_hal_crypto_enclave_unload_key(crypto_settings->crypto_key_slot),
+            "Encryption failed: enclave_unload_key");
 
         memset_s(plain_data_aligned, plain_data_aligned_length, 0, plain_data_aligned_length);
         free(plain_data_aligned);
@@ -65,13 +66,13 @@ uint8_t* totp_crypto_encrypt_v2(
         *encrypted_data_length = plain_data_length;
 
         furi_check(
-            furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
+            furi_hal_crypto_enclave_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
             "Encryption failed: store_load_key");
         furi_check(
             furi_hal_crypto_encrypt(plain_data, encrypted_data, plain_data_length),
             "Encryption failed: encrypt");
         furi_check(
-            furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot),
+            furi_hal_crypto_enclave_unload_key(crypto_settings->crypto_key_slot),
             "Encryption failed: store_unload_key");
     }
 
@@ -87,14 +88,14 @@ uint8_t* totp_crypto_decrypt_v2(
     uint8_t* decrypted_data = malloc(*decrypted_data_length);
     furi_check(decrypted_data != NULL);
     furi_check(
-        furi_hal_crypto_store_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
-        "Decryption failed: store_load_key");
+        furi_hal_crypto_enclave_load_key(crypto_settings->crypto_key_slot, crypto_settings->iv),
+        "Decryption failed: enclave_load_key");
     furi_check(
         furi_hal_crypto_decrypt(encrypted_data, decrypted_data, encrypted_data_length),
         "Decryption failed: decrypt");
     furi_check(
-        furi_hal_crypto_store_unload_key(crypto_settings->crypto_key_slot),
-        "Decryption failed: store_unload_key");
+        furi_hal_crypto_enclave_unload_key(crypto_settings->crypto_key_slot),
+        "Decryption failed: enclave_unload_key");
     return decrypted_data;
 }
 

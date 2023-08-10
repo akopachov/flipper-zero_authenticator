@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cli/cli.h>
-#include "../../../features_config.h"
+#include "../../../config/app/config.h"
 #include "../../../types/plugin_state.h"
 
 #define TOTP_CLI_COMMAND_ADD "add"

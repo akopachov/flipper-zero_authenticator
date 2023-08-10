@@ -2,7 +2,7 @@
 
 #include <cli/cli.h>
 #include "../../../types/plugin_state.h"
-#include "../../../features_config.h"
+#include "../../../config/app/config.h"
 
 #define TOTP_CLI_COMMAND_NOTIFICATION "notify"
 

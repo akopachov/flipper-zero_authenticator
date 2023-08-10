@@ -8,7 +8,7 @@
 #include <memset_s.h>
 #include "../../types/common.h"
 #include "../../types/token_info.h"
-#include "../../features_config.h"
+#include "../../config/app/config.h"
 #include "../crypto/crypto_facade.h"
 #include "../crypto/constants.h"
 #include "migrations/common_migration.h"

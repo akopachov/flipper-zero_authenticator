@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../features_config.h"
+#include "../../../config/app/config.h"
 #ifdef TOTP_UI_ADD_NEW_TOKEN_ENABLED
 #include <gui/gui.h>
 #include "../../../types/plugin_state.h"

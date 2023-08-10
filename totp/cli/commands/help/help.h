@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../features_config.h"
+#include "../../../config/app/config.h"
 #include <cli/cli.h>
 
 #define TOTP_CLI_COMMAND_HELP "help"

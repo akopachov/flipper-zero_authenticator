@@ -11,7 +11,7 @@
 #include "../../constants.h"
 #include "../../../services/config/config.h"
 #include "../../scene_director.h"
-#include "../../../features_config.h"
+#include "../../../config/app/config.h"
 #include "../../../workers/generate_totp_code/generate_totp_code.h"
 #include "../../../workers/usb_type_code/usb_type_code.h"
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED

@@ -1,5 +1,5 @@
 #include "../types/common.h"
-#include "../features_config.h"
+#include "../config/app/config.h"
 #include "scene_director.h"
 #include "scenes/authenticate/totp_scene_authenticate.h"
 #include "scenes/generate_token/totp_scene_generate_token.h"

@@ -1,5 +1,5 @@
 #include "crypto_facade.h"
-#include "../../features_config.h"
+#include "../../config/app/config.h"
 #include <furi_hal_crypto.h>
 #include <furi/core/check.h>
 #ifdef TOTP_OBSOLETE_CRYPTO_V1_COMPATIBILITY_ENABLED
@@ -17,9 +17,9 @@ bool totp_crypto_check_key_slot(uint8_t key_slot) {
         return false;
     }
 
-    return furi_hal_crypto_verify_key(key_slot) &&
-           furi_hal_crypto_store_load_key(key_slot, empty_iv) &&
-           furi_hal_crypto_store_unload_key(key_slot);
+    return furi_hal_crypto_enclave_ensure_key(key_slot) &&
+           furi_hal_crypto_enclave_load_key(key_slot, empty_iv) &&
+           furi_hal_crypto_enclave_unload_key(key_slot);
 }
 
 uint8_t* totp_crypto_encrypt(

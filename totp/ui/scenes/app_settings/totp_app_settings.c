@@ -10,7 +10,7 @@
 #include "../../../services/config/config.h"
 #include "../../../services/convert/convert.h"
 #include <roll_value.h>
-#include "../../../features_config.h"
+#include "../../../config/app/config.h"
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
 #include "../../../workers/bt_type_code/bt_type_code.h"
 #endif
