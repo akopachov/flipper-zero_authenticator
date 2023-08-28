@@ -7,8 +7,7 @@ void totp_cli_command_version_docopt_commands() {
     TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_VERSION "     Get application version\r\n");
 }
 void totp_cli_command_version_docopt_usage() {
-    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_NAME
-                    " " TOTP_CLI_COMMAND_VERSION "\r\n");
+    TOTP_CLI_PRINTF("  " TOTP_CLI_COMMAND_NAME " " TOTP_CLI_COMMAND_VERSION "\r\n");
 }
 #endif
 
