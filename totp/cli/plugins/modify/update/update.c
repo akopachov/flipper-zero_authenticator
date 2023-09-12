@@ -86,7 +86,7 @@ static TotpIteratorUpdateTokenResult
         furi_string_reset(temp_str);
         TOTP_CLI_PRINTF("Enter token secret and confirm with [ENTER]:\r\n");
         bool token_secret_read = totp_cli_read_line(context_t->cli, temp_str, mask_user_input);
-        totp_cli_delete_last_line();
+        TOTP_CLI_DELETE_LAST_LINE();
         if(!token_secret_read) {
             furi_string_secure_free(temp_str);
             return TotpIteratorUpdateTokenResultCancelled;
@@ -119,7 +119,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
     int token_number;
     if(!args_read_int_and_trim(args, &token_number) || token_number <= 0 ||
        (size_t)token_number > totp_token_info_iterator_get_total_count(iterator_context)) {
-        totp_cli_print_invalid_arguments();
+        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         return;
     }
 
@@ -139,13 +139,13 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
             furi_string_get_cstr(
                 totp_token_info_iterator_get_current_token(iterator_context)->name));
     } else if(update_result == TotpIteratorUpdateTokenResultInvalidArguments) {
-        totp_cli_print_invalid_arguments();
+        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
     } else if(update_result == TotpIteratorUpdateTokenResultCancelled) {
         TOTP_CLI_PRINTF_INFO("Cancelled by user\r\n");
     } else if(update_result == TotpIteratorUpdateTokenResultInvalidSecret) {
         TOTP_CLI_PRINTF_ERROR("Token secret seems to be invalid and can not be parsed\r\n");
     } else if(update_result == TotpIteratorUpdateTokenResultFileUpdateFailed) {
-        totp_cli_print_error_updating_config_file();
+        TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
     }
 
     totp_token_info_iterator_go_to(iterator_context, previous_index);

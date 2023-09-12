@@ -56,14 +56,14 @@ static bool totp_cli_read_pin(Cli* cli, uint8_t* pin, uint8_t* pin_length) {
                 }
             }
         } else if(c == CliSymbolAsciiETX) {
-            totp_cli_delete_current_line();
+            TOTP_CLI_DELETE_CURRENT_LINE();
             TOTP_CLI_PRINTF_INFO("Cancelled by user\r\n");
             return false;
         } else if(c == CliSymbolAsciiBackspace || c == CliSymbolAsciiDel) {
             if(*pin_length > 0) {
                 *pin_length = *pin_length - 1;
                 pin[*pin_length] = 0;
-                totp_cli_delete_last_char();
+                TOTP_CLI_DELETE_LAST_CHAR();
             }
         } else if(c == CliSymbolAsciiCR) {
             cli_nl();
@@ -71,7 +71,7 @@ static bool totp_cli_read_pin(Cli* cli, uint8_t* pin, uint8_t* pin_length) {
         }
     }
 
-    totp_cli_delete_last_line();
+    TOTP_CLI_DELETE_LAST_LINE();
     return true;
 }
 
@@ -99,14 +99,14 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
                 break;
             }
         } else {
-            totp_cli_print_invalid_arguments();
+            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
             arguments_parsed = false;
             break;
         }
     }
 
     if(!(do_change || do_remove) || (do_change && do_remove)) {
-        totp_cli_print_invalid_arguments();
+        TOTP_CLI_PRINT_INVALID_ARGUMENTS();
         arguments_parsed = false;
     }
 
@@ -146,7 +146,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
 
             memset_s(&new_pin[0], CRYPTO_IV_LENGTH, 0, CRYPTO_IV_LENGTH);
 
-            totp_cli_delete_last_line();
+            TOTP_CLI_DELETE_LAST_LINE();
 
             if(update_result) {
                 if(do_change) {
@@ -155,7 +155,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
                     TOTP_CLI_PRINTF_SUCCESS("PIN has been successfully removed\r\n");
                 }
             } else {
-                totp_cli_print_error_updating_config_file();
+                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
             }
 
         } while(false);

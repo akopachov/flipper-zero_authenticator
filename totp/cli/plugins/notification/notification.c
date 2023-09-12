@@ -56,7 +56,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
 
     do {
         if(!args_valid) {
-            totp_cli_print_invalid_arguments();
+            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
             break;
         }
 
@@ -69,7 +69,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
                 totp_cli_command_notification_print_method(new_method, TOTP_CLI_COLOR_SUCCESS);
                 cli_nl();
             } else {
-                totp_cli_print_error_updating_config_file();
+                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
             }
 
             TOTP_CLI_UNLOCK_UI(plugin_state);

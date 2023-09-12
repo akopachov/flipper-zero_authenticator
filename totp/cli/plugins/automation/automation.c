@@ -118,7 +118,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
 
     do {
         if(!args_valid) {
-            totp_cli_print_invalid_arguments();
+            TOTP_CLI_PRINT_INVALID_ARGUMENTS();
             break;
         }
 
@@ -135,7 +135,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
                 TOTP_CLI_PRINTF_SUCCESS(")");
                 cli_nl();
             } else {
-                totp_cli_print_error_updating_config_file();
+                TOTP_CLI_PRINT_ERROR_UPDATING_CONFIG_FILE();
             }
 
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED

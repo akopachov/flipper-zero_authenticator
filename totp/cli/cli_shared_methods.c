@@ -14,7 +14,7 @@ bool totp_cli_ensure_authenticated(const PluginState* plugin_state, Cli* cli) {
             furi_delay_ms(100);
         }
 
-        totp_cli_delete_last_line();
+        TOTP_CLI_DELETE_LAST_LINE();
 
         if(plugin_state->current_scene == TotpSceneAuthentication || //-V560
            plugin_state->current_scene == TotpSceneNone) { //-V560
@@ -56,7 +56,7 @@ bool totp_cli_read_line(Cli* cli, FuriString* out_str, bool mask_user_input) {
         } else if(c == CliSymbolAsciiBackspace || c == CliSymbolAsciiDel) {
             size_t out_str_size = furi_string_size(out_str);
             if(out_str_size > 0) {
-                totp_cli_delete_last_char();
+                TOTP_CLI_DELETE_LAST_CHAR();
                 furi_string_left(out_str, out_str_size - 1);
             }
         } else if(c == CliSymbolAsciiCR) {
