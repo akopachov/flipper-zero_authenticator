@@ -2,7 +2,6 @@
 #include <inttypes.h>
 #include "../../../../cli_helpers.h"
 
-
 void details_output_formatter_print_header_table() {
     TOTP_CLI_PRINTF("+----------------------+------------------------------+\r\n");
     TOTP_CLI_PRINTF("| %-20s | %-28s |\r\n", "Property", "Value");

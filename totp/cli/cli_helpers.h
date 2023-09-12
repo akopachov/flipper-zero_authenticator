@@ -37,7 +37,8 @@ extern "C" {
     totp_scene_director_force_redraw(plugin_state)
 
 #define totp_cli_print_invalid_arguments() \
-    TOTP_CLI_PRINTF_ERROR("Invalid command arguments. use \"help\" command to get list of available commands")
+    TOTP_CLI_PRINTF_ERROR(                 \
+        "Invalid command arguments. use \"help\" command to get list of available commands")
 
 #define totp_cli_print_error_updating_config_file() \
     TOTP_CLI_PRINTF_ERROR("An error has occurred during updating config file\r\n")
@@ -45,18 +46,17 @@ extern "C" {
 #define totp_cli_print_error_loading_token_info() \
     TOTP_CLI_PRINTF_ERROR("An error has occurred during loading token information\r\n")
 
-#define totp_cli_print_processing() \
-    TOTP_CLI_PRINTF("Processing, please wait...\r\n")
+#define totp_cli_print_processing() TOTP_CLI_PRINTF("Processing, please wait...\r\n")
 
 #define totp_cli_delete_last_char() \
-    TOTP_CLI_PRINTF("\b \b"); \
+    TOTP_CLI_PRINTF("\b \b");       \
     fflush(stdout)
 
 #define totp_cli_delete_current_line() \
-    TOTP_CLI_PRINTF("\33[2K\r"); \
+    TOTP_CLI_PRINTF("\33[2K\r");       \
     fflush(stdout)
 
-#define totp_cli_delete_last_line() \
+#define totp_cli_delete_last_line()    \
     TOTP_CLI_PRINTF("\033[A\33[2K\r"); \
     fflush(stdout)
 

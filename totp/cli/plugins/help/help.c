@@ -14,7 +14,8 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
 
     Stream* stream = file_stream_alloc(storage);
 
-    if(file_stream_open(stream, EXT_PATH("apps_assets/totp/cli/cli_help.txt"), FSAM_READ, FSOM_OPEN_EXISTING)) {
+    if(file_stream_open(
+           stream, EXT_PATH("apps_assets/totp/cli/cli_help.txt"), FSAM_READ, FSOM_OPEN_EXISTING)) {
         uint8_t buffer[32U];
         size_t bytes_read;
         while((bytes_read = stream_read(stream, &buffer[0], sizeof(buffer))) > 0) {
@@ -28,10 +29,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
     furi_record_close(RECORD_STORAGE);
 }
 
-static const CliPlugin plugin = {
-    .name = "TOTP CLI Plugin: Help",
-    .handle = &handle
-};
+static const CliPlugin plugin = {.name = "TOTP CLI Plugin: Help", .handle = &handle};
 
 static const FlipperAppPluginDescriptor plugin_descriptor = {
     .appid = PLUGIN_APP_ID,

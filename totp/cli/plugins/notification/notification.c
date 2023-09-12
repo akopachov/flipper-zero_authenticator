@@ -84,10 +84,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
     furi_string_free(temp_str);
 }
 
-static const CliPlugin plugin = {
-    .name = "TOTP CLI Plugin: Notification",
-    .handle = &handle
-};
+static const CliPlugin plugin = {.name = "TOTP CLI Plugin: Notification", .handle = &handle};
 
 static const FlipperAppPluginDescriptor plugin_descriptor = {
     .appid = PLUGIN_APP_ID,

@@ -1,5 +1,8 @@
 #include "cli.h"
 #include <lib/toolbox/args.h>
+#include <flipper_application/flipper_application.h>
+#include <flipper_application/plugins/composite_resolver.h>
+#include <loader/firmware_api/firmware_api.h>
 #include "cli_helpers.h"
 #include "plugins/timezone/meta.h"
 #include "plugins/list/meta.h"
@@ -14,11 +17,6 @@
 #include "plugins/automation/meta.h"
 #include "plugins/details/meta.h"
 #include "plugins/version/meta.h"
-
-#include <flipper_application/flipper_application.h>
-#include <flipper_application/plugins/composite_resolver.h>
-
-#include <loader/firmware_api/firmware_api.h>
 #include "cli_plugin_interface.h"
 #include "../app_api_interface.h"
 
@@ -34,11 +32,17 @@ static void totp_cli_print_unknown_command(const FuriString* unknown_command) {
         furi_string_get_cstr(unknown_command));
 }
 
-static void run_external_cli_plugin_handler(const char* handler_name, TotpCliContext* cli_context, FuriString* args, Cli* cli) {
+static void run_external_cli_plugin_handler(
+    const char* handler_name,
+    TotpCliContext* cli_context,
+    FuriString* args,
+    Cli* cli) {
     Storage* storage = furi_record_open(RECORD_STORAGE);
-    FlipperApplication* plugin_app = flipper_application_alloc(storage, composite_api_resolver_get(cli_context->plugin_api_resolver));
+    FlipperApplication* plugin_app = flipper_application_alloc(
+        storage, composite_api_resolver_get(cli_context->plugin_api_resolver));
     do {
-        FuriString* full_handler_path = furi_string_alloc_printf(EXT_PATH("apps_data/totp/plugins/%s.fal"), handler_name);
+        FuriString* full_handler_path =
+            furi_string_alloc_printf(EXT_PATH("apps_data/totp/plugins/%s.fal"), handler_name);
         FlipperApplicationPreloadStatus preload_res =
             flipper_application_preload(plugin_app, furi_string_get_cstr(full_handler_path));
         furi_string_free(full_handler_path);
@@ -62,13 +66,15 @@ static void run_external_cli_plugin_handler(const char* handler_name, TotpCliCon
         const FlipperAppPluginDescriptor* app_descriptor =
             flipper_application_plugin_get_descriptor(plugin_app);
 
-        if (strcmp(app_descriptor->appid, PLUGIN_APP_ID) != 0) {
+        if(strcmp(app_descriptor->appid, PLUGIN_APP_ID) != 0) {
             TOTP_CLI_PRINTF_ERROR("Plugin doesn't seems to be a valid TOTP CLI plugin\r\n");
             break;
         }
 
-        if (app_descriptor->ep_api_version != PLUGIN_API_VERSION) {
-            TOTP_CLI_PRINTF_ERROR("Plugin version %" PRIu32 " is not compatible with your app version\r\n", app_descriptor->ep_api_version);
+        if(app_descriptor->ep_api_version != PLUGIN_API_VERSION) {
+            TOTP_CLI_PRINTF_ERROR(
+                "Plugin version %" PRIu32 " is not compatible with your app version\r\n",
+                app_descriptor->ep_api_version);
             break;
         }
 
@@ -107,12 +113,11 @@ static void totp_cli_handler(Cli* cli, FuriString* args, void* context) {
         furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_DELETE) == 0 ||
         furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_DELETE_ALT) == 0) {
         external_plugin_name = TOTP_CLI_PLUGIN_DELETE_FILE_NAME;
-    } 
-    else if(furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_TIMEZONE) == 0 ||
+    } else if(
+        furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_TIMEZONE) == 0 ||
         furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_TIMEZONE_ALT) == 0) {
         external_plugin_name = TOTP_CLI_PLUGIN_TIMEZONE_FILE_NAME;
-    }
-    else if(
+    } else if(
         furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_MOVE) == 0 ||
         furi_string_cmp_str(cmd, TOTP_CLI_COMMAND_MOVE_ALT) == 0) {
         external_plugin_name = TOTP_CLI_PLUGIN_MOVE_FILE_NAME;
@@ -136,7 +141,7 @@ static void totp_cli_handler(Cli* cli, FuriString* args, void* context) {
         totp_cli_print_unknown_command(cmd);
     }
 
-    if (external_plugin_name != NULL) {
+    if(external_plugin_name != NULL) {
         run_external_cli_plugin_handler(external_plugin_name, cli_context, args, cli);
     }
 

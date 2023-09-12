@@ -31,15 +31,12 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
         }
     } else {
         TOTP_CLI_PRINTF_INFO(
-           "Current timezone offset is %f\r\n", (double)plugin_state->timezone_offset);
+            "Current timezone offset is %f\r\n", (double)plugin_state->timezone_offset);
     }
     furi_string_free(temp_str);
 }
 
-static const CliPlugin plugin = {
-    .name = "TOTP CLI Plugin: Timezone",
-    .handle = &handle
-};
+static const CliPlugin plugin = {.name = "TOTP CLI Plugin: Timezone", .handle = &handle};
 
 static const FlipperAppPluginDescriptor plugin_descriptor = {
     .appid = PLUGIN_APP_ID,

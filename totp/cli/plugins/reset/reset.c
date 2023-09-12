@@ -30,10 +30,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
     }
 }
 
-static const CliPlugin plugin = {
-    .name = "TOTP CLI Plugin: Reset",
-    .handle = &handle
-};
+static const CliPlugin plugin = {.name = "TOTP CLI Plugin: Reset", .handle = &handle};
 
 static const FlipperAppPluginDescriptor plugin_descriptor = {
     .appid = PLUGIN_APP_ID,
