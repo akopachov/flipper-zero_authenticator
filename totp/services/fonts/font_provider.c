@@ -22,7 +22,7 @@ size_t totp_font_provider_get_fonts_count() {
         char extension[sizeof(FONT_FILE_EXTENSION)];
         while(dir_walk_read(dir_walk, path_src, NULL) == DirWalkOK) {
             path_extract_extension(path_src, &extension[0], sizeof(extension));
-            if (strncmp(&extension[0], FONT_FILE_EXTENSION, sizeof(FONT_FILE_EXTENSION)) == 0) {
+            if(strncmp(&extension[0], FONT_FILE_EXTENSION, sizeof(FONT_FILE_EXTENSION)) == 0) {
                 result++;
             }
         }
@@ -40,41 +40,43 @@ bool totp_font_provider_get_font(size_t font_index, FontInfo* font_info) {
     Storage* storage = furi_record_open(RECORD_STORAGE);
     Stream* stream = file_stream_alloc(storage);
     bool loaded = false;
-    FuriString* font_path = furi_string_alloc_printf("%s/%02" PRIu16 "%s", FONT_BASE_PATH, font_index, FONT_FILE_EXTENSION);
+    FuriString* font_path = furi_string_alloc_printf(
+        "%s/%02" PRIu16 "%s", FONT_BASE_PATH, font_index, FONT_FILE_EXTENSION);
 
     do {
-        if(!file_stream_open(stream, furi_string_get_cstr(font_path), FSAM_READ, FSOM_OPEN_EXISTING) ||
-            !stream_rewind(stream)) {
+        if(!file_stream_open(
+               stream, furi_string_get_cstr(font_path), FSAM_READ, FSOM_OPEN_EXISTING) ||
+           !stream_rewind(stream)) {
             break;
         }
         uint8_t font_name_length;
-        if (!stream_read(stream, &font_name_length, 1)) {
+        if(!stream_read(stream, &font_name_length, 1)) {
             break;
         }
 
-        if (font_info->name != NULL) {
+        if(font_info->name != NULL) {
             free(font_info->name);
         }
         font_info->name = malloc(font_name_length + 1);
         furi_check(font_info->name);
-        if (!stream_read(stream, (uint8_t*)font_info->name, font_name_length)) {
+        if(!stream_read(stream, (uint8_t*)font_info->name, font_name_length)) {
             break;
         }
 
         font_info->name[font_name_length] = '\0';
-        if (!stream_read(stream, &font_info->height, 1) ||
-            !stream_read(stream, &font_info->start_char, 1) ||
-            !stream_read(stream, &font_info->end_char, 1) ||
-            !stream_read(stream, &font_info->space_width, 1)) {
+        if(!stream_read(stream, &font_info->height, 1) ||
+           !stream_read(stream, &font_info->start_char, 1) ||
+           !stream_read(stream, &font_info->end_char, 1) ||
+           !stream_read(stream, &font_info->space_width, 1)) {
             break;
         }
 
         uint16_t bitmap_data_length;
-        if (!stream_read(stream, (uint8_t*)&bitmap_data_length, 2)) {
+        if(!stream_read(stream, (uint8_t*)&bitmap_data_length, 2)) {
             break;
         }
 
-        if (font_info->data != NULL) {
+        if(font_info->data != NULL) {
             free(font_info->data);
         }
 
@@ -82,26 +84,26 @@ bool totp_font_provider_get_font(size_t font_index, FontInfo* font_info) {
 
         furi_check(font_info->data);
 
-        if (!stream_read(stream, font_info->data, bitmap_data_length)) {
+        if(!stream_read(stream, font_info->data, bitmap_data_length)) {
             break;
         }
         uint8_t descriptors_length;
-        if (!stream_read(stream, &descriptors_length, 1)) {
+        if(!stream_read(stream, &descriptors_length, 1)) {
             break;
         }
 
-        if (font_info->char_info != NULL) {
+        if(font_info->char_info != NULL) {
             free(font_info->char_info);
         }
         uint16_t char_info_array_size = descriptors_length * sizeof(FontCharInfo);
         font_info->char_info = malloc(char_info_array_size);
         furi_check(font_info->char_info);
-        if (!stream_read(stream, (uint8_t*)font_info->char_info, char_info_array_size)) {
+        if(!stream_read(stream, (uint8_t*)font_info->char_info, char_info_array_size)) {
             break;
         }
 
         loaded = true;
-    } while (false);
+    } while(false);
 
     furi_string_free(font_path);
     file_stream_close(stream);

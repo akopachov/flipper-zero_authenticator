@@ -80,7 +80,7 @@ void totp_scene_app_settings_activate(PluginState* plugin_state) {
     scene_state->total_fonts_count = totp_font_provider_get_fonts_count();
     scene_state->active_font_index = plugin_state->active_font_index;
     scene_state->active_font = totp_font_info_alloc();
-    if (!totp_font_provider_get_font(scene_state->active_font_index, scene_state->active_font)) {
+    if(!totp_font_provider_get_font(scene_state->active_font_index, scene_state->active_font)) {
         scene_state->active_font_index = 0;
         totp_font_provider_get_font(scene_state->active_font_index, scene_state->active_font);
     }
@@ -277,7 +277,8 @@ bool totp_scene_app_settings_handle_event(
                     0,
                     scene_state->total_fonts_count - 1,
                     RollOverflowBehaviorRoll);
-                totp_font_provider_get_font(scene_state->active_font_index, scene_state->active_font);
+                totp_font_provider_get_font(
+                    scene_state->active_font_index, scene_state->active_font);
             } else if(scene_state->selected_control == SoundSwitch) {
                 scene_state->notification_sound = !scene_state->notification_sound;
             } else if(scene_state->selected_control == VibroSwitch) {
@@ -312,7 +313,8 @@ bool totp_scene_app_settings_handle_event(
                     0,
                     scene_state->total_fonts_count - 1,
                     RollOverflowBehaviorRoll);
-                totp_font_provider_get_font(scene_state->active_font_index, scene_state->active_font);
+                totp_font_provider_get_font(
+                    scene_state->active_font_index, scene_state->active_font);
             } else if(scene_state->selected_control == SoundSwitch) {
                 scene_state->notification_sound = !scene_state->notification_sound;
             } else if(scene_state->selected_control == VibroSwitch) {

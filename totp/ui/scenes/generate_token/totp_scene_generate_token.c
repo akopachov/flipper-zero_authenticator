@@ -189,7 +189,7 @@ void totp_scene_generate_token_activate(PluginState* plugin_state) {
 
     scene_state->active_font = totp_font_info_alloc();
 
-    if (!totp_font_provider_get_font(plugin_state->active_font_index, scene_state->active_font)) {
+    if(!totp_font_provider_get_font(plugin_state->active_font_index, scene_state->active_font)) {
         totp_font_provider_get_font(0, scene_state->active_font);
     }
     scene_state->notification_app = furi_record_open(RECORD_NOTIFICATION);

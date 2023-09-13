@@ -10,16 +10,16 @@ FontInfo* totp_font_info_alloc() {
 }
 
 void totp_font_info_free(FontInfo* font_info) {
-    if (font_info == NULL) return;
-    if (font_info->char_info != NULL) {
+    if(font_info == NULL) return;
+    if(font_info->char_info != NULL) {
         free(font_info->char_info);
     }
 
-    if (font_info->data != NULL) {
+    if(font_info->data != NULL) {
         free(font_info->data);
     }
 
-    if (font_info->name != NULL) {
+    if(font_info->name != NULL) {
         free(font_info->name);
     }
 
