@@ -30,9 +30,19 @@ jobs:
           sudo apt update
           sudo apt install pvs-studio
           pvs-studio-analyzer credentials ${{ secrets.PVS_STUDIO_CREDENTIALS }}
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install uFBT
+        run: python3 -m pip install --upgrade ufbt
+
       - name: Build
+        shell: pwsh
         run: |
-          pvs-studio-analyzer trace -- ./pvs-build
+          pvs-studio-analyzer trace -- ./ufbt.ps1 x
       - name: Analyze
         run: |
           pvs-studio-analyzer analyze @.pvsoptions -j$(grep -c processor /proc/cpuinfo) -o PVS-Studio.log
