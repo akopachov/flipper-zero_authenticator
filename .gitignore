@@ -57,5 +57,6 @@ openocd.log
 PVS-Studio.log
 
 totp/dist/*
+totp/config/app/ufbt_def.h
 .vscode
 .clang-format
