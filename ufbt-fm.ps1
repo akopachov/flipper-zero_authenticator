@@ -17,7 +17,7 @@ if ($command -eq 'use') {
     elseif ($matching_firmware.type -eq 'git-release') {
         $release_info = Invoke-RestMethod -Uri "https://api.github.com/repos/$($matching_firmware.git_repo)/releases/$($matching_firmware.git_release)"
         $sdk_uri = ($release_info.assets | Where-Object { $_.name.EndsWith("-sdk.zip") } | Select-Object -Index 0).browser_download_url
-        $ufbt_state_file = Resolve-Path "~/.ufbt/current/ufbt_state.json"
+        $ufbt_state_file = Join-Path (Resolve-Path "~/.ufbt/") "current/ufbt_state.json"
         $need_update = $true
         if (Test-Path $ufbt_state_file) {
             $ufbt_state = Get-Content $ufbt_state_file -Raw | ConvertFrom-Json
