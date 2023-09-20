@@ -54,7 +54,7 @@ if ($run_cleanup) {
         Remove-Item "$ufbt_dist_dir/*" -Recurse -Force
     }
 
-    $ufbt_build_dir = Resolve-Path "~/.ufbt/build"
+    $ufbt_build_dir = Join-Path (Resolve-Path "~/") ".ufbt/build"
     if (Test-Path -PathType Container $ufbt_build_dir) {
         Remove-Item "$ufbt_build_dir/*" -Recurse -Force
     }
