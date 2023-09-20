@@ -17,7 +17,7 @@ jobs:
           submodules: 'recursive'
 
       - name: Install sonar-scanner and build-wrapper
-        uses: SonarSource/sonarcloud-github-c-cpp@v1
+        uses: SonarSource/sonarcloud-github-c-cpp@v2.0.1
 
       - name: Install Python
         uses: actions/setup-python@v4
@@ -27,14 +27,13 @@ jobs:
       - name: Install uFBT
         run: python3 -m pip install --upgrade ufbt
 
-      - name: Run build-wrapper
-        run: |
-          mkdir ${{ env.BUILD_WRAPPER_OUT_DIR }}
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ./sonar-build
+      - name: Build
+        shell: pwsh
+        run: ./ufbt.ps1 x --clean
 
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
+          sonar-scanner --define sonar.cfamily.compile-commands="totp/.vscode/compile_commands.json"
