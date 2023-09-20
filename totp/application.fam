@@ -4,15 +4,7 @@ App(
     apptype=FlipperAppType.EXTERNAL,
     entry_point="totp_app",
     cdefines=["APP_TOTP"],
-    requires=[
-        "gui",
-        "cli",
-        "dialogs",
-        "storage",
-        "input", 
-        "notification",
-        "bt"
-    ],
+    requires=["gui", "cli", "dialogs", "storage", "input", "notification", "bt"],
     stack_size=2 * 1024,
     order=20,
     fap_version="5.00",
@@ -47,11 +39,11 @@ App(
                 "wolfcrypt/src/hash.c",
                 "wolfcrypt/src/sha.c",
                 "wolfcrypt/src/sha256.c",
-                "wolfcrypt/src/sha512.c"
+                "wolfcrypt/src/sha512.c",
             ],
             cflags=["-Wno-error"],
             cdefines=["HAVE_CONFIG_H"],
-            cincludes=["config/wolfssl"]
+            cincludes=["config/wolfssl"],
         ),
     ],
 )
@@ -61,10 +53,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_timezone_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
-    sources=[
-        "cli/plugins/timezone/timezone.c",
-        "cli/cli_shared_methods.c"],
+    sources=["cli/plugins/timezone/timezone.c", "cli/cli_shared_methods.c"],
 )
 
 App(
@@ -72,7 +61,6 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_version_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
     sources=["cli/plugins/version/version.c"],
 )
 
@@ -81,7 +69,6 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_help_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
     sources=["cli/plugins/help/help.c"],
 )
 
@@ -90,12 +77,12 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_list_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
     sources=[
         "cli/plugins/list/list.c",
         "cli/cli_shared_methods.c",
         "cli/plugins/list/formatters/table/list_output_formatter_table.c",
-        "cli/plugins/list/formatters/tsv/list_output_formatter_tsv.c"],
+        "cli/plugins/list/formatters/tsv/list_output_formatter_tsv.c",
+    ],
 )
 
 App(
@@ -103,12 +90,12 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_details_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
     sources=[
         "cli/plugins/details/details.c",
         "cli/cli_shared_methods.c",
         "cli/plugins/details/formatters/table/details_output_formatter_table.c",
-        "cli/plugins/details/formatters/tsv/details_output_formatter_tsv.c"],
+        "cli/plugins/details/formatters/tsv/details_output_formatter_tsv.c",
+    ],
 )
 
 App(
@@ -116,11 +103,11 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_add_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
     sources=[
         "cli/plugins/modify/add/add.c",
         "cli/plugins/modify/common.c",
-        "cli/cli_shared_methods.c"],
+        "cli/cli_shared_methods.c",
+    ],
 )
 
 App(
@@ -128,11 +115,11 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_update_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
     sources=[
         "cli/plugins/modify/update/update.c",
         "cli/plugins/modify/common.c",
-        "cli/cli_shared_methods.c"],
+        "cli/cli_shared_methods.c",
+    ],
 )
 
 App(
@@ -140,10 +127,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_delete_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
-    sources=[
-        "cli/plugins/delete/delete.c",
-        "cli/cli_shared_methods.c"],
+    sources=["cli/plugins/delete/delete.c", "cli/cli_shared_methods.c"],
 )
 
 App(
@@ -151,10 +135,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_move_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
-    sources=[
-        "cli/plugins/move/move.c",
-        "cli/cli_shared_methods.c"],
+    sources=["cli/plugins/move/move.c", "cli/cli_shared_methods.c"],
 )
 
 App(
@@ -162,10 +143,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_reset_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
-    sources=[
-        "cli/plugins/reset/reset.c",
-        "cli/cli_shared_methods.c"],
+    sources=["cli/plugins/reset/reset.c", "cli/cli_shared_methods.c"],
 )
 
 App(
@@ -173,10 +151,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_pin_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
-    sources=[
-        "cli/plugins/pin/pin.c",
-        "cli/cli_shared_methods.c"],
+    sources=["cli/plugins/pin/pin.c", "cli/cli_shared_methods.c"],
 )
 
 App(
@@ -184,10 +159,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_automation_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
-    sources=[
-        "cli/plugins/automation/automation.c",
-        "cli/cli_shared_methods.c"],
+    sources=["cli/plugins/automation/automation.c", "cli/cli_shared_methods.c"],
 )
 
 App(
@@ -195,8 +167,5 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="totp_cli_notification_plugin_ep",
     requires=["totp"],
-    # fal_embedded=True,
-    sources=[
-        "cli/plugins/notification/notification.c",
-        "cli/cli_shared_methods.c"],
+    sources=["cli/plugins/notification/notification.c", "cli/cli_shared_methods.c"],
 )
