@@ -9,7 +9,7 @@ jobs:
     name: Build and analyze
     runs-on: ubuntu-latest
     env:
-      BUILD_WRAPPER_OUT_DIR: "$HOME/.sonar/build_wrapper_output" # Directory where build-wrapper output will be placed
+      BUILD_WRAPPER_OUT_DIR: "$HOME/build_wrapper_output" # Directory where build-wrapper output will be placed
     steps:
       - uses: actions/checkout@v2
         with:
