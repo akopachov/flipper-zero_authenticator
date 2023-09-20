@@ -1,0 +1,6 @@
+#!/bin/bash
+
+pushd totp
+ufbt update --channel=release
+ufbt
+popd

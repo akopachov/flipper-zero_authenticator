@@ -44,7 +44,6 @@ jobs:
           curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{ env.BUILD_WRAPPER_DOWNLOAD_URL }}
           unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
-          mkdir $HOME/.sonar/build_wrapper_output
 
       - name: Install Python
         uses: actions/setup-python@v4
@@ -55,9 +54,10 @@ jobs:
         run: python3 -m pip install --upgrade ufbt
 
       - name: Run build-wrapper
-        shell: pwsh
         run: |
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ./ufbt.ps1 x
+          mkdir $HOME/.sonar/build_wrapper_output
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ./sonar-build
+
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

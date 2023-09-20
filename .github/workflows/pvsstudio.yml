@@ -40,9 +40,8 @@ jobs:
         run: python3 -m pip install --upgrade ufbt
 
       - name: Build
-        shell: pwsh
         run: |
-          pvs-studio-analyzer trace -- ./ufbt.ps1 x
+          pvs-studio-analyzer trace -- ./pvs-build
       - name: Analyze
         run: |
           pvs-studio-analyzer analyze @.pvsoptions -j$(grep -c processor /proc/cpuinfo) -o PVS-Studio.log
