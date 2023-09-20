@@ -35,11 +35,12 @@ jobs:
         run: python3 -m pip install --upgrade ufbt
 
       - name: Build
-        run: |
-          pvs-studio-analyzer trace -- ./pvs-build
+        shell: pwsh
+        run: ./ufbt.ps1 x --clean
+          
       - name: Analyze
         run: |
-          pvs-studio-analyzer analyze @.pvsoptions -j$(grep -c processor /proc/cpuinfo) -o PVS-Studio.log
+          pvs-studio-analyzer analyze @.pvsoptions -f totp/.vscode/compile_commands.json -j -o PVS-Studio.log
       - name: Convert report
         run: |
           plog-converter -t sarif -o pvs-report.sarif PVS-Studio.log
