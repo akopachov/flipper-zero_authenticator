@@ -20,7 +20,6 @@
 #endif
 #endif
 
-
 // Application automatic lock timeout if user IDLE. (ticks)
 #ifndef TOTP_AUTO_LOCK_IDLE_TIMEOUT_SEC
 #define TOTP_AUTO_LOCK_IDLE_TIMEOUT_SEC (60)
