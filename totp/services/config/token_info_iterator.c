@@ -199,6 +199,17 @@ static bool
             break;
         }
 
+        tmp_uint32 = token_info->type;
+        if(!flipper_format_write_uint32(
+               temp_ff, TOTP_CONFIG_KEY_TOKEN_TYPE, &tmp_uint32, 1)) {
+            break;
+        }
+
+        if(!flipper_format_write_hex_uint64(
+               temp_ff, TOTP_CONFIG_KEY_TOKEN_COUNTER, &token_info->counter, 1)) {
+            break;
+        }
+
         Stream* temp_stream = flipper_format_get_raw_stream(temp_ff);
 
         if(!stream_rewind(temp_stream)) {
@@ -236,6 +247,12 @@ static bool
     context->last_seek_index = context->current_index;
 
     return result;
+}
+
+static TotpIteratorUpdateTokenResult token_info_inc_counter(TokenInfo* const token_info, const void* context) {
+    UNUSED(context);
+    token_info->counter++;
+    return TotpIteratorUpdateTokenResultSuccess;
 }
 
 TokenInfoIteratorContext* totp_token_info_iterator_alloc(
@@ -398,6 +415,10 @@ TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(
     return result;
 }
 
+TotpIteratorUpdateTokenResult totp_token_info_iterator_current_token_inc_counter(TokenInfoIteratorContext* context) {
+    return totp_token_info_iterator_update_current_token(context, &token_info_inc_counter, NULL);
+}
+
 TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(
     TokenInfoIteratorContext* context,
     TOTP_ITERATOR_UPDATE_TOKEN_ACTION update,
@@ -519,6 +540,18 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
         tokenInfo->automation_features = temp_data32;
     } else {
         tokenInfo->automation_features = TokenAutomationFeatureNone;
+    }
+
+    if(flipper_format_read_uint32(
+           context->config_file, TOTP_CONFIG_KEY_TOKEN_TYPE, &temp_data32, 1)) {
+        tokenInfo->type = temp_data32;
+    } else {
+        tokenInfo->type = TokenTypeTOTP;
+    }
+
+    if(!flipper_format_read_hex_uint64(
+           context->config_file, TOTP_CONFIG_KEY_TOKEN_COUNTER, &tokenInfo->counter, 1)) {
+        tokenInfo->counter = 0;
     }
 
     stream_seek(stream, original_offset, StreamOffsetFromStart);

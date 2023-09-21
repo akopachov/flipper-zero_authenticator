@@ -25,6 +25,7 @@ typedef uint8_t TokenDigitsCount;
 typedef uint8_t TokenDuration;
 typedef uint8_t TokenAutomationFeature;
 typedef uint8_t PlainTokenSecretEncoding;
+typedef uint8_t TokenType;
 
 /**
  * @brief Hashing algorithm to be used to generate token
@@ -148,6 +149,22 @@ enum PlainTokenSecretEncodings {
 };
 
 /**
+ * @brief Token types
+ */
+enum TokenTypes {
+
+    /**
+     * @brief Time-based One-time Password token type
+     */
+    TokenTypeTOTP = 0,
+
+    /**
+     * @brief HMAC-Based One-Time Password token type
+     */
+    TokenTypeHOTP = 1
+};
+
+/**
  * @brief TOTP token information
  */
 typedef struct {
@@ -185,6 +202,16 @@ typedef struct {
      * @brief Token input automation features
      */
     TokenAutomationFeature automation_features;
+
+    /**
+     * @brief Token type
+     */
+    TokenType type;
+
+    /**
+     * @brief HOTP counter
+     */
+    uint64_t counter;
 } TokenInfo;
 
 /**

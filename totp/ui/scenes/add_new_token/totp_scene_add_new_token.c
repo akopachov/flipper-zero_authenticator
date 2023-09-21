@@ -12,6 +12,8 @@
 
 char* TOKEN_ALGO_LIST[] = {"SHA1", "SHA256", "SHA512", "Steam"};
 char* TOKEN_DIGITS_TEXT_LIST[] = {"5 digits", "6 digits", "8 digits"};
+char* TOKEN_TYPE_LIST[] = {"TOTP", "HOTP"};
+
 TokenDigitsCount TOKEN_DIGITS_VALUE_LIST[] = {
     TokenDigitsCountFive,
     TokenDigitsCountSix,
@@ -20,6 +22,7 @@ TokenDigitsCount TOKEN_DIGITS_VALUE_LIST[] = {
 typedef enum {
     TokenNameTextBox,
     TokenSecretTextBox,
+    TokenTypeSelect,
     TokenAlgoSelect,
     TokenLengthSelect,
     TokenDurationSelect,
@@ -38,6 +41,7 @@ typedef struct {
     uint8_t digits_count_index;
     uint8_t duration;
     FuriString* duration_text;
+    TokenType type;
 } SceneState;
 
 struct TotpAddContext {
@@ -69,6 +73,7 @@ static TotpIteratorUpdateTokenResult add_token_handler(TokenInfo* tokenInfo, con
     tokenInfo->algo = context_t->scene_state->algo;
     tokenInfo->digits = TOKEN_DIGITS_VALUE_LIST[context_t->scene_state->digits_count_index];
     tokenInfo->duration = context_t->scene_state->duration;
+    tokenInfo->type = context_t->scene_state->type;
 
     return TotpIteratorUpdateTokenResultSuccess;
 }
@@ -108,6 +113,7 @@ void totp_scene_add_new_token_activate(PluginState* plugin_state) {
 
     scene_state->duration = TokenDurationDefault;
     scene_state->duration_text = furi_string_alloc();
+    scene_state->type = TokenTypeTOTP;
     update_duration_text(scene_state);
 }
 
@@ -124,33 +130,44 @@ void totp_scene_add_new_token_render(Canvas* const canvas, const PluginState* pl
         27 - scene_state->screen_y_offset,
         scene_state->token_secret,
         scene_state->selected_control == TokenSecretTextBox);
+    
     ui_control_select_render(
         canvas,
         0,
         44 - scene_state->screen_y_offset,
+        SCREEN_WIDTH,
+        TOKEN_TYPE_LIST[scene_state->type],
+        scene_state->selected_control == TokenTypeSelect);
+    
+    ui_control_select_render(
+        canvas,
+        0,
+        61 - scene_state->screen_y_offset,
         SCREEN_WIDTH,
         TOKEN_ALGO_LIST[scene_state->algo],
         scene_state->selected_control == TokenAlgoSelect);
     ui_control_select_render(
         canvas,
         0,
-        61 - scene_state->screen_y_offset,
+        78 - scene_state->screen_y_offset,
         SCREEN_WIDTH,
         TOKEN_DIGITS_TEXT_LIST[scene_state->digits_count_index],
         scene_state->selected_control == TokenLengthSelect);
 
-    ui_control_select_render(
-        canvas,
-        0,
-        78 - scene_state->screen_y_offset,
-        SCREEN_WIDTH,
-        furi_string_get_cstr(scene_state->duration_text),
-        scene_state->selected_control == TokenDurationSelect);
+    if (scene_state->type == TokenTypeTOTP) {
+        ui_control_select_render(
+            canvas,
+            0,
+            95 - scene_state->screen_y_offset,
+            SCREEN_WIDTH,
+            furi_string_get_cstr(scene_state->duration_text),
+            scene_state->selected_control == TokenDurationSelect);
+    }
 
     ui_control_button_render(
         canvas,
         SCREEN_WIDTH_CENTER - 24,
-        101 - scene_state->screen_y_offset,
+        (scene_state->type == TokenTypeTOTP ? 119 : 102) - scene_state->screen_y_offset,
         48,
         13,
         "Confirm",
@@ -165,9 +182,11 @@ void totp_scene_add_new_token_render(Canvas* const canvas, const PluginState* pl
 }
 
 void update_screen_y_offset(SceneState* scene_state) {
-    if(scene_state->selected_control > TokenLengthSelect) {
-        scene_state->screen_y_offset = 51;
+    if(scene_state->selected_control > TokenLengthSelect && scene_state->type == TokenTypeTOTP) {
+        scene_state->screen_y_offset = 68;
     } else if(scene_state->selected_control > TokenAlgoSelect) {
+        scene_state->screen_y_offset = 51;
+    } else if(scene_state->selected_control > TokenTypeSelect) {
         scene_state->screen_y_offset = 34;
     } else if(scene_state->selected_control > TokenSecretTextBox) {
         scene_state->screen_y_offset = 17;
@@ -194,6 +213,9 @@ bool totp_scene_add_new_token_handle_event(
                 TokenNameTextBox,
                 ConfirmButton,
                 RollOverflowBehaviorStop);
+            if (scene_state->type == TokenTypeHOTP && scene_state->selected_control == TokenDurationSelect) {
+                scene_state->selected_control--;
+            }
             update_screen_y_offset(scene_state);
             break;
         case InputKeyDown:
@@ -203,6 +225,9 @@ bool totp_scene_add_new_token_handle_event(
                 TokenNameTextBox,
                 ConfirmButton,
                 RollOverflowBehaviorStop);
+            if (scene_state->type == TokenTypeHOTP && scene_state->selected_control == TokenDurationSelect) {
+                scene_state->selected_control++;
+            }
             update_screen_y_offset(scene_state);
             break;
         case InputKeyRight:
@@ -220,6 +245,9 @@ bool totp_scene_add_new_token_handle_event(
                 totp_roll_value_uint8_t(
                     &scene_state->duration, 15, 15, 255, RollOverflowBehaviorStop);
                 update_duration_text(scene_state);
+            } else if(scene_state->selected_control == TokenTypeSelect) {
+                totp_roll_value_uint8_t(
+                    &scene_state->type, 1, 0, 1, RollOverflowBehaviorRoll);
             }
             break;
         case InputKeyLeft:
@@ -237,6 +265,9 @@ bool totp_scene_add_new_token_handle_event(
                 totp_roll_value_uint8_t(
                     &scene_state->duration, -15, 15, 255, RollOverflowBehaviorStop);
                 update_duration_text(scene_state);
+            } else if(scene_state->selected_control == TokenTypeSelect) {
+                totp_roll_value_uint8_t(
+                    &scene_state->type, -1, 0, 1, RollOverflowBehaviorRoll);
             }
             break;
         case InputKeyOk:
@@ -247,7 +278,7 @@ bool totp_scene_add_new_token_handle_event(
         default:
             break;
         }
-    } else if(event->input.type == InputTypeRelease && event->input.key == InputKeyOk) {
+    } else if(event->input.type == InputTypeShort && event->input.key == InputKeyOk) {
         switch(scene_state->selected_control) {
         case TokenNameTextBox:
             ask_user_input(
