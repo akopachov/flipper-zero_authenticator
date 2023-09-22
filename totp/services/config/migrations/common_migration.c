@@ -198,11 +198,11 @@ bool totp_config_migrate_to_latest(
                     &default_token_type,
                     1);
                 const uint64_t default_counter = 0;
-                flipper_format_write_hex_uint64(
+                flipper_format_write_hex(
                     fff_data_file,
                     TOTP_CONFIG_KEY_TOKEN_COUNTER,
-                    &default_counter,
-                    1);
+                    (uint8_t*)&default_counter,
+                    sizeof(default_counter));
             }
         }
 

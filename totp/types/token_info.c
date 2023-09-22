@@ -204,5 +204,6 @@ void token_info_set_defaults(TokenInfo* token_info) {
     token_info->duration = TokenDurationDefault;
     token_info->automation_features = TokenAutomationFeatureNone;
     token_info->type = TokenTypeTOTP;
+    token_info->counter = 0;
     furi_string_reset(token_info->name);
 }

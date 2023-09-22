@@ -205,8 +205,8 @@ static bool
             break;
         }
 
-        if(!flipper_format_write_hex_uint64(
-               temp_ff, TOTP_CONFIG_KEY_TOKEN_COUNTER, &token_info->counter, 1)) {
+        if(!flipper_format_write_hex(
+               temp_ff, TOTP_CONFIG_KEY_TOKEN_COUNTER, (uint8_t*)&token_info->counter, sizeof(token_info->counter))) {
             break;
         }
 
@@ -247,12 +247,6 @@ static bool
     context->last_seek_index = context->current_index;
 
     return result;
-}
-
-static TotpIteratorUpdateTokenResult token_info_inc_counter(TokenInfo* const token_info, const void* context) {
-    UNUSED(context);
-    token_info->counter++;
-    return TotpIteratorUpdateTokenResultSuccess;
 }
 
 TokenInfoIteratorContext* totp_token_info_iterator_alloc(
@@ -416,7 +410,47 @@ TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(
 }
 
 TotpIteratorUpdateTokenResult totp_token_info_iterator_current_token_inc_counter(TokenInfoIteratorContext* context) {
-    return totp_token_info_iterator_update_current_token(context, &token_info_inc_counter, NULL);
+    if(!seek_to_token(context->current_index, context)) {
+        return TotpIteratorUpdateTokenResultFileUpdateFailed;
+    }
+
+    Stream* stream = flipper_format_get_raw_stream(context->config_file);
+
+    size_t offset_start = stream_tell(stream);
+
+    TokenInfo* token_info = context->current_token;
+    token_info->counter++;
+
+    char buffer[sizeof(TOTP_CONFIG_KEY_TOKEN_COUNTER) + 1];
+    bool found = false;
+    while(!found) {
+        if(!stream_seek_to_char(stream, '\n', StreamDirectionForward)) {
+            break;
+        }
+
+        size_t buffer_read_size;
+        if((buffer_read_size = stream_read(stream, (uint8_t*)&buffer[0], sizeof(buffer))) == 0) {
+            break;
+        }
+
+        if(!stream_seek(stream, -(int32_t)buffer_read_size, StreamOffsetFromCurrent)) {
+            break;
+        }
+
+        if(strncmp(buffer, "\n" TOTP_CONFIG_KEY_TOKEN_COUNTER ":", sizeof(buffer)) == 0) {
+            found = true;
+        }
+    }
+
+    TotpIteratorUpdateTokenResult result = TotpIteratorUpdateTokenResultFileUpdateFailed;
+    if (found && 
+        stream_seek(stream, 1, StreamOffsetFromCurrent) &&
+        flipper_format_write_hex(context->config_file, TOTP_CONFIG_KEY_TOKEN_COUNTER, (uint8_t*)&token_info->counter, sizeof(token_info->counter))) {
+        result = TotpIteratorUpdateTokenResultSuccess;
+    }
+
+    stream_seek(stream, offset_start, StreamOffsetFromStart);
+    return result;
 }
 
 TotpIteratorUpdateTokenResult totp_token_info_iterator_add_new_token(
@@ -549,8 +583,8 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
         tokenInfo->type = TokenTypeTOTP;
     }
 
-    if(!flipper_format_read_hex_uint64(
-           context->config_file, TOTP_CONFIG_KEY_TOKEN_COUNTER, &tokenInfo->counter, 1)) {
+    if(!flipper_format_read_hex(
+           context->config_file, TOTP_CONFIG_KEY_TOKEN_COUNTER, (uint8_t*)&tokenInfo->counter, sizeof(tokenInfo->counter))) {
         tokenInfo->counter = 0;
     }
 
