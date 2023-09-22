@@ -15,6 +15,8 @@
 #define TOKEN_AUTOMATION_FEATURE_ENTER_AT_THE_END_NAME "enter"
 #define TOKEN_AUTOMATION_FEATURE_TAB_AT_THE_END_NAME "tab"
 #define TOKEN_AUTOMATION_FEATURE_TYPE_SLOWER_NAME "slower"
+#define TOKEN_TYPE_TOTP_NAME "totp"
+#define TOKEN_TYPE_HOTP_NAME "hotp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -275,8 +277,8 @@ bool token_info_set_algo_from_str(TokenInfo* token_info, const FuriString* str);
 bool token_info_set_algo_from_int(TokenInfo* token_info, uint8_t algo_code);
 
 /**
- * @brief Gets token hahsing algorithm name as C-string
- * @param token_info instance which token hahsing algorithm name should be returned
+ * @brief Gets token hashing algorithm name as C-string
+ * @param token_info instance which token hashing algorithm name should be returned
  * @return token hashing algorithm name as C-string
  */
 const char* token_info_get_algo_as_cstr(const TokenInfo* token_info);
@@ -288,6 +290,29 @@ const char* token_info_get_algo_as_cstr(const TokenInfo* token_info);
  * @return \c true if token automation feature has been set; \c false otherwise
  */
 bool token_info_set_automation_feature_from_str(TokenInfo* token_info, const FuriString* str);
+
+/**
+ * @brief Sets token type from \c str value
+ * @param token_info instance whichs token type should be updated
+ * @param str desired token type
+ * @return \c true if token type has been set; \c false otherwise
+ */
+bool token_info_set_token_type_from_str(TokenInfo* token_info, const FuriString* str);
+
+/**
+ * @brief Gets token type as C-string
+ * @param token_info instance which token type should be returned
+ * @return token type as C-string
+ */
+const char* token_info_get_type_as_cstr(const TokenInfo* token_info);
+
+/**
+ * @brief Sets token counter from \c str value
+ * @param token_info instance whichs token counter should be updated
+ * @param str desired token counter
+ * @return \c true if token counter has been set; \c false otherwise
+ */
+bool token_info_set_token_counter_from_str(TokenInfo* token_info, const FuriString* str);
 
 /**
  * @brief Clones \c TokenInfo instance

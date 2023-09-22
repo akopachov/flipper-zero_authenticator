@@ -103,6 +103,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
 
         (*formatter->header_formatter)();
         (*formatter->sizet_formatter)("Index", token_number);
+        (*formatter->cstr_formatter)("Type", token_info_get_type_as_cstr(token_info));
         (*formatter->cstr_formatter)("Name", furi_string_get_cstr(token_info->name));
         (*formatter->cstr_formatter)("Hashing algorithm", token_info_get_algo_as_cstr(token_info));
         (*formatter->uint8t_formatter)("Number of digits", token_info->digits);
