@@ -3,7 +3,7 @@
 #include "../../../../cli_helpers.h"
 
 void list_output_formatter_print_header_tsv() {
-    TOTP_CLI_PRINTF("%s\t%s\t%s\t%s\t%s\r\n", "#", "Name", "Algo", "Ln", "Dur");
+    TOTP_CLI_PRINTF("%s\t%s\t%s\t%s\t%s\r\n", "#", "Name", "Algo", "Ln", "Type");
 }
 
 void list_output_formatter_print_body_item_tsv(size_t index, const TokenInfo* token_info) {
