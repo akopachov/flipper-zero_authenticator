@@ -201,7 +201,7 @@ bool totp_config_migrate_to_latest(
                 flipper_format_write_hex(
                     fff_data_file,
                     TOTP_CONFIG_KEY_TOKEN_COUNTER,
-                    (uint8_t*)&default_counter,
+                    (const uint8_t*)&default_counter,
                     sizeof(default_counter));
             }
         }
