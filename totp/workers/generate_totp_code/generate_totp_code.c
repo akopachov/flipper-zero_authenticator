@@ -71,9 +71,9 @@ static void generate_totp_code(
         size_t key_length;
         uint8_t* key = totp_crypto_decrypt(
             token_info->token, token_info->token_length, context->crypto_settings, &key_length);
-        
+
         uint64_t otp_code;
-        if (token_info->type == TokenTypeTOTP) {
+        if(token_info->type == TokenTypeTOTP) {
             otp_code = totp_at(
                 get_totp_algo_impl(token_info->algo),
                 key,
@@ -81,21 +81,14 @@ static void generate_totp_code(
                 current_ts,
                 context->timezone_offset,
                 token_info->duration);
-        } else if (token_info->type == TokenTypeHOTP) {
+        } else if(token_info->type == TokenTypeHOTP) {
             otp_code = hotp_at(
-                get_totp_algo_impl(token_info->algo),
-                key,
-                key_length,
-                token_info->counter);
+                get_totp_algo_impl(token_info->algo), key, key_length, token_info->counter);
         } else {
             furi_crash("Unknown token type");
         }
 
-        int_token_to_str(
-            otp_code,
-            context->code_buffer,
-            token_info->digits,
-            token_info->algo);
+        int_token_to_str(otp_code, context->code_buffer, token_info->digits, token_info->algo);
         memset_s(key, key_length, 0, key_length);
         free(key);
     } else {
@@ -138,7 +131,7 @@ static int32_t totp_generate_worker_callback(void* context) {
            (is_time_based && (time_left = (curr_ts % token_info->duration) == 0))) {
             if(furi_mutex_acquire(t_context->code_buffer_sync, FuriWaitForever) == FuriStatusOk) {
                 generate_totp_code(t_context, token_info, curr_ts);
-                if (is_time_based) {
+                if(is_time_based) {
                     curr_ts = furi_hal_rtc_get_timestamp();
                 }
                 furi_mutex_release(t_context->code_buffer_sync);
@@ -149,7 +142,8 @@ static int32_t totp_generate_worker_callback(void* context) {
             }
         }
 
-        if(t_context->on_code_lifetime_changed_handler != NULL && token_info->type == TokenTypeTOTP) {
+        if(t_context->on_code_lifetime_changed_handler != NULL &&
+           token_info->type == TokenTypeTOTP) {
             (*(t_context->on_code_lifetime_changed_handler))(
                 (float)(token_info->duration - curr_ts % token_info->duration) /
                     (float)token_info->duration,

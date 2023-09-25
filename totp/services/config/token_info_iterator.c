@@ -200,13 +200,15 @@ static bool
         }
 
         tmp_uint32 = token_info->type;
-        if(!flipper_format_write_uint32(
-               temp_ff, TOTP_CONFIG_KEY_TOKEN_TYPE, &tmp_uint32, 1)) {
+        if(!flipper_format_write_uint32(temp_ff, TOTP_CONFIG_KEY_TOKEN_TYPE, &tmp_uint32, 1)) {
             break;
         }
 
         if(!flipper_format_write_hex(
-               temp_ff, TOTP_CONFIG_KEY_TOKEN_COUNTER, (uint8_t*)&token_info->counter, sizeof(token_info->counter))) {
+               temp_ff,
+               TOTP_CONFIG_KEY_TOKEN_COUNTER,
+               (uint8_t*)&token_info->counter,
+               sizeof(token_info->counter))) {
             break;
         }
 
@@ -409,7 +411,8 @@ TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(
     return result;
 }
 
-TotpIteratorUpdateTokenResult totp_token_info_iterator_current_token_inc_counter(TokenInfoIteratorContext* context) {
+TotpIteratorUpdateTokenResult
+    totp_token_info_iterator_current_token_inc_counter(TokenInfoIteratorContext* context) {
     if(!seek_to_token(context->current_index, context)) {
         return TotpIteratorUpdateTokenResultFileUpdateFailed;
     }
@@ -443,9 +446,12 @@ TotpIteratorUpdateTokenResult totp_token_info_iterator_current_token_inc_counter
     }
 
     TotpIteratorUpdateTokenResult result = TotpIteratorUpdateTokenResultFileUpdateFailed;
-    if (found && 
-        stream_seek(stream, 1, StreamOffsetFromCurrent) &&
-        flipper_format_write_hex(context->config_file, TOTP_CONFIG_KEY_TOKEN_COUNTER, (uint8_t*)&token_info->counter, sizeof(token_info->counter))) {
+    if(found && stream_seek(stream, 1, StreamOffsetFromCurrent) &&
+       flipper_format_write_hex(
+           context->config_file,
+           TOTP_CONFIG_KEY_TOKEN_COUNTER,
+           (uint8_t*)&token_info->counter,
+           sizeof(token_info->counter))) {
         result = TotpIteratorUpdateTokenResultSuccess;
     }
 
@@ -584,7 +590,10 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
     }
 
     if(!flipper_format_read_hex(
-           context->config_file, TOTP_CONFIG_KEY_TOKEN_COUNTER, (uint8_t*)&tokenInfo->counter, sizeof(tokenInfo->counter))) {
+           context->config_file,
+           TOTP_CONFIG_KEY_TOKEN_COUNTER,
+           (uint8_t*)&tokenInfo->counter,
+           sizeof(tokenInfo->counter))) {
         tokenInfo->counter = 0;
     }
 
