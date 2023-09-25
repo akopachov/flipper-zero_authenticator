@@ -12,7 +12,7 @@
 
 char* TOKEN_ALGO_LIST[] = {"SHA1", "SHA256", "SHA512", "Steam"};
 char* TOKEN_DIGITS_TEXT_LIST[] = {"5 digits", "6 digits", "8 digits"};
-char* TOKEN_TYPE_LIST[] = {"TOTP", "HOTP"};
+char* TOKEN_TYPE_LIST[] = {"Time-based (TOTP)", "Counter-based (HOTP)"};
 
 TokenDigitsCount TOKEN_DIGITS_VALUE_LIST[] = {
     TokenDigitsCountFive,
