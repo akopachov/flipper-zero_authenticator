@@ -111,9 +111,9 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
         (*formatter->cstr_formatter)("Name", furi_string_get_cstr(token_info->name));
         (*formatter->cstr_formatter)("Hashing algorithm", token_info_get_algo_as_cstr(token_info));
         (*formatter->uint8t_formatter)("Number of digits", token_info->digits);
-        if (token_info->type == TokenTypeTOTP) {
+        if(token_info->type == TokenTypeTOTP) {
             (*formatter->uint8t_formatter)("Token lifetime", token_info->duration);
-        } else if (token_info->type == TokenTypeHOTP) {
+        } else if(token_info->type == TokenTypeHOTP) {
             (*formatter->uint64t_formatter)("Token counter", token_info->counter);
         }
         print_automation_features(token_info, formatter);

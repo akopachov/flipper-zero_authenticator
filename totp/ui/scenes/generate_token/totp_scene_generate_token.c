@@ -256,8 +256,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
 
     canvas_set_font(canvas, FontPrimary);
     const TokenInfo* token_info = totp_token_info_iterator_get_current_token(iterator_context);
-    const char* token_name_cstr =
-        furi_string_get_cstr(token_info->name);
+    const char* token_name_cstr = furi_string_get_cstr(token_info->name);
     uint16_t token_name_width = canvas_string_width(canvas, token_name_cstr);
     if(SCREEN_WIDTH - token_name_width > 18) {
         canvas_draw_str_aligned(
@@ -278,7 +277,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
 
     draw_totp_code(canvas, plugin_state);
 
-    if (token_info->type == TokenTypeTOTP) {
+    if(token_info->type == TokenTypeTOTP) {
         canvas_draw_box(
             canvas,
             scene_state->ui_precalculated_dimensions.progress_bar_x,
@@ -290,12 +289,7 @@ void totp_scene_generate_token_render(Canvas* const canvas, PluginState* plugin_
         snprintf(&buffer[0], sizeof(buffer), "%" PRIu64, token_info->counter);
         canvas_set_font(canvas, FontSecondary);
         canvas_draw_str_aligned(
-            canvas,
-            SCREEN_WIDTH_CENTER,
-            SCREEN_HEIGHT - 5,
-            AlignCenter,
-            AlignCenter,
-            buffer);
+            canvas, SCREEN_WIDTH_CENTER, SCREEN_HEIGHT - 5, AlignCenter, AlignCenter, buffer);
     }
 
     if(totp_token_info_iterator_get_total_count(iterator_context) > 1) {
@@ -374,15 +368,17 @@ bool totp_scene_generate_token_handle_event(
                 scene_state->notification_app,
                 get_notification_sequence_automation(plugin_state, scene_state));
             return true;
-        } else if (event->input.key == InputKeyOk) {
+        } else if(event->input.key == InputKeyOk) {
             TokenInfoIteratorContext* iterator_context =
                 totp_config_get_token_iterator_context(plugin_state);
-            const TokenInfo* token_info = totp_token_info_iterator_get_current_token(iterator_context);
-            if (token_info->type == TokenTypeHOTP) {
+            const TokenInfo* token_info =
+                totp_token_info_iterator_get_current_token(iterator_context);
+            if(token_info->type == TokenTypeHOTP) {
                 scene_state = (SceneState*)plugin_state->current_scene_state;
                 totp_token_info_iterator_current_token_inc_counter(iterator_context);
                 totp_generate_code_worker_notify(
-                    scene_state->generate_code_worker_context, TotpGenerateCodeWorkerEventForceUpdate);
+                    scene_state->generate_code_worker_context,
+                    TotpGenerateCodeWorkerEventForceUpdate);
                 notification_message(
                     scene_state->notification_app,
                     get_notification_sequence_new_token(plugin_state, scene_state));

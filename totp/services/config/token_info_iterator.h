@@ -75,7 +75,8 @@ TotpIteratorUpdateTokenResult totp_token_info_iterator_update_current_token(
  * @param context token info iterator context
  * @return \c true if operation succeeded; \c false otherwise
  */
-TotpIteratorUpdateTokenResult totp_token_info_iterator_current_token_inc_counter(TokenInfoIteratorContext* context);
+TotpIteratorUpdateTokenResult
+    totp_token_info_iterator_current_token_inc_counter(TokenInfoIteratorContext* context);
 
 /**
  * @brief Adds new token info to the end of the list using given update action

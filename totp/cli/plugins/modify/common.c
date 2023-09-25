@@ -143,7 +143,7 @@ bool totp_cli_try_read_token_type(
     if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_ARG_TYPE_PREFIX) == 0) {
         if(!args_read_string_and_trim(args, arg)) {
             totp_cli_printf_missed_argument_value(TOTP_CLI_COMMAND_ARG_TYPE_PREFIX);
-        } else if (!token_info_set_token_type_from_str(token_info, arg)) {
+        } else if(!token_info_set_token_type_from_str(token_info, arg)) {
             TOTP_CLI_PRINTF_ERROR(
                 "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_TYPE_PREFIX
                 "\"\r\n",
@@ -166,7 +166,7 @@ bool totp_cli_try_read_token_counter(
     if(furi_string_cmpi_str(arg, TOTP_CLI_COMMAND_ARG_COUNTER_PREFIX) == 0) {
         if(!args_read_string_and_trim(args, arg)) {
             totp_cli_printf_missed_argument_value(TOTP_CLI_COMMAND_ARG_COUNTER_PREFIX);
-        } else if (!token_info_set_token_counter_from_str(token_info, arg)) {
+        } else if(!token_info_set_token_counter_from_str(token_info, arg)) {
             TOTP_CLI_PRINTF_ERROR(
                 "\"%s\" is incorrect value for argument \"" TOTP_CLI_COMMAND_ARG_COUNTER_PREFIX
                 "\"\r\n",
