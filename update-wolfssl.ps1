@@ -51,6 +51,7 @@ try {
     finally {
         $zip_archive.Dispose()
     }
+    Set-Content -Value "DisableFormat: true`nSortIncludes: Never" -Path (Join-Path $output_dir '.clang-format')
     Write-Host "Done"
 }
 finally {
