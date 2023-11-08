@@ -330,14 +330,15 @@ bool totp_scene_app_settings_handle_event(
             }
             break;
         case InputKeyOk:
-            if(
-                scene_state->selected_control == ConfirmButton) {
-                plugin_state->timezone_offset =
-                    (float)scene_state->tz_offset_hours + (float)scene_state->tz_offset_minutes / 60.0f;
+            if(scene_state->selected_control == ConfirmButton) {
+                plugin_state->timezone_offset = (float)scene_state->tz_offset_hours +
+                                                (float)scene_state->tz_offset_minutes / 60.0f;
 
                 plugin_state->notification_method =
-                    (scene_state->notification_sound ? NotificationMethodSound : NotificationMethodNone) |
-                    (scene_state->notification_vibro ? NotificationMethodVibro : NotificationMethodNone);
+                    (scene_state->notification_sound ? NotificationMethodSound :
+                                                       NotificationMethodNone) |
+                    (scene_state->notification_vibro ? NotificationMethodVibro :
+                                                       NotificationMethodNone);
 
                 plugin_state->automation_method = scene_state->automation_method;
                 plugin_state->active_font_index = scene_state->active_font_index;
@@ -350,7 +351,7 @@ bool totp_scene_app_settings_handle_event(
 
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
                 if((scene_state->automation_method & AutomationMethodBadBt) == 0 &&
-                plugin_state->bt_type_code_worker_context != NULL) {
+                   plugin_state->bt_type_code_worker_context != NULL) {
                     totp_bt_type_code_worker_free(plugin_state->bt_type_code_worker_context);
                     plugin_state->bt_type_code_worker_context = NULL;
                 }

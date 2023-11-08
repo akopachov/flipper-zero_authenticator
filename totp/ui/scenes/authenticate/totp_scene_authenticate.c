@@ -112,10 +112,12 @@ bool totp_scene_authenticate_handle_event(
             break;
         case InputKeyOk: {
             CryptoSeedIVResult seed_result = totp_crypto_seed_iv(
-                &plugin_state->crypto_settings, &scene_state->code_input[0], scene_state->code_length);
+                &plugin_state->crypto_settings,
+                &scene_state->code_input[0],
+                scene_state->code_length);
 
             if(seed_result & CryptoSeedIVResultFlagSuccess &&
-            seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
+               seed_result & CryptoSeedIVResultFlagNewCryptoVerifyData) {
                 totp_config_file_update_crypto_signatures(plugin_state);
             }
 

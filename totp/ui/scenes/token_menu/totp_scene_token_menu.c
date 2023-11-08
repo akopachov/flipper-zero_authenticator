@@ -154,7 +154,7 @@ bool totp_scene_token_menu_handle_event(const PluginEvent* const event, PluginSt
                 TokenInfoIteratorContext* iterator_context =
                     totp_config_get_token_iterator_context(plugin_state);
                 if(dialog_result == DialogMessageButtonRight &&
-                totp_token_info_iterator_get_total_count(iterator_context) > 0) {
+                   totp_token_info_iterator_get_total_count(iterator_context) > 0) {
                     if(!totp_token_info_iterator_remove_current_token_info(iterator_context)) {
                         totp_dialogs_config_updating_error(plugin_state);
                         return false;
