@@ -1,7 +1,7 @@
 #include "common_migration.h"
 #include "../constants.h"
 #include "../../../types/token_info.h"
-#include "../../../types/automation_kb_layout.h"
+#include "../../kb_layouts/kb_layout_provider.h"
 #include <flipper_format/flipper_format_i.h>
 
 #define TOTP_OLD_CONFIG_KEY_BASE_IV "BaseIV"
@@ -100,15 +100,31 @@ bool totp_config_migrate_to_latest(
 
         if(flipper_format_read_string(
                fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str)) {
+            if (current_version < 11) {
+                switch (furi_string_get_char(temp_str, 0))
+                {
+                case '0':
+                    furi_string_set_str(temp_str, "en-US");
+                    break;
+                case '1':
+                    furi_string_set_str(temp_str, "fr-FR");
+                    break;
+                case '2':
+                    furi_string_set_str(temp_str, "de-DE");
+                    break;                
+                default:
+                    furi_string_set_str(temp_str, TOTP_DEFAULT_KB_LAYOUT);
+                    break;
+                }
+            }
+
             flipper_format_write_string(
-                fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str);
+                    fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str);
         } else {
-            uint32_t default_automation_kb_layout = AutomationKeyboardLayoutQWERTY;
-            flipper_format_write_uint32(
+            flipper_format_write_string_cstr(
                 fff_data_file,
                 TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT,
-                &default_automation_kb_layout,
-                1);
+                TOTP_DEFAULT_KB_LAYOUT);
         }
 
         flipper_format_rewind(fff_backup_data_file);
