@@ -73,7 +73,11 @@ static void two_digit_to_str(int8_t num, char* str) {
 }
 
 static void update_formatted_automation_initial_delay(SceneState* scene_state) {
-    snprintf(&scene_state->automation_initial_delay_formatted[0], sizeof(scene_state->automation_initial_delay_formatted), "%.1f sec.", (double)(scene_state->automation_initial_delay / 1000.0f));
+    snprintf(
+        &scene_state->automation_initial_delay_formatted[0],
+        sizeof(scene_state->automation_initial_delay_formatted),
+        "%.1f sec.",
+        (double)(scene_state->automation_initial_delay / 1000.0f));
 }
 
 void totp_scene_app_settings_activate(PluginState* plugin_state) {
@@ -190,9 +194,14 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
 
         int group_offset = 0;
 
-        if (scene_state->selected_control <= AutomationSwitch) {
+        if(scene_state->selected_control <= AutomationSwitch) {
             canvas_draw_str_aligned(
-                canvas, 0, 209 - scene_state->y_offset - group_offset, AlignLeft, AlignTop, "Method:");
+                canvas,
+                0,
+                209 - scene_state->y_offset - group_offset,
+                AlignLeft,
+                AlignTop,
+                "Method:");
             ui_control_select_render(
                 canvas,
                 36,

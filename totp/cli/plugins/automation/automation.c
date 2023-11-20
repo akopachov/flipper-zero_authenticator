@@ -117,10 +117,14 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
                 args_valid = false;
                 break;
             }
-        } else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_AUTOMATION_ARG_INITIAL_DELAY_PREFIX) == 0) {
+        } else if(
+            furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_AUTOMATION_ARG_INITIAL_DELAY_PREFIX) ==
+            0) {
             float temp_float;
             char* strtof_endptr;
-            if(args_read_string_and_trim(args, temp_str) && (temp_float = strtof(furi_string_get_cstr(temp_str), &strtof_endptr)) >= 0 && *strtof_endptr == 0) {
+            if(args_read_string_and_trim(args, temp_str) &&
+               (temp_float = strtof(furi_string_get_cstr(temp_str), &strtof_endptr)) >= 0 &&
+               *strtof_endptr == 0) {
                 new_initial_delay = (uint16_t)(temp_float * 1000.0f);
             } else {
                 args_valid = false;
@@ -138,10 +142,11 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
             break;
         }
 
-        if(new_method_provided || new_kb_layout != plugin_state->automation_kb_layout || new_initial_delay != plugin_state->automation_initial_delay) {
+        if(new_method_provided || new_kb_layout != plugin_state->automation_kb_layout ||
+           new_initial_delay != plugin_state->automation_initial_delay) {
             TOTP_CLI_LOCK_UI(plugin_state);
 
-            if (new_method_provided) {
+            if(new_method_provided) {
                 plugin_state->automation_method = new_method;
             }
 
@@ -154,7 +159,8 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
                 print_kb_layout(plugin_state->automation_kb_layout, TOTP_CLI_COLOR_SUCCESS);
                 TOTP_CLI_PRINTF_SUCCESS(")");
                 TOTP_CLI_PRINTF_SUCCESS(" [");
-                print_initial_delay(plugin_state->automation_initial_delay, TOTP_CLI_COLOR_SUCCESS);
+                print_initial_delay(
+                    plugin_state->automation_initial_delay, TOTP_CLI_COLOR_SUCCESS);
                 TOTP_CLI_PRINTF_SUCCESS(" sec.]");
                 cli_nl();
             } else {

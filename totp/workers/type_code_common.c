@@ -70,7 +70,7 @@ void totp_type_code_worker_execute_automation(
     AutomationKeyboardLayout keyboard_layout,
     uint16_t initial_delay) {
     furi_delay_ms(initial_delay);
-    
+
     const uint8_t* keyboard_layout_dict;
     switch(keyboard_layout) {
     case AutomationKeyboardLayoutQWERTY:
