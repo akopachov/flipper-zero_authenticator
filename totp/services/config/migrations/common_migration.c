@@ -98,34 +98,29 @@ bool totp_config_migrate_to_latest(
 
         flipper_format_rewind(fff_backup_data_file);
 
-        if(flipper_format_read_string(
-               fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str)) {
-            if (current_version < 11) {
-                switch (furi_string_get_char(temp_str, 0))
+        uint32_t kb_layout;
+        if(flipper_format_read_uint32(
+               fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &kb_layout, 1)) {
+            if (current_version < 12) {
+                switch (kb_layout)
                 {
-                case '0':
-                    furi_string_set_str(temp_str, "en-US");
+                case 1:
+                    kb_layout = 13;
                     break;
-                case '1':
-                    furi_string_set_str(temp_str, "fr-FR");
-                    break;
-                case '2':
-                    furi_string_set_str(temp_str, "de-DE");
+                case 2:
+                    kb_layout = 4;
                     break;                
                 default:
-                    furi_string_set_str(temp_str, TOTP_DEFAULT_KB_LAYOUT);
+                    kb_layout = TOTP_DEFAULT_KB_LAYOUT;
                     break;
                 }
             }
-
-            flipper_format_write_string(
-                    fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, temp_str);
         } else {
-            flipper_format_write_string_cstr(
-                fff_data_file,
-                TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT,
-                TOTP_DEFAULT_KB_LAYOUT);
+            kb_layout = TOTP_DEFAULT_KB_LAYOUT;
         }
+
+        flipper_format_write_uint32(
+                    fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &kb_layout, 1);
 
         flipper_format_rewind(fff_backup_data_file);
 
