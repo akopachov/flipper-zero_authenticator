@@ -29,25 +29,36 @@ function ConvertStringToFixedSizeByteArray {
     return $fixedSizeArray
 }
 
+function AreArraysEqual {
+    param (
+        [array]$array1,
+        [array]$array2
+    )
+
+    if ($array1.Count -ne $array2.Count) {
+        return $false
+    }
+
+    for ($i = 0; $i -lt $array1.Count; $i++) {
+        if ($array1[$i] -ne $array2[$i]) {
+            return $false
+        }
+    }
+
+    return $true
+}
+
 $kbFiles = Invoke-RestMethod -Uri 'https://api.github.com/repos/Flipper-XFW/Xtreme-Firmware/contents/applications/main/bad_kb/resources/badkb/assets/layouts?ref=dev'
 
 $layoutsFile = New-Item -Name $outputFile -ItemType File -Force
 $layoutsFileStream = $layoutsFile.OpenWrite()
 $tempFile = New-TemporaryFile
-$layouts = @()
+$uniqueMaps = [System.Collections.ArrayList]@()
+$layouts = [System.Collections.ArrayList]@()
 try {
-    $layoutsFileStream.WriteByte($kbFiles.Length)
-    $dataStartOffset = 1 + $kbFiles.Length * 12
-    $i = 0
-    foreach ($kbFile in $kbFiles) {
-        $layoutName = [System.IO.Path]::GetFileNameWithoutExtension($kbFile.name) -replace 'cz_CS', 'cs-CZ'
-        $layoutsFileStream.Write((ConvertStringToFixedSizeByteArray -inputString $layoutName -fixedSize 10), 0, 10)
-        $layoutsFileStream.Write((Get-UInt16AsBytes -Value ($dataStartOffset + $i * 72)), 0, 2)
-        $i = $i + 1
-        $layouts += $layoutName
-    }
     foreach ($kbFile in $kbFiles) {
         Write-Host "Processing $($kbFile.name)"
+        $layoutName = [System.IO.Path]::GetFileNameWithoutExtension($kbFile.name) -replace 'cz_CS', 'cs-CZ'
         Invoke-WebRequest -Uri $kbFile.download_url -OutFile $tempFile
         try {
             $kbFileStream = $tempFile.OpenRead()
@@ -57,11 +68,50 @@ try {
 
             $kbFileStream.Position = 130 # Positioning at symbol 'A'
             $kbFileStream.Read($buffer, 20, 52) | Out-Null
-            $layoutsFileStream.Write($buffer, 0, $buffer.Length)
+            
+            $thereIsMatch = $false
+            foreach ($map in $uniqueMaps) {
+                if ((AreArraysEqual -array1 $map.Map -array2 $buffer) -eq $true) {
+                    $thereIsMatch = $true
+                    $map.Aliases.Add($layoutName) | Out-Null
+                    break
+                }
+            }
+
+            if (!$thereIsMatch) {
+                $uniqueMaps.Add([PSCustomObject]@{
+                        Map     = $buffer;
+                        Aliases = [System.Collections.ArrayList]@($layoutName);
+                    }) | Out-Null
+            }
         }
         finally {
             $kbFileStream.Dispose()
         }
+    }
+
+    $uniqueMaps | ForEach-Object {
+        Write-Host $_.Aliases
+    }
+
+
+    $layoutsFileStream.WriteByte($kbFiles.Length)
+    $dataStartOffset = 1 + $kbFiles.Length * 12
+    $i = 0
+    $aliasOffsets = @{}
+    foreach ($map in $uniqueMaps) {
+        foreach ($alias in $map.Aliases) {
+            $aliasOffsets.Add($alias, $dataStartOffset + $i * 72)
+        }
+        $i = $i + 1
+    }
+    foreach ($alias in $aliasOffsets.Keys | Sort-Object) {
+        $layoutsFileStream.Write((ConvertStringToFixedSizeByteArray -inputString $alias -fixedSize 10), 0, 10)
+        $layoutsFileStream.Write((Get-UInt16AsBytes -Value $aliasOffsets.$alias), 0, 2)
+        $layouts.Add($alias) | Out-Null
+    }
+    foreach ($map in $uniqueMaps) {
+        $layoutsFileStream.Write($map.Map, 0, $map.Map.Length)
     }
 }
 finally {
@@ -70,5 +120,5 @@ finally {
 }
 
 $cliHelpFileContent = Get-Content -Path $cliHelpFile -Raw
-$cliHelpFileContent = $cliHelpFileContent -replace '(?m)(-k <layout>.+Must be one of: )(.+)$', ('$1' + ($layouts -join ', '))
+$cliHelpFileContent = $cliHelpFileContent -replace '(?m)(-k <layout>.+Must be one of: )(.*)$', ('$1' + ($layouts -join ', '))
 Set-Content -Path $cliHelpFile -Value $cliHelpFileContent -NoNewline -Force -Encoding Ascii | Out-Null
