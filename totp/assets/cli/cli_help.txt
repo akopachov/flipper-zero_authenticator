@@ -53,5 +53,5 @@ Options:
   -s             Update token secret
   -f             Force command to do not ask user for interactive confirmation
   -c <slot>      New crypto key slot. Must be between 12 and 100
-  -k <layout>    Automation keyboard layout. Must be one of: ba-BA, cs-CZ, da-DA, de-CH, de-DE, dvorak, en-UK, en-US, es-ES, fr-BE, fr-CA, fr-CH, fr-FR, fr-FR-mac, hr-HR, hu-HU, it-IT, nb-NO, nl-NL, pt-BR, pt-PT, si-SI, sk-SK, sv-SE, tr-TR
+  -k <layout>    Automation keyboard layout. Must be one of: QWERTY, AZERTY, QWERTZ, Czech, Dvorak, Hungarian, Slovak
   -w <delay>     Automation initial delay in seconds. Must be positive float value [default: 0.5]

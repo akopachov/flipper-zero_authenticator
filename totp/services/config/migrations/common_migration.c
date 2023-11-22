@@ -99,23 +99,8 @@ bool totp_config_migrate_to_latest(
         flipper_format_rewind(fff_backup_data_file);
 
         uint32_t kb_layout;
-        if(flipper_format_read_uint32(
+        if(!flipper_format_read_uint32(
                fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &kb_layout, 1)) {
-            if (current_version < 12) {
-                switch (kb_layout)
-                {
-                case 1:
-                    kb_layout = 13;
-                    break;
-                case 2:
-                    kb_layout = 4;
-                    break;                
-                default:
-                    kb_layout = TOTP_DEFAULT_KB_LAYOUT;
-                    break;
-                }
-            }
-        } else {
             kb_layout = TOTP_DEFAULT_KB_LAYOUT;
         }
 

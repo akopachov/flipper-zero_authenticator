@@ -89,23 +89,57 @@ try {
             $kbFileStream.Dispose()
         }
     }
+   
+    $dataStartOffset = 1
+
+    foreach ($map in $uniqueMaps) {
+        if ($map.Aliases -contains 'en-US') {
+            $map.Aliases = @('QWERTY')
+        }
+        elseif ($map.Aliases -contains 'fr-FR') {
+            $map.Aliases = @('AZERTY')
+        }
+        elseif ($map.Aliases -contains 'de-DE') {
+            $map.Aliases = @('QWERTZ')
+        }
+        elseif ($map.Aliases -contains 'dvorak') {
+            $map.Aliases = @('Dvorak')
+        }
+        elseif ($map.Aliases -contains 'hu-HU') {
+            $map.Aliases = @('Hungarian')
+        }
+        
+        if ($map.Aliases -contains 'cs-CZ') {
+            $map.Aliases.Remove('cs-CZ') | Out-Null
+            $map.Aliases.Add('Czech') | Out-Null
+        }
+
+        if ($map.Aliases -contains 'sk-SK') {
+            $map.Aliases.Remove('sk-SK') | Out-Null
+            $map.Aliases.Add('Slovak') | Out-Null
+        }
+
+        $dataStartOffset += $map.Aliases.Count * 12
+    }
 
     $uniqueMaps | ForEach-Object {
         Write-Host $_.Aliases
     }
 
-
-    $layoutsFileStream.WriteByte($kbFiles.Length)
-    $dataStartOffset = 1 + $kbFiles.Length * 12
     $i = 0
     $aliasOffsets = @{}
+    
     foreach ($map in $uniqueMaps) {
         foreach ($alias in $map.Aliases) {
             $aliasOffsets.Add($alias, $dataStartOffset + $i * 72)
         }
         $i = $i + 1
     }
-    foreach ($alias in $aliasOffsets.Keys | Sort-Object) {
+
+    $layoutsFileStream.WriteByte($aliasOffsets.Count)
+
+    $layoutsOrder = @('QWERTY', 'AZERTY', 'QWERTZ')
+    foreach ($alias in $aliasOffsets.Keys | Sort-Object -Property @{ Exp = { if ($layoutsOrder -contains $_) { $layoutsOrder.IndexOf($_) } else { $_ } }; Desc = $false }) {
         $layoutsFileStream.Write((ConvertStringToFixedSizeByteArray -inputString $alias -fixedSize 10), 0, 10)
         $layoutsFileStream.Write((Get-UInt16AsBytes -Value $aliasOffsets.$alias), 0, 2)
         $layouts.Add($alias) | Out-Null
