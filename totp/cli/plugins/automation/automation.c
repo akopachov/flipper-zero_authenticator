@@ -81,7 +81,8 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
 #endif
         else if(furi_string_cmpi_str(temp_str, TOTP_CLI_COMMAND_AUTOMATION_ARG_KB_LAYOUT_PREFIX) == 0) {
             if(!args_read_string_and_trim(args, temp_str) ||
-               !totp_kb_layout_provider_get_layout_by_name(furi_string_get_cstr(temp_str), &new_kb_layout)) {
+               !totp_kb_layout_provider_get_layout_by_name(
+                   furi_string_get_cstr(temp_str), &new_kb_layout)) {
                 args_valid = false;
                 break;
             }

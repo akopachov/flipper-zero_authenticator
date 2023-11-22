@@ -83,7 +83,10 @@ static void update_formatted_automation_initial_delay(SceneState* scene_state) {
 }
 
 static void update_formatted_automation_kb_layout_name(SceneState* scene_state) {
-    totp_kb_layout_provider_get_layout_name(scene_state->automation_kb_layout, &scene_state->automation_kb_layout_name[0], sizeof(scene_state->automation_kb_layout_name));
+    totp_kb_layout_provider_get_layout_name(
+        scene_state->automation_kb_layout,
+        &scene_state->automation_kb_layout_name[0],
+        sizeof(scene_state->automation_kb_layout_name));
 }
 
 void totp_scene_app_settings_activate(PluginState* plugin_state) {

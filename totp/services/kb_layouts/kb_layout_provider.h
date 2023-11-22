@@ -33,7 +33,10 @@ uint8_t totp_kb_layout_provider_get_layouts_count();
  * @param buffer_length available buffer length
  * @return \c true if keyboard layout name found successfully; \c false otherwise
  */
-bool totp_kb_layout_provider_get_layout_name(AutomationKeyboardLayout kb_layout, char* buffer, size_t buffer_length);
+bool totp_kb_layout_provider_get_layout_name(
+    AutomationKeyboardLayout kb_layout,
+    char* buffer,
+    size_t buffer_length);
 
 /**
  * @brief Gets keyboard layout by \c name
@@ -41,7 +44,9 @@ bool totp_kb_layout_provider_get_layout_name(AutomationKeyboardLayout kb_layout,
  * @param[out] kb_layout keyboard layout
  * @return \c true if keyboard layout found successfully; \c false otherwise
  */
-bool totp_kb_layout_provider_get_layout_by_name(const char* name, AutomationKeyboardLayout* kb_layout);
+bool totp_kb_layout_provider_get_layout_by_name(
+    const char* name,
+    AutomationKeyboardLayout* kb_layout);
 
 #ifdef __cplusplus
 }

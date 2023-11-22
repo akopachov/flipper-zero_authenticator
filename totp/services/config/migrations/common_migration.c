@@ -105,7 +105,7 @@ bool totp_config_migrate_to_latest(
         }
 
         flipper_format_write_uint32(
-                    fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &kb_layout, 1);
+            fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &kb_layout, 1);
 
         flipper_format_rewind(fff_backup_data_file);
 

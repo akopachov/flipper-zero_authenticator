@@ -40,7 +40,7 @@ void totp_type_code_worker_execute_automation(
     AutomationKeyboardLayout keyboard_layout,
     uint16_t initial_delay) {
     uint16_t keyboard_layout_dict[TOTP_KB_LAYOUT_DATA_LENGTH];
-    if (!totp_kb_layout_provider_get_layout_data(keyboard_layout, &keyboard_layout_dict[0])) {
+    if(!totp_kb_layout_provider_get_layout_data(keyboard_layout, &keyboard_layout_dict[0])) {
         return;
     }
 
