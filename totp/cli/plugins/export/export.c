@@ -10,13 +10,13 @@
 
 static const char* BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
-static void print_as_base32(const uint8_t *data, size_t length) {
+static void print_as_base32(const uint8_t* data, size_t length) {
     int buffer = data[0];
     size_t next = 1;
     int bitsLeft = 8;
-    while (bitsLeft > 0 || next < length) {
-        if (bitsLeft < 5) {
-            if (next < length) {
+    while(bitsLeft > 0 || next < length) {
+        if(bitsLeft < 5) {
+            if(next < length) {
                 buffer <<= 8;
                 buffer |= data[next++] & 0xFF;
                 bitsLeft += 8;
@@ -32,12 +32,13 @@ static void print_as_base32(const uint8_t *data, size_t length) {
     }
 }
 
-static void print_uri_component(const char *data, size_t length) {
-    const char *c_ptr = data;
+static void print_uri_component(const char* data, size_t length) {
+    const char* c_ptr = data;
     const char* last_ptr = data + length;
-    while (c_ptr < last_ptr) {
+    while(c_ptr < last_ptr) {
         const char c = *c_ptr;
-        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_') {
+        if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
+           c == '-' || c == '_') {
             putchar(c);
         } else {
             printf("%%%x", c);
@@ -64,7 +65,7 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
     } while(user_pick != 'y' && user_pick != 'n' && user_pick != CliSymbolAsciiCR &&
             user_pick != CliSymbolAsciiETX && user_pick != CliSymbolAsciiEsc);
 
-    if (user_pick != 'y' && user_pick != CliSymbolAsciiCR) {
+    if(user_pick != 'y' && user_pick != CliSymbolAsciiCR) {
         TOTP_CLI_PRINTF_INFO("User has not confirmed\r\n");
         return;
     }
@@ -84,17 +85,21 @@ static void handle(PluginState* plugin_state, FuriString* args, Cli* cli) {
         totp_token_info_iterator_go_to(iterator_context, i);
         const TokenInfo* token_info = totp_token_info_iterator_get_current_token(iterator_context);
         TOTP_CLI_PRINTF("otpauth://%s/", token_info_get_type_as_cstr(token_info));
-        print_uri_component(furi_string_get_cstr(token_info->name), furi_string_size(token_info->name));
+        print_uri_component(
+            furi_string_get_cstr(token_info->name), furi_string_size(token_info->name));
         TOTP_CLI_PRINTF("?secret=");
         size_t key_length;
         uint8_t* key = totp_crypto_decrypt(
-            token_info->token, token_info->token_length, &plugin_state->crypto_settings, &key_length);
+            token_info->token,
+            token_info->token_length,
+            &plugin_state->crypto_settings,
+            &key_length);
         print_as_base32(key, key_length);
         memset_s(key, key_length, 0, key_length);
         free(key);
         TOTP_CLI_PRINTF("&algorithm=%s", token_info_get_algo_as_cstr(token_info));
         TOTP_CLI_PRINTF("&digits=%" PRIu8, token_info->digits);
-        if (token_info->type == TokenTypeHOTP) {
+        if(token_info->type == TokenTypeHOTP) {
             TOTP_CLI_PRINTF("&counter=%" PRIu64, token_info->counter);
         } else {
             TOTP_CLI_PRINTF("&period=%" PRIu8, token_info->duration);
