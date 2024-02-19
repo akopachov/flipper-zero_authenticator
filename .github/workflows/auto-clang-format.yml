@@ -31,5 +31,5 @@ jobs:
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: CLang format changes
+          commit_message: "chore: CLang format changes"
           branch: ${{ github.head_ref }}
