@@ -152,10 +152,7 @@ TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init(uint16_t mac_xor) {
     furi_delay_ms(200);
     bt_keys_storage_set_storage_path(context->bt, HID_BT_KEYS_STORAGE_PATH);
 
-    BleProfileHidParams ble_params = {
-        .device_name_prefix = "TOTP",
-        .mac_xor = mac_xor
-    };
+    BleProfileHidParams ble_params = {.device_name_prefix = "TOTP", .mac_xor = mac_xor};
     context->ble_hid_profile = bt_profile_start(context->bt, ble_profile_hid, &ble_params);
     furi_check(context->ble_hid_profile);
 
@@ -183,7 +180,7 @@ void totp_bt_type_code_worker_free(TotpBtTypeCodeWorkerContext* context) {
     bt_disconnect(context->bt);
     furi_delay_ms(200);
     bt_keys_storage_set_default_path(context->bt);
-    if (!bt_profile_restore_default(context->bt)) {
+    if(!bt_profile_restore_default(context->bt)) {
         FURI_LOG_E(LOGGING_TAG, "Failed to restore to default BT profile");
     }
 
