@@ -61,7 +61,8 @@ void totp_type_code_worker_execute_automation(
         if(char_index >= TOTP_KB_LAYOUT_DATA_LENGTH) break;
 
         uint16_t hid_kb_key = keyboard_layout_dict[char_index];
-        totp_type_code_worker_press_key(hid_kb_key, key_press_fn, key_release_fn, features, context);
+        totp_type_code_worker_press_key(
+            hid_kb_key, key_press_fn, key_release_fn, features, context);
         furi_delay_ms(keystroke_delay);
         i++;
     }
@@ -74,6 +75,7 @@ void totp_type_code_worker_execute_automation(
 
     if(features & TokenAutomationFeatureTabAtTheEnd) {
         furi_delay_ms(keystroke_delay);
-        totp_type_code_worker_press_key(HID_KEYBOARD_TAB, key_press_fn, key_release_fn, features, context);
+        totp_type_code_worker_press_key(
+            HID_KEYBOARD_TAB, key_press_fn, key_release_fn, features, context);
     }
 }
