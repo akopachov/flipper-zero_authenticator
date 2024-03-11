@@ -432,7 +432,7 @@ bool totp_scene_generate_token_handle_event(
         default:
             break;
         }
-    } else if (event->input.type == InputTypeShort && event->input.key == InputKeyOk) {
+    } else if(event->input.type == InputTypeShort && event->input.key == InputKeyOk) {
         totp_scene_director_activate_scene(plugin_state, TotpSceneTokenMenu);
     }
 
