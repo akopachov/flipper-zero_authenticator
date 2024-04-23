@@ -39,7 +39,7 @@ void ui_control_text_box_render(
             1);
     }
 
-    if (text != NULL) {
+    if(text != NULL) {
         canvas_draw_str_aligned(
             canvas, TEXT_BOX_MARGIN + 2, TEXT_BOX_MARGIN + 3 + y, AlignLeft, AlignTop, text);
     }

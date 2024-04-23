@@ -97,11 +97,11 @@ static void ask_user_input(
         strlcpy(input_result.user_input, *user_input, INPUT_BUFFER_SIZE);
     }
 
-    if (plugin_state->idle_timeout_context != NULL) {
+    if(plugin_state->idle_timeout_context != NULL) {
         idle_timeout_pause(plugin_state->idle_timeout_context);
     }
     totp_input_text(plugin_state->gui, header, &input_result);
-    if (plugin_state->idle_timeout_context != NULL) {
+    if(plugin_state->idle_timeout_context != NULL) {
         idle_timeout_report_activity(plugin_state->idle_timeout_context);
         idle_timeout_resume(plugin_state->idle_timeout_context);
     }
