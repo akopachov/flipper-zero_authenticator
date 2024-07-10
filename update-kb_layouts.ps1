@@ -48,7 +48,7 @@ function AreArraysEqual {
     return $true
 }
 
-$kbFiles = Invoke-RestMethod -Uri 'https://api.github.com/repos/Flipper-XFW/Xtreme-Firmware/contents/applications/main/bad_kb/resources/badkb/assets/layouts?ref=dev'
+$kbFiles = Invoke-RestMethod -Uri 'https://api.github.com/repos/Next-Flip/Momentum-Firmware/contents/applications/main/bad_kb/resources/badusb/assets/layouts?ref=dev'
 
 $layoutsFile = New-Item -Name $outputFile -ItemType File -Force
 $layoutsFileStream = $layoutsFile.OpenWrite()
