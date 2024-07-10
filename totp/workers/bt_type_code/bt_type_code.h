@@ -40,7 +40,8 @@ enum TotpBtTypeCodeWorkerEvents {
  * @param profile_index profile index to be used
  * @return worker context
  */
-TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init(uint16_t mac_xor, uint8_t profile_index);
+TotpBtTypeCodeWorkerContext*
+    totp_bt_type_code_worker_init(uint16_t mac_xor, uint8_t profile_index);
 
 /**
  * @brief Disposes bluetooth token input automation worker and releases all the allocated resources

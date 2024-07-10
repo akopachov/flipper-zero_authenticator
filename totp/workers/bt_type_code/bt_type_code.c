@@ -141,7 +141,8 @@ void totp_bt_type_code_worker_notify(
     furi_thread_flags_set(furi_thread_get_id(context->thread), event);
 }
 
-TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init(uint16_t mac_xor, uint8_t profile_index) {
+TotpBtTypeCodeWorkerContext*
+    totp_bt_type_code_worker_init(uint16_t mac_xor, uint8_t profile_index) {
     TotpBtTypeCodeWorkerContext* context = malloc(sizeof(TotpBtTypeCodeWorkerContext));
     furi_check(context != NULL);
 
@@ -152,14 +153,19 @@ TotpBtTypeCodeWorkerContext* totp_bt_type_code_worker_init(uint16_t mac_xor, uin
     furi_delay_ms(200);
 
     char keys_storage_path[sizeof(HID_BT_KEYS_STORAGE_PATH_FORMAT)];
-    snprintf(keys_storage_path, sizeof(keys_storage_path), HID_BT_KEYS_STORAGE_PATH_FORMAT, profile_index);
+    snprintf(
+        keys_storage_path,
+        sizeof(keys_storage_path),
+        HID_BT_KEYS_STORAGE_PATH_FORMAT,
+        profile_index);
     bt_keys_storage_set_storage_path(context->bt, &keys_storage_path[0]);
 
     uint16_t final_mac_xor = (mac_xor & 0xFF80) + profile_index;
     char* device_prefix = "TOTP-00";
     snprintf(&device_prefix[5], 3, "%02X", profile_index);
 
-    BleProfileHidParams ble_params = {.device_name_prefix = device_prefix, .mac_xor = final_mac_xor};
+    BleProfileHidParams ble_params = {
+        .device_name_prefix = device_prefix, .mac_xor = final_mac_xor};
     context->ble_hid_profile = bt_profile_start(context->bt, ble_profile_hid, &ble_params);
     furi_check(context->ble_hid_profile);
 

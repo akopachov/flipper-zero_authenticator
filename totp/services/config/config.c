@@ -180,7 +180,8 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
 
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
         tmp_uint32 = 0; //-V1048
-        flipper_format_write_uint32(fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_BADBT_PROFILE, &tmp_uint32, 1);
+        flipper_format_write_uint32(
+            fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_BADBT_PROFILE, &tmp_uint32, 1);
 #endif
 
         tmp_uint32 = 500;

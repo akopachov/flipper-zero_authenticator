@@ -232,10 +232,16 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
         }
 
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
-        if(scene_state->selected_control <= AutomationDelaySelect || (scene_state->automation_method & AutomationMethodBadBt) == 0) {
+        if(scene_state->selected_control <= AutomationDelaySelect ||
+           (scene_state->automation_method & AutomationMethodBadBt) == 0) {
 #endif
             canvas_draw_str_aligned(
-                canvas, 0, 227 - scene_state->y_offset - group_offset, AlignLeft, AlignTop, "Layout:");
+                canvas,
+                0,
+                227 - scene_state->y_offset - group_offset,
+                AlignLeft,
+                AlignTop,
+                "Layout:");
 
             ui_control_select_render(
                 canvas,
@@ -245,7 +251,7 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
                 scene_state->automation_kb_layout_name,
                 scene_state->selected_control == BadKeyboardLayoutSelect);
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
-        } else if ((scene_state->automation_method & AutomationMethodBadBt) != 0) {
+        } else if((scene_state->automation_method & AutomationMethodBadBt) != 0) {
             group_offset += 18;
         }
 #endif
@@ -262,13 +268,18 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
             scene_state->selected_control == AutomationDelaySelect);
 
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
-        if ((scene_state->automation_method & AutomationMethodBadBt) != 0) {
+        if((scene_state->automation_method & AutomationMethodBadBt) != 0) {
             canvas_draw_str_aligned(
-                canvas, 0, 263 - scene_state->y_offset - group_offset, AlignLeft, AlignTop, "BT Profile:");
+                canvas,
+                0,
+                263 - scene_state->y_offset - group_offset,
+                AlignLeft,
+                AlignTop,
+                "BT Profile:");
 
             char profile_index_formatted[4];
             snprintf(profile_index_formatted, 4, "%d", scene_state->badbt_profile_index);
-        
+
             ui_control_select_render(
                 canvas,
                 42,
@@ -287,7 +298,7 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
 #else
             260
 #endif
-            - scene_state->y_offset - group_offset,
+                - scene_state->y_offset - group_offset,
             48,
             13,
             "Confirm",
@@ -316,7 +327,8 @@ bool totp_scene_app_settings_handle_event(
                 ConfirmButton,
                 RollOverflowBehaviorStop);
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
-            if ((scene_state->automation_method & AutomationMethodBadBt) == 0 && scene_state->selected_control == BadBtProfileSelect) {
+            if((scene_state->automation_method & AutomationMethodBadBt) == 0 &&
+               scene_state->selected_control == BadBtProfileSelect) {
                 scene_state->selected_control--;
             }
 #endif
@@ -338,7 +350,8 @@ bool totp_scene_app_settings_handle_event(
                 ConfirmButton,
                 RollOverflowBehaviorStop);
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
-            if ((scene_state->automation_method & AutomationMethodBadBt) == 0 && scene_state->selected_control == BadBtProfileSelect) {
+            if((scene_state->automation_method & AutomationMethodBadBt) == 0 &&
+               scene_state->selected_control == BadBtProfileSelect) {
                 scene_state->selected_control++;
             }
 #endif
@@ -395,15 +408,11 @@ bool totp_scene_app_settings_handle_event(
                     60000,
                     RollOverflowBehaviorStop);
                 update_formatted_automation_initial_delay(scene_state);
-            } 
+            }
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
             else if(scene_state->selected_control == BadBtProfileSelect) {
                 totp_roll_value_uint8_t(
-                    &scene_state->badbt_profile_index,
-                    1,
-                    0,
-                    UINT8_MAX,
-                    RollOverflowBehaviorRoll);
+                    &scene_state->badbt_profile_index, 1, 0, UINT8_MAX, RollOverflowBehaviorRoll);
             }
 #endif
             break;
@@ -450,15 +459,11 @@ bool totp_scene_app_settings_handle_event(
                     60000,
                     RollOverflowBehaviorStop);
                 update_formatted_automation_initial_delay(scene_state);
-            } 
+            }
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
             else if(scene_state->selected_control == BadBtProfileSelect) {
                 totp_roll_value_uint8_t(
-                    &scene_state->badbt_profile_index,
-                    -1,
-                    0,
-                    UINT8_MAX,
-                    RollOverflowBehaviorRoll);
+                    &scene_state->badbt_profile_index, -1, 0, UINT8_MAX, RollOverflowBehaviorRoll);
             }
 #endif
             break;
@@ -479,7 +484,9 @@ bool totp_scene_app_settings_handle_event(
                 plugin_state->automation_initial_delay = scene_state->automation_initial_delay;
 
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
-                if(((scene_state->automation_method & AutomationMethodBadBt) == 0 || plugin_state->bt_type_code_worker_profile_index != scene_state->badbt_profile_index) &&
+                if(((scene_state->automation_method & AutomationMethodBadBt) == 0 ||
+                    plugin_state->bt_type_code_worker_profile_index !=
+                        scene_state->badbt_profile_index) &&
                    plugin_state->bt_type_code_worker_context != NULL) {
                     totp_bt_type_code_worker_free(plugin_state->bt_type_code_worker_context);
                     plugin_state->bt_type_code_worker_context = NULL;

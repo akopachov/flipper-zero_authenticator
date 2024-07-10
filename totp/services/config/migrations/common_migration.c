@@ -108,11 +108,14 @@ bool totp_config_migrate_to_latest(
             fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_KB_LAYOUT, &kb_layout, 1);
 
         flipper_format_rewind(fff_backup_data_file);
-        
+
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
         uint32_t bt_profile_index;
         if(!flipper_format_read_uint32(
-               fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_BADBT_PROFILE, &bt_profile_index, 1)) {
+               fff_backup_data_file,
+               TOTP_CONFIG_KEY_AUTOMATION_BADBT_PROFILE,
+               &bt_profile_index,
+               1)) {
             bt_profile_index = 0;
         }
 
