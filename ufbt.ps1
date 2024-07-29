@@ -7,8 +7,8 @@ if (('official-dev', 'off-dev', 'od').Contains($args[0])) {
 elseif (('official-stable', 'off-stbl', 'os').Contains($args[0])) {
     $FW_CDEF = "TOTP_FIRMWARE_OFFICIAL_STABLE"
 }
-elseif (('xtreme-stable', 'xts', 'xs', 'xtreme-dev', 'xtd', 'xd', 'u', 'ul', 'unleashed', 'ud', 'uld', 'unleashed-dev').Contains($args[0])) {
-    $FW_CDEF = "TOTP_FIRMWARE_XTREME_UL"
+elseif (('u', 'ul', 'unleashed', 'ud', 'uld', 'unleashed-dev').Contains($args[0])) {
+    $FW_CDEF = "TOTP_FIRMWARE_UNLEASHED"
 }
 elseif (('momentum-stable', 'mts', 'ms', 'momentum-dev', 'mtd', 'md').Contains($args[0])) {
     $FW_CDEF = "TOTP_FIRMWARE_MOMENTUM"

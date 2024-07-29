@@ -65,7 +65,7 @@ jobs:
   build:
     strategy:
       matrix:
-        firmware: [od, os, xs, xd, ul, ud, ms, md]
+        firmware: [od, os, ul, ud, ms, md]
 
     runs-on: ubuntu-latest
     continue-on-error: true

@@ -41,4 +41,4 @@ There is a companion app for desktop allowing you to interact with Flipper Authe
 
 Checkout [FAQ](https://github.com/akopachov/flipper-zero_authenticator/wiki/FAQ) or start a discussion [here](https://github.com/akopachov/flipper-zero_authenticator/discussions). You may also find help on your firmware Discord server.
 
-If you would like to talk to the author directly, you can always find me on these Discord servers: [Xtreme](https://discord.gg/flipper-xtreme), [Momentum](https://discord.gg/momentum), in [Telegram](https://t.me/akopachov) or [Signal](https://signal.me/#eu/awO0hlh9qSAynfctObaziRFXg1f8o6ebxD6r1I3D9rIwwnDd34tKlYZQ6lLIzM10)
+If you would like to talk to the author directly, you can always find me on these Discord servers: [Momentum](https://discord.gg/momentum), [Unleashed](https://discord.gg/flipperzero-unofficial), in [Telegram](https://t.me/akopachov) or [Signal](https://signal.me/#eu/awO0hlh9qSAynfctObaziRFXg1f8o6ebxD6r1I3D9rIwwnDd34tKlYZQ6lLIzM10)
