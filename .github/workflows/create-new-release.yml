@@ -49,7 +49,7 @@ jobs:
     outputs:
       upload_url: ${{steps.create-release.outputs.upload_url}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: create-release
         uses: ncipollo/release-action@v1.14.0
         with:
