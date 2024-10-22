@@ -2,6 +2,12 @@
 
 #include <stdio.h>
 
+#if __has_include(<cli/cli_ansi.h>)
+#include <cli/cli_ansi.h>
+#else
+#include "../lib/polyfills/cli_ansi.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
