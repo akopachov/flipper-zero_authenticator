@@ -55,7 +55,7 @@
 ## v5.7.0 - 3 Nov 2023
 
 * Updated WolfSSL to [v5.6.4](https://github.com/wolfSSL/wolfssl/releases/tag/v5.6.4-stable)
-* Cosmetic fix to `totp help` CLI command output text
+* Cosmetic fix to "totp help" CLI command output text
 
 ## v5.6.0 - 30 Oct 2023
 
@@ -74,7 +74,7 @@
 ## v4.1.0 - 28 Aug 2023
 
 * Implemented [#195](https://github.com/akopachov/flipper-zero_authenticator/issues/195)
-* Added `totp version` CLI command
+* Added "totp version" CLI command
 
 ## v4.0.0 - 9 Aug 2023
 
