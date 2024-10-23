@@ -17,7 +17,7 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git fetch origin
-          git reset --hard refs/heads/master
+          git reset --hard origin/master
       - run: |
           sed -i 's/appid="totp",/appid="totp",\n    fal_embedded=True,/' totp/application.fam
       - run: |
