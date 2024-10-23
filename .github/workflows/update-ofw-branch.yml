@@ -1,0 +1,25 @@
+name: Update OFW branch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+jobs:
+  build-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: "recursive"
+          ref: master_ofw-catalog
+      - run: |
+          git fetch origin
+          git merge -X theirs origin/master
+      - run: |
+          sed -i 's/appid="totp",/appid="totp",\n    fal_embedded=True,/' totp/application.fam
+      - run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git commit -am "chore: Applied OFW catalog changes"
+          git push -u
