@@ -21,6 +21,7 @@ jobs:
       - run: |
           sed -i 's/apptype=FlipperAppType.PLUGIN,/apptype=FlipperAppType.PLUGIN,\n    fal_embedded=True,/' totp/application.fam
           printf "\n#define TOTP_APP_VERSION_META \"$(git rev-parse --short HEAD).ofw-catalog\"\n" >> totp/version.h
+          sed -i 's~apps_data/totp/plugins/~apps_assets/totp/plugins/~' totp/cli/cli.c
       - run: |
           git commit -am "chore: Applied OFW catalog changes"
           git push -u --force origin master_ofw-catalog
