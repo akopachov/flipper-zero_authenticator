@@ -17,9 +17,9 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git fetch origin
-          git merge -X theirs origin/master
+          git reset --hard master
       - run: |
           sed -i 's/appid="totp",/appid="totp",\n    fal_embedded=True,/' totp/application.fam
       - run: |
           git commit -am "chore: Applied OFW catalog changes"
-          git push -u
+          git push -u --force origin master_ofw-catalog
