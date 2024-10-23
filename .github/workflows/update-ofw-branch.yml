@@ -20,7 +20,7 @@ jobs:
           git reset --hard origin/master
       - run: |
           sed -i 's/appid="totp",/appid="totp",\n    fal_embedded=True,/' totp/application.fam
-          echo "#define TOTP_APP_VERSION_META \"$(git rev-parse --short HEAD^).ofw-catalog\"\n" >> totp/version.h
+          printf "\n#define TOTP_APP_VERSION_META \"$(git rev-parse --short HEAD).ofw-catalog\"\n" >> totp/version.h
       - run: |
           git commit -am "chore: Applied OFW catalog changes"
           git push -u --force origin master_ofw-catalog
