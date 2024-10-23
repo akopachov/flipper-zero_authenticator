@@ -32,6 +32,10 @@ jobs:
       - name: Install uFBT
         run: python3 -m pip install --upgrade ufbt
 
+      - name: Generate version metadata
+        run: |
+          printf "\n#define TOTP_APP_VERSION_META \"$(git rev-parse --short HEAD).nightly.$(date +'%Y%m%dT%H%M%S')\"\n" >> totp/version.h
+
       - name: Build
         run: ./build.ps1 ${{ matrix.firmware }}
         shell: pwsh
