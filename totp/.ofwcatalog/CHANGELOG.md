@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.17.0 - 27 Feb 2025
+
+* feat: Extended valid UTC offset range to be from -12 to +14 ([#249](https://github.com/akopachov/flipper-zero_authenticator/issues/249))
+
 ## v5.16.1 - 22 Oct 2024
 
 * Fixed compatibility with latest FW changes ([#243](https://github.com/akopachov/flipper-zero_authenticator/issues/243))
