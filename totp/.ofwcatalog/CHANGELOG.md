@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.17.1 - 26 Mar 2025
+
+* fix: fix: HOTP counter is not increasing when "OK" button long-pressed ([#253](https://github.com/akopachov/flipper-zero_authenticator/issues/253))
+
 ## v5.17.0 - 27 Feb 2025
 
 * feat: Extended valid UTC offset range to be from -12 to +14 ([#249](https://github.com/akopachov/flipper-zero_authenticator/issues/249))
