@@ -1,5 +1,9 @@
 # Changelog
 
+## v 5.17.3 - Apr 11 2025
+
+* fix: compatibility with SDK version 1.3 f7 ([#256](https://github.com/akopachov/flipper-zero_authenticator/issues/256))
+
 ## v5.17.1 - 26 Mar 2025
 
 * fix: HOTP counter is not increasing when "OK" button long-pressed ([#253](https://github.com/akopachov/flipper-zero_authenticator/issues/253))
