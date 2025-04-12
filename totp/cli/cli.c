@@ -21,9 +21,7 @@
 #include "cli_plugin_interface.h"
 #include "../app_api_interface.h"
 
-#ifndef RECORD_CLI
-#define RECORD_CLI "cli"
-#else
+#if !(__has_include(<toolbox/cli/cli_registry.h>))
 #define cli_registry_add_command cli_add_command
 #define cli_registry_delete_command cli_delete_command
 #define CliRegistry Cli
