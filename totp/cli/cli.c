@@ -49,7 +49,7 @@ static void run_external_cli_plugin_handler(
         storage, composite_api_resolver_get(cli_context->plugin_api_resolver));
     do {
         FuriString* full_handler_path =
-            furi_string_alloc_printf(EXT_PATH("apps_data/totp/plugins/%s.fal"), handler_name);
+            furi_string_alloc_printf(EXT_PATH("apps_assets/totp/plugins/%s.fal"), handler_name);
         FlipperApplicationPreloadStatus preload_res =
             flipper_application_preload(plugin_app, furi_string_get_cstr(full_handler_path));
         furi_string_free(full_handler_path);
