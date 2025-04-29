@@ -205,6 +205,19 @@ File format is standard for Flipper Zero device. Each line has one setting ident
 </details>
 
 <details>
+<summary><h3 style="display: inline">TokenSecretLength</h3></summary>
+<p>
+
+**Type:** unsigned int32
+
+**Default value:** 0
+
+**Description:** Plain token secret original bytes-length.
+
+</p>
+</details>
+
+<details>
 <summary><h3 style="display: inline">TokenAlgo</h3></summary>
 <p>
 
