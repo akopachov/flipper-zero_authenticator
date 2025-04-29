@@ -1,6 +1,10 @@
 # Changelog
 
-## v 5.17.3 - Apr 11 2025
+## v5.18.0 - Apr 29 2025
+
+* fix: tokens longer than 64 bytes are leading to incorrect codes ([#260](https://github.com/akopachov/flipper-zero_authenticator/issues/260))
+
+## v5.17.3 - Apr 11 2025
 
 * fix: compatibility with SDK version 1.3 f7 ([#256](https://github.com/akopachov/flipper-zero_authenticator/issues/256))
 
