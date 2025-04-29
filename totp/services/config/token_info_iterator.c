@@ -179,7 +179,8 @@ static bool
         }
 
         uint32_t tmp_uint32 = token_info->token_plain_length;
-        if(!flipper_format_write_uint32(temp_ff, TOTP_CONFIG_KEY_TOKEN_SECRET_LENGTH, &tmp_uint32, 1)) {
+        if(!flipper_format_write_uint32(
+               temp_ff, TOTP_CONFIG_KEY_TOKEN_SECRET_LENGTH, &tmp_uint32, 1)) {
             break;
         }
 
@@ -564,7 +565,7 @@ bool totp_token_info_iterator_go_to(TokenInfoIteratorContext* context, size_t to
         }
 
         if(flipper_format_read_uint32(
-            context->config_file, TOTP_CONFIG_KEY_TOKEN_SECRET_LENGTH, &temp_data32, 1)) {
+               context->config_file, TOTP_CONFIG_KEY_TOKEN_SECRET_LENGTH, &temp_data32, 1)) {
             tokenInfo->token_plain_length = temp_data32;
         } else {
             tokenInfo->token_plain_length = tokenInfo->token_length;

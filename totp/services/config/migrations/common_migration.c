@@ -152,7 +152,7 @@ bool totp_config_migrate_to_latest(
                 fff_backup_data_file, TOTP_CONFIG_KEY_TOKEN_SECRET, temp_str);
             flipper_format_write_string(fff_data_file, TOTP_CONFIG_KEY_TOKEN_SECRET, temp_str);
 
-            if (current_version > 13) {
+            if(current_version > 13) {
                 flipper_format_read_string(
                     fff_backup_data_file, TOTP_CONFIG_KEY_TOKEN_SECRET_LENGTH, temp_str);
                 flipper_format_write_string(
