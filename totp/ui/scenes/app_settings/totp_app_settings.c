@@ -321,7 +321,7 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
         ui_control_button_render(
             canvas,
             SCREEN_WIDTH_CENTER - 24,
-            307 - scene_state->y_offset,
+            306 - scene_state->y_offset,
             48,
             13,
             "Confirm",

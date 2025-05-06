@@ -28,6 +28,7 @@ typedef struct {
     uint8_t code_total_length;
     uint8_t code_offset_x;
     uint8_t code_offset_y;
+    uint8_t group_space_width;
 } UiPrecalculatedDimensions;
 
 typedef struct {
@@ -134,7 +135,7 @@ static void draw_totp_code(Canvas* const canvas, const PluginState* const plugin
                 &scene_state->last_code[i],
                 MIN(group_length, code_length - i),
                 scene_state->active_font);
-            offset_x += (group_length + 1) * (char_width + scene_state->active_font->space_width);
+            offset_x += (group_length * (char_width + scene_state->active_font->space_width) + scene_state->ui_precalculated_dimensions.group_space_width);
         }
     } else {
         canvas_draw_str_ex(
@@ -162,10 +163,17 @@ static void on_new_token_code_generated(bool time_left, void* context) {
     uint8_t group_spaces = plugin_state->split_token_into_groups > 0 
         ? plugin_state->split_token_into_groups - 1
         : 0;
+    uint8_t group_space_width = char_width;
     scene_state->ui_precalculated_dimensions.code_total_length =
-        (current_token->digits + group_spaces) * (char_width + scene_state->active_font->space_width);
+        current_token->digits * (char_width + scene_state->active_font->space_width);
+    uint8_t rest_available_width = SCREEN_WIDTH - MIN(SCREEN_WIDTH, scene_state->ui_precalculated_dimensions.code_total_length);
+    if (group_space_width * group_spaces > rest_available_width) {
+        group_space_width = rest_available_width / group_spaces;
+    }
+    scene_state->ui_precalculated_dimensions.code_total_length += group_space_width * group_spaces;
+    scene_state->ui_precalculated_dimensions.group_space_width = group_space_width;
     scene_state->ui_precalculated_dimensions.code_offset_x =
-        (SCREEN_WIDTH - scene_state->ui_precalculated_dimensions.code_total_length) >> 1;
+        (SCREEN_WIDTH - MIN(SCREEN_WIDTH, scene_state->ui_precalculated_dimensions.code_total_length)) >> 1;
     scene_state->ui_precalculated_dimensions.code_offset_y =
         SCREEN_HEIGHT_CENTER - (scene_state->active_font->height >> 1);
 
