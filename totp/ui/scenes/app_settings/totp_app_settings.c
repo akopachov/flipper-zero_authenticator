@@ -129,8 +129,9 @@ void totp_scene_app_settings_activate(PluginState* plugin_state) {
 
     update_formatted_automation_initial_delay(scene_state);
     update_formatted_automation_kb_layout_name(scene_state);
-    
-    scene_state->split_token_into_groups = TOKEN_GROUPING_LIST_VALUES_INDEXES[plugin_state->split_token_into_groups];
+
+    scene_state->split_token_into_groups =
+        TOKEN_GROUPING_LIST_VALUES_INDEXES[plugin_state->split_token_into_groups];
 }
 
 void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plugin_state) {
@@ -211,7 +212,7 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
             SCREEN_WIDTH - 36 - UI_CONTROL_VSCROLL_WIDTH,
             YES_NO_LIST[scene_state->notification_vibro],
             scene_state->selected_control == VibroSwitch);
-    } else if (scene_state->selected_control < SplitTokenIntoGroupsSelect) {
+    } else if(scene_state->selected_control < SplitTokenIntoGroupsSelect) {
         canvas_set_font(canvas, FontPrimary);
         canvas_draw_str_aligned(
             canvas, 0, 192 - scene_state->y_offset, AlignLeft, AlignTop, "Automation");
@@ -298,18 +299,12 @@ void totp_scene_app_settings_render(Canvas* const canvas, const PluginState* plu
 #endif
     } else {
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(
-            canvas, 0, 256 - scene_state->y_offset, AlignLeft, AlignTop, "UI");
+        canvas_draw_str_aligned(canvas, 0, 256 - scene_state->y_offset, AlignLeft, AlignTop, "UI");
         canvas_set_font(canvas, FontSecondary);
 
         canvas_draw_str_aligned(
-            canvas,
-            0,
-            273 - scene_state->y_offset,
-            AlignLeft,
-            AlignTop,
-            "Digit grouping:");
-        
+            canvas, 0, 273 - scene_state->y_offset, AlignLeft, AlignTop, "Digit grouping:");
+
         ui_control_select_render(
             canvas,
             64,
@@ -356,11 +351,11 @@ bool totp_scene_app_settings_handle_event(
             }
 #endif
 
-            if(scene_state->selected_control > 
+            if(scene_state->selected_control >
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
-                BadBtProfileSelect
+               BadBtProfileSelect
 #else
-                AutomationDelaySelect
+               AutomationDelaySelect
 #endif
             ) {
                 scene_state->y_offset = SCREEN_HEIGHT * 4;
@@ -388,12 +383,12 @@ bool totp_scene_app_settings_handle_event(
             }
 #endif
 
-            if(scene_state->selected_control > 
-    #ifdef TOTP_BADBT_AUTOMATION_ENABLED
-                    BadBtProfileSelect
-    #else
-                    AutomationDelaySelect
-    #endif
+            if(scene_state->selected_control >
+#ifdef TOTP_BADBT_AUTOMATION_ENABLED
+               BadBtProfileSelect
+#else
+               AutomationDelaySelect
+#endif
             ) {
                 scene_state->y_offset = SCREEN_HEIGHT * 4;
             } else if(scene_state->selected_control > VibroSwitch) {
@@ -539,7 +534,8 @@ bool totp_scene_app_settings_handle_event(
                 plugin_state->active_font_index = scene_state->active_font_index;
                 plugin_state->automation_kb_layout = scene_state->automation_kb_layout;
                 plugin_state->automation_initial_delay = scene_state->automation_initial_delay;
-                plugin_state->split_token_into_groups = TOKEN_GROUPING_LIST_VALUES[scene_state->split_token_into_groups];
+                plugin_state->split_token_into_groups =
+                    TOKEN_GROUPING_LIST_VALUES[scene_state->split_token_into_groups];
 
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
                 if(((scene_state->automation_method & AutomationMethodBadBt) == 0 ||
