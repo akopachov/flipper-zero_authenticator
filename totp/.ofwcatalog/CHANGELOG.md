@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.19.0 - May 7 2025
+
+* feat: space between groups of digits ([#259](https://github.com/akopachov/flipper-zero_authenticator/issues/259))
+
 ## v5.18.0 - Apr 29 2025
 
 * fix: tokens longer than 64 bytes are leading to incorrect codes ([#260](https://github.com/akopachov/flipper-zero_authenticator/issues/260))
