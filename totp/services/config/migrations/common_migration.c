@@ -140,6 +140,32 @@ bool totp_config_migrate_to_latest(
 
         flipper_format_rewind(fff_backup_data_file);
 
+        if(flipper_format_read_string(
+               fff_backup_data_file, TOTP_CONFIG_KEY_AUTOMATION_HID_CONFIG, temp_str)) {
+            flipper_format_write_string(
+                fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_HID_CONFIG, temp_str);
+        } else {
+            flipper_format_write_string_cstr(
+                fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_HID_CONFIG, TOTP_CONFIG_AUTOMATION_HID_CONFIG_DEFAULT);
+        }
+
+        flipper_format_rewind(fff_backup_data_file);
+
+        if(flipper_format_read_string(
+               fff_backup_data_file, TOTP_CONFIG_KEY_UI_TOKEN_DIGIT_GROUPING, temp_str)) {
+            flipper_format_write_string(
+                fff_data_file, TOTP_CONFIG_KEY_UI_TOKEN_DIGIT_GROUPING, temp_str);
+        } else {
+            uint32_t default_token_grouping = 0;
+            flipper_format_write_uint32(
+                fff_data_file,
+                TOTP_CONFIG_KEY_UI_TOKEN_DIGIT_GROUPING,
+                &default_token_grouping,
+                1);
+        }
+
+        flipper_format_rewind(fff_backup_data_file);
+
         while(true) {
             if(!flipper_format_read_string(
                    fff_backup_data_file, TOTP_CONFIG_KEY_TOKEN_NAME, temp_str)) {

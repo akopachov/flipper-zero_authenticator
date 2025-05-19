@@ -190,6 +190,11 @@ static bool totp_open_config_file(Storage* storage, FlipperFormat** file) {
 
         tmp_uint32 = 0; //-V1048
         flipper_format_write_uint32(fff_data_file, TOTP_CONFIG_KEY_FONT, &tmp_uint32, 1);
+
+        flipper_format_write_string_cstr(
+                fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_HID_CONFIG, TOTP_CONFIG_AUTOMATION_HID_CONFIG_DEFAULT);
+
+        tmp_uint32 = 0; //-V1048
         flipper_format_write_uint32(
             fff_data_file, TOTP_CONFIG_KEY_UI_TOKEN_DIGIT_GROUPING, &tmp_uint32, 1);
 
@@ -298,6 +303,7 @@ bool totp_config_file_update_automation_method(const PluginState* plugin_state) 
 bool totp_config_file_update_user_settings(const PluginState* plugin_state) {
     FlipperFormat* file = plugin_state->config_file_context->config_file;
     flipper_format_rewind(file);
+    FuriString* tmp_str = furi_string_alloc();
     bool update_result = false;
     do {
         if(!flipper_format_insert_or_update_float(
@@ -341,6 +347,21 @@ bool totp_config_file_update_user_settings(const PluginState* plugin_state) {
             break;
         }
 
+        furi_string_printf(
+            tmp_str, 
+            "%" PRIX32 ":%" PRIX32 " %s:%s",
+            plugin_state->hid_config.vid,
+            plugin_state->hid_config.pid,
+            plugin_state->hid_config.manuf,
+            plugin_state->hid_config.product);
+
+        if (!flipper_format_insert_or_update_string(
+            file,
+            TOTP_CONFIG_KEY_AUTOMATION_HID_CONFIG,
+            tmp_str)) {
+            break;
+        }
+
         tmp_uint32 = plugin_state->split_token_into_groups;
         if(!flipper_format_insert_or_update_uint32(
                file, TOTP_CONFIG_KEY_UI_TOKEN_DIGIT_GROUPING, &tmp_uint32, 1)) {
@@ -349,6 +370,7 @@ bool totp_config_file_update_user_settings(const PluginState* plugin_state) {
 
         update_result = true;
     } while(false);
+    furi_string_free(tmp_str);
 
     return update_result;
 }
@@ -584,6 +606,25 @@ bool totp_config_file_load(PluginState* const plugin_state) {
         if(!flipper_format_read_uint32(
                fff_data_file, TOTP_CONFIG_KEY_UI_TOKEN_DIGIT_GROUPING, &tmp_uint32, 1)) {
             tmp_uint32 = 0;
+        }
+
+        if(!flipper_format_rewind(fff_data_file)) {
+            break;
+        }
+
+        if(flipper_format_read_string(
+               fff_data_file, TOTP_CONFIG_KEY_AUTOMATION_HID_CONFIG, temp_str)) {
+            sscanf(
+                furi_string_get_cstr(temp_str),
+                "%" PRIX32 ":%" PRIX32 " %31[^\r\n:]:%31[^\r\n]",
+                &plugin_state->hid_config.vid,
+                &plugin_state->hid_config.pid,
+                plugin_state->hid_config.manuf,
+                plugin_state->hid_config.product);
+        }
+
+        if(!flipper_format_rewind(fff_data_file)) {
+            break;
         }
 
         plugin_state->split_token_into_groups = tmp_uint32;

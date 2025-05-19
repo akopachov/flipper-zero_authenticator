@@ -17,6 +17,7 @@ struct TotpUsbTypeCodeWorkerContext {
     FuriHalUsbInterface* usb_mode_prev;
     AutomationKeyboardLayout keyboard_layout;
     uint16_t initial_delay;
+    FuriHalUsbHidConfig* hid_config;
 };
 
 static void totp_type_code_worker_restore_usb_mode(TotpUsbTypeCodeWorkerContext* context) {
@@ -43,7 +44,7 @@ static bool hid_key_release(uint16_t button, void* context) {
 static void totp_type_code_worker_type_code(TotpUsbTypeCodeWorkerContext* context) {
     context->usb_mode_prev = furi_hal_usb_get_config();
     furi_hal_usb_unlock();
-    furi_check(furi_hal_usb_set_config(&usb_hid, NULL) == true);
+    furi_check(furi_hal_usb_set_config(&usb_hid, context->hid_config) == true);
     uint8_t i = 0;
     do {
         furi_delay_ms(500);
@@ -100,7 +101,8 @@ TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
     uint8_t code_buffer_size,
     FuriMutex* code_buffer_sync,
     AutomationKeyboardLayout keyboard_layout,
-    uint16_t initial_delay) {
+    uint16_t initial_delay,
+    FuriHalUsbHidConfig* hid_config) {
     TotpUsbTypeCodeWorkerContext* context = malloc(sizeof(TotpUsbTypeCodeWorkerContext));
     furi_check(context != NULL);
     context->code_buffer = code_buffer;
@@ -110,6 +112,7 @@ TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
     context->usb_mode_prev = NULL;
     context->keyboard_layout = keyboard_layout;
     context->initial_delay = initial_delay;
+    context->hid_config = hid_config;
     furi_thread_set_name(context->thread, "TOTPUsbHidWorker");
     furi_thread_set_stack_size(context->thread, 1024);
     furi_thread_set_context(context->thread, context);

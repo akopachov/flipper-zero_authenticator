@@ -218,7 +218,8 @@ void totp_scene_generate_token_activate(PluginState* plugin_state) {
             TokenDigitsCountMax + 1,
             scene_state->last_code_update_sync,
             plugin_state->automation_kb_layout,
-            plugin_state->automation_initial_delay);
+            plugin_state->automation_initial_delay,
+            &plugin_state->hid_config);
     }
 
     scene_state->active_font = totp_font_info_alloc();

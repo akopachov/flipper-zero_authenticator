@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <furi/core/mutex.h>
+#include <furi_hal_usb_hid.h>
 #include "../../types/automation_kb_layout.h"
 
 typedef uint8_t TotpUsbTypeCodeWorkerEvent;
@@ -37,6 +38,7 @@ enum TotpUsbTypeCodeWorkerEvents {
  * @param code_buffer_sync code buffer synchronization primitive
  * @param keyboard_layout keyboard layout to be used
  * @param initial_delay initial delay before starting automation
+ * @param hid_config HID configuration
  * @return worker context
  */
 TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
@@ -44,7 +46,8 @@ TotpUsbTypeCodeWorkerContext* totp_usb_type_code_worker_start(
     uint8_t code_buffer_size,
     FuriMutex* code_buffer_sync,
     AutomationKeyboardLayout keyboard_layout,
-    uint16_t initial_delay);
+    uint16_t initial_delay,
+    FuriHalUsbHidConfig* hid_config);
 
 /**
  * @brief Stops USB token input automation worker

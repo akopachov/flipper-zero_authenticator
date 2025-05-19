@@ -3,6 +3,7 @@
 #include <notification/notification.h>
 #include <gui/gui.h>
 #include <dialogs/dialogs.h>
+#include <furi_hal_usb_hid.h>
 #include "../config/app/config.h"
 #include "../ui/totp_scenes_enum.h"
 #include "../services/config/config_file_context.h"
@@ -68,6 +69,11 @@ typedef struct {
      * @brief Automation initial delay between "user initiated automation" and "code sending key-press events" events
      */
     uint16_t automation_initial_delay;
+
+    /**
+     * @brief USB HID configuration for automation
+     */
+    FuriHalUsbHidConfig hid_config;
 
 #ifdef TOTP_BADBT_AUTOMATION_ENABLED
     /**
