@@ -1,0 +1,13 @@
+version = 1
+
+[[annotations]]
+path = ["AGENTS.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 Ross A. Baker <ross@rossabaker.com>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["CLAUDE.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Ross A. Baker <ross@rossabaker.com>"
+SPDX-License-Identifier = "CC0-1.0"
