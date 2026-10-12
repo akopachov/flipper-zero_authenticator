@@ -18,6 +18,13 @@ extern "C" {
 bool totp_crypto_check_key_slot(uint8_t key_slot);
 
 /**
+ * @brief Checks whether given crypto version is supported by this build
+ * @param crypto_version crypto version
+ * @return \c true if crypto version is supported; \c false otherwise
+ */
+bool totp_crypto_is_version_supported(uint8_t crypto_version);
+
+/**
  * @brief Encrypts plain data using built-in certificate and given initialization vector (IV)
  * @param plain_data plain data to be encrypted
  * @param plain_data_length plain data length

@@ -16,3 +16,10 @@ DialogMessageButton totp_dialogs_config_loading_error(PluginState* plugin_state)
  * @return dialog button which user pressed to close the dialog
  */
 DialogMessageButton totp_dialogs_config_updating_error(PluginState* plugin_state);
+
+/**
+ * @brief Shows dialog about the fact that config file uses unsupported crypto version and offers to reset it
+ * @param plugin_state application state
+ * @return \c DialogMessageButtonRight if user agreed to reset config file; other dialog button otherwise
+ */
+DialogMessageButton totp_dialogs_config_unsupported_crypto_version(PluginState* plugin_state);

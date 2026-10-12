@@ -13,6 +13,12 @@ extern "C" {
 typedef uint8_t TotpConfigFileOpenResult;
 typedef uint8_t TotpConfigFileUpdateResult;
 
+typedef enum {
+    TotpConfigFileLoadResultSuccess,
+    TotpConfigFileLoadResultError,
+    TotpConfigFileLoadResultUnsupportedCryptoVersion
+} TotpConfigFileLoadResult;
+
 /**
  * @brief Tries to take a config file backup
  * @param plugin_state application state
@@ -23,9 +29,9 @@ char* totp_config_file_backup(const PluginState* plugin_state);
 /**
  * @brief Loads basic information from an application config file into application state without loading all the tokens
  * @param plugin_state application state
- * @return Config file open result
+ * @return Config file load result
  */
-bool totp_config_file_load(PluginState* const plugin_state);
+TotpConfigFileLoadResult totp_config_file_load(PluginState* const plugin_state);
 
 /**
  * @brief Updates timezone offset in an application config file
@@ -67,6 +73,13 @@ bool totp_config_file_update_crypto_signatures(const PluginState* plugin_state);
  * @param plugin_state application state
  */
 void totp_config_file_reset(PluginState* const plugin_state);
+
+/**
+ * @brief Takes a backup of config file and then resets all the settings to default
+ * @param plugin_state application state
+ * @return \c true if backup taken and config file reset; \c false otherwise
+ */
+bool totp_config_file_backup_and_reset(PluginState* const plugin_state);
 
 /**
  * @brief Closes config file and releases all the resources

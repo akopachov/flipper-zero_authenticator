@@ -22,6 +22,22 @@ bool totp_crypto_check_key_slot(uint8_t key_slot) {
            furi_hal_crypto_enclave_unload_key(key_slot);
 }
 
+bool totp_crypto_is_version_supported(uint8_t crypto_version) {
+#ifdef TOTP_OBSOLETE_CRYPTO_V1_COMPATIBILITY_ENABLED
+    if(crypto_version == 1) {
+        return true;
+    }
+#endif
+
+#ifdef TOTP_OBSOLETE_CRYPTO_V2_COMPATIBILITY_ENABLED
+    if(crypto_version == 2) {
+        return true;
+    }
+#endif
+
+    return crypto_version == 3;
+}
+
 uint8_t* totp_crypto_encrypt(
     const uint8_t* plain_data,
     const size_t plain_data_length,

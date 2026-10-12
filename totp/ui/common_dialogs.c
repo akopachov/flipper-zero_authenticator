@@ -18,3 +18,19 @@ DialogMessageButton totp_dialogs_config_loading_error(PluginState* plugin_state)
 DialogMessageButton totp_dialogs_config_updating_error(PluginState* plugin_state) {
     return totp_dialogs_common(plugin_state, "An error has occurred\nduring updating config file");
 }
+
+DialogMessageButton totp_dialogs_config_unsupported_crypto_version(PluginState* plugin_state) {
+    char text[80];
+    snprintf(
+        text,
+        sizeof(text),
+        "Config encryption v%" PRIu8 "\nis not supported.\nReset? Backup is kept.",
+        plugin_state->crypto_settings.crypto_version);
+    DialogMessage* message = dialog_message_alloc();
+    dialog_message_set_buttons(message, "Exit", NULL, "Reset");
+    dialog_message_set_text(
+        message, text, SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, AlignCenter, AlignCenter);
+    DialogMessageButton result = dialog_message_show(plugin_state->dialogs_app, message);
+    dialog_message_free(message);
+    return result;
+}

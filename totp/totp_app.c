@@ -157,7 +157,19 @@ static bool totp_plugin_state_init(PluginState* const plugin_state) {
     plugin_state->dialogs_app = furi_record_open(RECORD_DIALOGS);
     memset(&plugin_state->crypto_settings.iv[0], 0, CRYPTO_IV_LENGTH);
 
-    if(!totp_config_file_load(plugin_state)) {
+    TotpConfigFileLoadResult load_result = totp_config_file_load(plugin_state);
+    if(load_result == TotpConfigFileLoadResultUnsupportedCryptoVersion) {
+        if(totp_dialogs_config_unsupported_crypto_version(plugin_state) !=
+           DialogMessageButtonRight) {
+            return false;
+        }
+
+        load_result = totp_config_file_backup_and_reset(plugin_state) ?
+                          totp_config_file_load(plugin_state) :
+                          TotpConfigFileLoadResultError;
+    }
+
+    if(load_result != TotpConfigFileLoadResultSuccess) {
         totp_dialogs_config_loading_error(plugin_state);
         return false;
     }

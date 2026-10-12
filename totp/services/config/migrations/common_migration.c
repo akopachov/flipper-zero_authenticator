@@ -245,8 +245,8 @@ bool totp_config_migrate_to_latest(
         Stream* stream = flipper_format_get_raw_stream(fff_data_file);
         size_t current_pos = stream_tell(stream);
         size_t total_size = stream_size(stream);
-        if(current_pos < total_size) {
-            stream_delete(stream, total_size - current_pos);
+        if(current_pos < total_size && !stream_delete(stream, total_size - current_pos)) {
+            break;
         }
 
         result = true;

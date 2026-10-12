@@ -353,17 +353,17 @@ bool totp_config_file_update_user_settings(const PluginState* plugin_state) {
     return update_result;
 }
 
-bool totp_config_file_load(PluginState* const plugin_state) {
+TotpConfigFileLoadResult totp_config_file_load(PluginState* const plugin_state) {
     Storage* storage = totp_open_storage();
     FlipperFormat* fff_data_file;
     if(!totp_open_config_file(storage, &fff_data_file)) {
         totp_close_storage();
-        return false;
+        return TotpConfigFileLoadResultError;
     }
 
     flipper_format_rewind(fff_data_file);
 
-    bool result = false;
+    TotpConfigFileLoadResult result = TotpConfigFileLoadResultError;
 
     plugin_state->timezone_offset = 0;
 
@@ -384,11 +384,13 @@ bool totp_config_file_load(PluginState* const plugin_state) {
                 file_version,
                 CONFIG_FILE_ACTUAL_VERSION);
             totp_close_config_file(fff_data_file);
+            fff_data_file = NULL;
 
             char* backup_path = totp_config_file_backup_i(storage);
 
             if(backup_path != NULL) {
                 if(totp_open_config_file(storage, &fff_data_file) != true) {
+                    free(backup_path);
                     break;
                 }
 
@@ -396,6 +398,7 @@ bool totp_config_file_load(PluginState* const plugin_state) {
                 if(!flipper_format_file_open_existing(fff_backup_data_file, backup_path)) {
                     flipper_format_file_close(fff_backup_data_file);
                     flipper_format_free(fff_backup_data_file);
+                    free(backup_path);
                     break;
                 }
 
@@ -410,13 +413,24 @@ bool totp_config_file_load(PluginState* const plugin_state) {
                         LOGGING_TAG,
                         "An error occurred during migration to version %" PRId16,
                         CONFIG_FILE_ACTUAL_VERSION);
+                    flipper_format_file_close(fff_backup_data_file);
+                    flipper_format_free(fff_backup_data_file);
+                    free(backup_path);
                     break;
                 }
 
                 flipper_format_file_close(fff_backup_data_file);
                 flipper_format_free(fff_backup_data_file);
-                flipper_format_rewind(fff_data_file);
                 free(backup_path);
+
+                // Reopen config file to commit migrated content to the storage right away.
+                // Otherwise new file size is not persisted until file is closed and
+                // if app crashes later, tail of the old file content re-appears
+                totp_close_config_file(fff_data_file);
+                fff_data_file = NULL;
+                if(!totp_open_config_file(storage, &fff_data_file)) {
+                    break;
+                }
             } else {
                 FURI_LOG_E(
                     LOGGING_TAG,
@@ -435,6 +449,15 @@ bool totp_config_file_load(PluginState* const plugin_state) {
         }
 
         plugin_state->crypto_settings.crypto_version = tmp_uint32;
+
+        if(!totp_crypto_is_version_supported(plugin_state->crypto_settings.crypto_version)) {
+            FURI_LOG_E(
+                LOGGING_TAG,
+                "Crypto v%" PRIu8 " is not supported",
+                plugin_state->crypto_settings.crypto_version);
+            result = TotpConfigFileLoadResultUnsupportedCryptoVersion;
+            break;
+        }
 
         if(!flipper_format_rewind(fff_data_file)) {
             break;
@@ -597,8 +620,13 @@ bool totp_config_file_load(PluginState* const plugin_state) {
                 storage,
                 plugin_state->config_file_context->config_file,
                 &plugin_state->crypto_settings);
-        result = true;
+        result = TotpConfigFileLoadResultSuccess;
     } while(false);
+
+    if(result != TotpConfigFileLoadResultSuccess) {
+        totp_close_config_file(fff_data_file);
+        totp_close_storage();
+    }
 
     furi_string_free(temp_str);
     return result;
@@ -665,6 +693,16 @@ void totp_config_file_reset(PluginState* const plugin_state) {
     Storage* storage = totp_open_storage();
     storage_simply_remove(storage, CONFIG_FILE_PATH);
     totp_close_storage();
+}
+
+bool totp_config_file_backup_and_reset(PluginState* const plugin_state) {
+    totp_config_file_close(plugin_state);
+    Storage* storage = totp_open_storage();
+    char* backup_path = totp_config_file_backup_i(storage);
+    bool result = backup_path != NULL && storage_simply_remove(storage, CONFIG_FILE_PATH);
+    free(backup_path);
+    totp_close_storage();
+    return result;
 }
 
 bool totp_config_file_update_encryption(
